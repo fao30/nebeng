@@ -1,4 +1,5 @@
 import { amapEnabled, amapReverse, amapSearch } from './amap';
+import { maptilerEnabled, maptilerReverse, maptilerSearch } from './maptiler';
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/$/, '');
 
@@ -47,27 +48,52 @@ export function qs(params) {
 
 // Free geocoding via OpenStreetMap Nominatim (fine for testing; use a paid
 // provider for production traffic).
-export async function geocode(query) {
-  if (amapEnabled()) {
+const geoCache = new Map();
+
+/**
+ * Address search. Provider order: MapTiler (if key set) → AMap (if key set)
+ * → OpenStreetMap Nominatim. Results are cached per query; pass an
+ * AbortSignal so a newer keystroke cancels the older request.
+ */
+export async function geocode(query, { signal, near } = {}) {
+  const key = query.trim().toLowerCase();
+  if (geoCache.has(key)) return geoCache.get(key);
+  let rows = null;
+  if (maptilerEnabled()) {
     try {
-      const r = await amapSearch(query);
-      if (r.length) return r;
-    } catch {
-      /* fall back to OpenStreetMap */
+      rows = await maptilerSearch(query, { signal, near });
+    } catch (e) {
+      if (e.name === 'AbortError') throw e;
     }
   }
-  return nominatimSearch(query);
+  if (!rows?.length && amapEnabled()) {
+    try {
+      rows = await amapSearch(query);
+    } catch {
+      /* next provider */
+    }
+  }
+  if (!rows?.length) rows = await nominatimSearch(query, signal);
+  geoCache.set(key, rows);
+  return rows;
 }
 
-async function nominatimSearch(query) {
+async function nominatimSearch(query, signal) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=6&countrycodes=id&accept-language=id&q=${encodeURIComponent(query)}`;
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
+  const res = await fetch(url, { headers: { Accept: 'application/json' }, signal });
   if (!res.ok) throw new Error('Pencarian alamat gagal');
   const rows = await res.json();
   return rows.map((r) => ({ lat: parseFloat(r.lat), lng: parseFloat(r.lon), label: shortLabel(r.display_name) }));
 }
 
 export async function reverseGeocode(lat, lng) {
+  if (maptilerEnabled()) {
+    try {
+      return await maptilerReverse(lat, lng);
+    } catch {
+      /* next provider */
+    }
+  }
   if (amapEnabled()) {
     try {
       return await amapReverse(lat, lng);

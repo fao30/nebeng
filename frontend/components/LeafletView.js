@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { useLeaflet, DEFAULT_CENTER, pinIcon } from '@/lib/leaflet';
+import { maptilerEnabled, maptilerTiles } from '@/lib/maptiler';
 
 /**
  * markers: [{ lat, lng, kind, text, popup }]
@@ -20,10 +21,22 @@ export default function LeafletView({ markers = [], lines = [], circles = [], on
   useEffect(() => {
     if (!L || !el.current || map.current) return;
     const m = L.map(el.current, { zoomControl: true, attributionControl: true }).setView(DEFAULT_CENTER, 9);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap',
-    }).addTo(m);
+    const osm = () =>
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' });
+    if (maptilerEnabled()) {
+      // MapTiler tiles; if they keep failing (bad key, origin not allowed), use OpenStreetMap.
+      const mt = maptilerTiles();
+      const tiles = L.tileLayer(mt.url, mt.options).addTo(m);
+      let errors = 0;
+      tiles.on('tileerror', () => {
+        if (++errors === 4) {
+          m.removeLayer(tiles);
+          osm().addTo(m);
+        }
+      });
+    } else {
+      osm().addTo(m);
+    }
     layer.current = L.layerGroup().addTo(m);
     m.on('click', (e) => clickRef.current && clickRef.current({ lat: e.latlng.lat, lng: e.latlng.lng }));
     map.current = m;

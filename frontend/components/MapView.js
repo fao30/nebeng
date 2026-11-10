@@ -1,12 +1,15 @@
 'use client';
 import { useState } from 'react';
 import { amapEnabled } from '@/lib/amap';
+import { maptilerEnabled } from '@/lib/maptiler';
 import AmapView from './AmapView';
 import LeafletView from './LeafletView';
 
 /**
- * Map used across the app. Uses AMap when NEXT_PUBLIC_AMAP_KEY is set and
- * falls back to OpenStreetMap (Leaflet) if there is no key or AMap fails.
+ * Map used across the app. Provider order:
+ *   1. MapTiler tiles (NEXT_PUBLIC_MAPTILER_KEY) on Leaflet
+ *   2. AMap (NEXT_PUBLIC_AMAP_KEY), falling back to OpenStreetMap if it fails
+ *   3. OpenStreetMap tiles on Leaflet
  *
  * markers: [{ lat, lng, kind, text, popup }]
  * lines:   [{ points: [...] } or { from, to }, kind: route | walk ]
@@ -15,6 +18,6 @@ import LeafletView from './LeafletView';
  */
 export default function MapView(props) {
   const [amapFailed, setAmapFailed] = useState(false);
-  if (amapEnabled() && !amapFailed) return <AmapView {...props} onFail={() => setAmapFailed(true)} />;
+  if (!maptilerEnabled() && amapEnabled() && !amapFailed) return <AmapView {...props} onFail={() => setAmapFailed(true)} />;
   return <LeafletView {...props} />;
 }

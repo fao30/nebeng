@@ -85,22 +85,21 @@ npm run dev              # http://localhost:3000
 
 Catatan: GPS browser hanya jalan di `https://` atau `localhost`. Untuk tes live sharing dari HP, pakai URL hasil deploy.
 
-## Peta: AMap (opsional)
+## Peta dan pencarian alamat
 
-Frontend memakai **AMap Maps Platform** (versi internasional, [mapsplatform.opnavi.com](https://mapsplatform.opnavi.com))
-bila key diisi, dan otomatis kembali ke OpenStreetMap bila tidak ada key atau AMap gagal dimuat.
-Pencarian alamat memakai AMap AutoComplete dengan cadangan Nominatim.
+Urutan penyedia (otomatis, dengan cadangan bila gagal):
 
-Isi di Vercel → Settings → Environment Variables, lalu Redeploy:
+1. **MapTiler** — `NEXT_PUBLIC_MAPTILER_KEY`. Tile peta di Leaflet + Geocoding API untuk kolom titik jemput/antar
+   (dibatasi ke Indonesia, diurutkan dekat lokasi). Jika tile gagal dimuat, peta beralih ke OpenStreetMap.
+2. **AMap** ([mapsplatform.opnavi.com](https://mapsplatform.opnavi.com)) — `NEXT_PUBLIC_AMAP_KEY`,
+   `NEXT_PUBLIC_AMAP_SECURITY_CODE`, `NEXT_PUBLIC_AMAP_REGION` (`sg`/`de`). Dipakai hanya bila MapTiler tidak diisi.
+3. **OpenStreetMap + Nominatim** — tanpa key.
 
-| Env | Isi |
-|---|---|
-| `NEXT_PUBLIC_AMAP_KEY` | Key dari konsol AMap (platform: JavaScript API) |
-| `NEXT_PUBLIC_AMAP_SECURITY_CODE` | Security code dari konsol AMap |
-| `NEXT_PUBLIC_AMAP_REGION` | `sg` (Singapura, default) atau `de` |
+Pencarian memakai `useDebounce` (350 ms): request baru dikirim setelah berhenti mengetik, request lama
+dibatalkan (AbortController), dan hasil disimpan di cache.
 
-Di konsol AMap, isi **Domain whitelist** dengan domain Vercel Anda (dan `localhost` untuk development)
-supaya key tidak bisa dipakai situs lain. Jangan commit key/security code: repo ini publik.
+Isi env di Vercel → Settings → Environment Variables, lalu **Redeploy**. Batasi key ke domain Anda di dashboard
+penyedia (MapTiler: *Allowed HTTP Origins*). Jangan commit key: repo ini publik.
 
 ## Deploy untuk testing
 

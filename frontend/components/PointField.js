@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Icon from './Icon';
 import { geocode, reverseGeocode } from '@/lib/api';
+import { useDebounce } from '@/lib/useDebounce';
 
 /**
  * Place picker: type to get suggestions, use current location, or (when the
@@ -15,7 +16,7 @@ export default function PointField({ label, value, onChange, active, onActivate,
   const [err, setErr] = useState('');
   const wrap = useRef(null);
   const input = useRef(null);
-  const timer = useRef(null);
+  const debounced = useDebounce(q.trim(), 350);
 
   useEffect(() => setEditing(!value), [value]);
 
@@ -25,23 +26,35 @@ export default function PointField({ label, value, onChange, active, onActivate,
     return () => document.removeEventListener('mousedown', close);
   }, []);
 
+  // Search only after typing pauses (useDebounce); a newer query aborts the
+  // request still in flight so stale results never overwrite fresh ones.
+  useEffect(() => {
+    if (debounced.length < 3) {
+      setResults([]);
+      setBusy(false);
+      return;
+    }
+    const ctrl = new AbortController();
+    setBusy(true);
+    setErr('');
+    geocode(debounced, { signal: ctrl.signal, near: value || undefined })
+      .then((r) => {
+        if (ctrl.signal.aborted) return;
+        setResults(r);
+        if (!r.length) setErr('Tidak ditemukan. Coba nama jalan atau tempat lain, atau pilih di peta.');
+      })
+      .catch((e) => {
+        if (e.name !== 'AbortError') setErr('Pencarian alamat gagal. Coba lagi atau pilih di peta.');
+      })
+      .finally(() => !ctrl.signal.aborted && setBusy(false));
+    return () => ctrl.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debounced]);
+
   function onType(v) {
     setQ(v);
     setErr('');
-    clearTimeout(timer.current);
-    if (v.trim().length < 3) return setResults([]);
-    timer.current = setTimeout(async () => {
-      setBusy(true);
-      try {
-        const r = await geocode(v.trim());
-        setResults(r);
-        if (!r.length) setErr('Tidak ditemukan. Coba nama jalan atau tempat lain, atau pilih di peta.');
-      } catch (e) {
-        setErr(e.message);
-      } finally {
-        setBusy(false);
-      }
-    }, 450);
+    if (v.trim().length < 3) setResults([]);
   }
 
   function pick(p) {
@@ -115,6 +128,13 @@ export default function PointField({ label, value, onChange, active, onActivate,
           </button>
         )}
       </div>
+      {busy && q.trim().length >= 3 && !results.length && (
+        <div className="place-menu">
+          <p className="small muted" style={{ padding: 10 }}>
+            Mencari…
+          </p>
+        </div>
+      )}
       {results.length > 0 && (
         <div className="place-menu" role="listbox">
           {results.map((r, i) => (
