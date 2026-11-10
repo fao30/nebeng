@@ -85,6 +85,23 @@ npm run dev              # http://localhost:3000
 
 Catatan: GPS browser hanya jalan di `https://` atau `localhost`. Untuk tes live sharing dari HP, pakai URL hasil deploy.
 
+## Peta: AMap (opsional)
+
+Frontend memakai **AMap Maps Platform** (versi internasional, [mapsplatform.opnavi.com](https://mapsplatform.opnavi.com))
+bila key diisi, dan otomatis kembali ke OpenStreetMap bila tidak ada key atau AMap gagal dimuat.
+Pencarian alamat memakai AMap AutoComplete dengan cadangan Nominatim.
+
+Isi di Vercel → Settings → Environment Variables, lalu Redeploy:
+
+| Env | Isi |
+|---|---|
+| `NEXT_PUBLIC_AMAP_KEY` | Key dari konsol AMap (platform: JavaScript API) |
+| `NEXT_PUBLIC_AMAP_SECURITY_CODE` | Security code dari konsol AMap |
+| `NEXT_PUBLIC_AMAP_REGION` | `sg` (Singapura, default) atau `de` |
+
+Di konsol AMap, isi **Domain whitelist** dengan domain Vercel Anda (dan `localhost` untuk development)
+supaya key tidak bisa dipakai situs lain. Jangan commit key/security code: repo ini publik.
+
 ## Deploy untuk testing
 
 Vercel cocok untuk Next.js, tetapi tidak cocok untuk API ini (butuh proses yang terus hidup untuk live streaming

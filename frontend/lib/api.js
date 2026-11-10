@@ -1,3 +1,5 @@
+import { amapEnabled, amapReverse, amapSearch } from './amap';
+
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/$/, '');
 
 export function getToken() {
@@ -46,6 +48,18 @@ export function qs(params) {
 // Free geocoding via OpenStreetMap Nominatim (fine for testing; use a paid
 // provider for production traffic).
 export async function geocode(query) {
+  if (amapEnabled()) {
+    try {
+      const r = await amapSearch(query);
+      if (r.length) return r;
+    } catch {
+      /* fall back to OpenStreetMap */
+    }
+  }
+  return nominatimSearch(query);
+}
+
+async function nominatimSearch(query) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=6&countrycodes=id&accept-language=id&q=${encodeURIComponent(query)}`;
   const res = await fetch(url, { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error('Pencarian alamat gagal');
@@ -54,6 +68,13 @@ export async function geocode(query) {
 }
 
 export async function reverseGeocode(lat, lng) {
+  if (amapEnabled()) {
+    try {
+      return await amapReverse(lat, lng);
+    } catch {
+      /* fall back to OpenStreetMap */
+    }
+  }
   try {
     const url = `https://nominatim.openstreetmap.org/reverse?format=json&zoom=16&accept-language=id&lat=${lat}&lon=${lng}`;
     const res = await fetch(url);
