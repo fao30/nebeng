@@ -21,6 +21,7 @@ export default function LeafletView({ markers = [], lines = [], circles = [], on
   useEffect(() => {
     if (!L || !el.current || map.current) return;
     const m = L.map(el.current, { zoomControl: true, attributionControl: true }).setView(DEFAULT_CENTER, 9);
+    m.attributionControl.setPrefix(false); // keep only the required map data credits
     const osm = () =>
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' });
     if (maptilerEnabled()) {
