@@ -89,7 +89,7 @@ function LivePanel({ trip, live, passenger }) {
           kind="outline"
           icon="copy"
           title="Kirim link pantau ke keluarga"
-          onPress={() => Linking.openURL(`https://wa.me/?text=${encodeURIComponent(`Pantau perjalanan Nebeng saya: ${WEB_URL}/live/${trip.share_token}`)}`)}
+          onPress={() => Linking.openURL(`https://wa.me/?text=${encodeURIComponent(`Pantau perjalanan Numpang saya: ${WEB_URL}/live/${trip.share_token}`)}`)}
         />
       )}
     </Card>

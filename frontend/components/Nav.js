@@ -62,9 +62,9 @@ export default function Nav() {
     <>
       <header className="header">
         <div className="header-inner">
-          <Link href="/" className="brand" aria-label="Nebeng, beranda">
+          <Link href="/" className="brand" aria-label="Numpang, beranda">
             <BrandGlyph />
-            <span className={user ? 'brand-word' : ''}>nebeng</span>
+            <span className={user ? 'brand-word' : ''}>numpang</span>
           </Link>
           {user && (
             <nav className="nav" aria-label="Menu utama">
@@ -131,7 +131,7 @@ export default function Nav() {
               ? 'Verifikasi identitas sedang ditinjau admin, maksimal 1x24 jam.'
               : user.identity_status === 'rejected'
                 ? 'Verifikasi identitas ditolak. Ketuk untuk melihat alasan dan kirim ulang.'
-                : 'Verifikasi wajah dan KTP/SIM untuk mulai nebeng.'}
+                : 'Verifikasi wajah dan KTP/SIM untuk mulai numpang.'}
           </span>
           <Icon name="chevronRight" className="icon-sm" />
         </Link>

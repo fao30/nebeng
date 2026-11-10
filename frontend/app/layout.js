@@ -3,7 +3,7 @@ import { Providers } from './providers';
 import Nav from '@/components/Nav';
 
 export const metadata = {
-  title: 'Nebeng — berbagi tumpangan',
+  title: 'Numpang — berbagi tumpangan',
   description: 'Cari tumpangan searah atau isi kursi kosong mobil Anda, dalam kota maupun antar kota.',
 };
 

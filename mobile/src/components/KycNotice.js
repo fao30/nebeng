@@ -24,12 +24,12 @@ export default function KycNotice({ need = 'identity', navigation }) {
           ? 'Verifikasi identitas ditolak'
           : 'Verifikasi identitas dulu';
   const body = pending
-    ? 'Tim Nebeng memeriksa data Anda, maksimal 1x24 jam. Kami kirim notifikasi begitu selesai.'
+    ? 'Tim Numpang memeriksa data Anda, maksimal 1x24 jam. Kami kirim notifikasi begitu selesai.'
     : rejected
       ? 'Lihat alasannya dan kirim ulang foto di halaman verifikasi.'
       : need === 'vehicle'
         ? 'Untuk keamanan penumpang, pemilik mobil wajib verifikasi wajah, KTP/SIM, foto mobil tampak depan, dan STNK. Diperiksa admin maksimal 1x24 jam.'
-        : 'Untuk keamanan bersama, setiap akun wajib verifikasi wajah dan KTP/SIM sebelum nebeng. Diperiksa admin maksimal 1x24 jam.';
+        : 'Untuk keamanan bersama, setiap akun wajib verifikasi wajah dan KTP/SIM sebelum numpang. Diperiksa admin maksimal 1x24 jam.';
   return (
     <View style={{ flexDirection: 'row', gap: 12, padding: 16, borderRadius: 18, backgroundColor: pending ? colors.amber50 : colors.primary50 }}>
       <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: pending ? colors.amber : colors.primary, alignItems: 'center', justifyContent: 'center' }}>

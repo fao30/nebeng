@@ -109,7 +109,7 @@ func main() {
 	mux.HandleFunc("GET /api/live/{token}/stream", api.h(api.liveStream))
 
 	addr := ":" + env("PORT", "8080")
-	log.Printf("nebeng API listening on %s", addr)
+	log.Printf("numpang API listening on %s", addr)
 	srv := &http.Server{Addr: addr, Handler: logging(cors(mux)), ReadHeaderTimeout: 10 * time.Second}
 	log.Fatal(srv.ListenAndServe())
 }

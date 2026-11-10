@@ -140,7 +140,7 @@ func requireIdentity(u *User) error {
 		return nil
 	}
 	return apiError{status: 403, code: "kyc_required",
-		msg: "Verifikasi identitas dulu sebelum nebeng. Status verifikasi Anda: " + kycStatusText(u.IdentityStatus) + "."}
+		msg: "Verifikasi identitas dulu sebelum numpang. Status verifikasi Anda: " + kycStatusText(u.IdentityStatus) + "."}
 }
 
 // requireVehicle: creating trips and offering rides need a verified identity and car.

@@ -29,12 +29,12 @@ export function KycNotice({ need = 'identity', compact }) {
           ? 'Verifikasi identitas ditolak'
           : 'Verifikasi identitas dulu';
   const body = pending
-    ? 'Tim Nebeng memeriksa data Anda, maksimal 1x24 jam. Kami kirim notifikasi begitu selesai.'
+    ? 'Tim Numpang memeriksa data Anda, maksimal 1x24 jam. Kami kirim notifikasi begitu selesai.'
     : rejected
       ? 'Lihat alasannya dan kirim ulang foto di halaman verifikasi.'
       : need === 'vehicle'
         ? 'Untuk keamanan penumpang, pemilik mobil wajib verifikasi wajah, KTP/SIM, foto mobil tampak depan, dan STNK. Diperiksa admin maksimal 1x24 jam.'
-        : 'Untuk keamanan bersama, setiap akun wajib verifikasi wajah dan KTP/SIM sebelum nebeng. Diperiksa admin maksimal 1x24 jam.';
+        : 'Untuk keamanan bersama, setiap akun wajib verifikasi wajah dan KTP/SIM sebelum numpang. Diperiksa admin maksimal 1x24 jam.';
   return (
     <div className={`kyc-notice ${compact ? 'kyc-notice-compact' : 'card'} ${pending ? 'is-pending' : ''}`}>
       <span className="kyc-notice-icon">

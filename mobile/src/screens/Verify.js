@@ -124,7 +124,7 @@ export default function Verify() {
     >
       <View style={{ gap: 16 }}>
         <Banner tone="mint" icon="shield">
-          Foto hanya dilihat tim verifikasi Nebeng, disimpan terenkripsi, dan tidak pernah ditampilkan ke pengguna lain. Pengguna lain hanya melihat tanda "Terverifikasi".
+          Foto hanya dilihat tim verifikasi Numpang, disimpan terenkripsi, dan tidak pernah ditampilkan ke pengguna lain. Pengguna lain hanya melihat tanda "Terverifikasi".
         </Banner>
         <ErrorText>{err}</ErrorText>
 
@@ -182,7 +182,7 @@ export default function Verify() {
             </>
           )}
         </Card>
-        <Text style={[t.xs, { textAlign: 'center' }]}>Semua verifikasi diperiksa manual oleh admin Nebeng, maksimal 1x24 jam.</Text>
+        <Text style={[t.xs, { textAlign: 'center' }]}>Semua verifikasi diperiksa manual oleh admin Numpang, maksimal 1x24 jam.</Text>
       </View>
     </Screen>
   );

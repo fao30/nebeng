@@ -61,8 +61,8 @@ export default function Masuk() {
     <div className="auth">
       <div className="stack" style={{ '--gap': '6px', alignItems: 'center', textAlign: 'center', marginBottom: 20 }}>
         <BrandGlyph />
-        <h1>{tab === 'login' ? 'Selamat datang kembali' : 'Buat akun Nebeng'}</h1>
-        <p className="muted">Satu akun untuk nebeng dan memberi tumpangan.</p>
+        <h1>{tab === 'login' ? 'Selamat datang kembali' : 'Buat akun Numpang'}</h1>
+        <p className="muted">Satu akun untuk numpang dan memberi tumpangan.</p>
       </div>
       {blocked && (
         <div className="banner banner-danger" role="alert" style={{ marginBottom: 14 }}>

@@ -223,21 +223,21 @@ function Verify() {
       <div className="page-head">
         <div>
           <h1>Verifikasi akun</h1>
-          <p>Untuk keamanan bersama, semua yang nebeng dan pemilik mobil dikenal identitasnya.</p>
+          <p>Untuk keamanan bersama, semua yang numpang dan pemilik mobil dikenal identitasnya.</p>
         </div>
       </div>
 
       {welcome && idSt === '' && (
         <div className="banner" style={{ marginBottom: 16 }}>
           <b>Akun Anda sudah dibuat 🎉</b>
-          <span className="small">Satu langkah lagi: verifikasi wajah dan KTP/SIM supaya bisa mulai nebeng.</span>
+          <span className="small">Satu langkah lagi: verifikasi wajah dan KTP/SIM supaya bisa mulai numpang.</span>
         </div>
       )}
 
       <div className="kyc-privacy small">
         <Icon name="shield" />
         <span>
-          Foto hanya dilihat tim verifikasi Nebeng, disimpan terenkripsi, dan <b>tidak pernah ditampilkan ke pengguna lain</b>. Pengguna lain hanya melihat
+          Foto hanya dilihat tim verifikasi Numpang, disimpan terenkripsi, dan <b>tidak pernah ditampilkan ke pengguna lain</b>. Pengguna lain hanya melihat
           tanda &ldquo;Terverifikasi&rdquo;. <Link href="/syarat">Baca S&K bagian verifikasi</Link>.
         </span>
       </div>
@@ -272,7 +272,7 @@ function Verify() {
         )}
       </section>
       <p className="xs muted" style={{ textAlign: 'center', margin: '8px 0 24px' }}>
-        Semua verifikasi diperiksa manual oleh admin Nebeng, maksimal 1x24 jam.
+        Semua verifikasi diperiksa manual oleh admin Numpang, maksimal 1x24 jam.
       </p>
     </div>
   );

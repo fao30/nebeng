@@ -37,8 +37,8 @@ export default function Auth() {
     <Screen>
       <View style={{ alignItems: 'center', gap: 8, marginTop: 24, marginBottom: 20 }}>
         <Logo size={56} />
-        <Text style={t.h1}>{tab === 'login' ? 'Selamat datang' : 'Buat akun Nebeng'}</Text>
-        <Text style={[t.small, { textAlign: 'center' }]}>Satu akun untuk nebeng dan memberi tumpangan.</Text>
+        <Text style={t.h1}>{tab === 'login' ? 'Selamat datang' : 'Buat akun Numpang'}</Text>
+        <Text style={[t.small, { textAlign: 'center' }]}>Satu akun untuk numpang dan memberi tumpangan.</Text>
       </View>
       {blocked ? (
         <View style={{ marginBottom: 14 }}>

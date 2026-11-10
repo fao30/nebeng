@@ -392,7 +392,7 @@ function ReportSheet({ booking: b, targetRole, open, onClose }) {
         <View style={{ alignItems: 'center', gap: 8, padding: 16 }}>
           <Icon name="shield" size={36} color={colors.primary} />
           <Text style={t.h3}>Laporan terkirim</Text>
-          <Text style={[t.small, { textAlign: 'center' }]}>Admin Nebeng akan meninjau laporan Anda. Kabarnya muncul di notifikasi. Jika Anda dalam bahaya, hubungi 112.</Text>
+          <Text style={[t.small, { textAlign: 'center' }]}>Admin Numpang akan meninjau laporan Anda. Kabarnya muncul di notifikasi. Jika Anda dalam bahaya, hubungi 112.</Text>
         </View>
       ) : (
         <>

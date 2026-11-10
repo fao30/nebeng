@@ -83,7 +83,7 @@ function KycBar() {
           ? 'Verifikasi sedang ditinjau admin, maksimal 1x24 jam.'
           : user.identity_status === 'rejected'
             ? 'Verifikasi ditolak. Ketuk untuk kirim ulang.'
-            : 'Verifikasi wajah dan KTP/SIM untuk mulai nebeng.'}
+            : 'Verifikasi wajah dan KTP/SIM untuk mulai numpang.'}
       </Text>
       <Icon name="chevronRight" size={16} color={pending ? colors.amber : '#fff'} />
     </Pressable>

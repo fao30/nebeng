@@ -308,7 +308,7 @@ export function ReportSheet({ booking: b, targetRole, open, onClose }) {
         <div className="empty" style={{ padding: '24px 8px' }}>
           <Icon name="shield" />
           <h3>Laporan terkirim</h3>
-          <p>Admin Nebeng akan meninjau laporan Anda. Kabar tindak lanjutnya muncul di notifikasi. Jika Anda dalam bahaya, hubungi 112.</p>
+          <p>Admin Numpang akan meninjau laporan Anda. Kabar tindak lanjutnya muncul di notifikasi. Jika Anda dalam bahaya, hubungi 112.</p>
         </div>
       ) : (
         <div className="stack" style={{ '--gap': '14px' }}>

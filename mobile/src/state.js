@@ -23,7 +23,7 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     setBlockedHandler((msg) => {
-      setBlocked(msg || 'Akun Anda diblokir oleh admin Nebeng.');
+      setBlocked(msg || 'Akun Anda diblokir oleh admin Numpang.');
       signOut();
     });
     (async () => {
@@ -95,7 +95,7 @@ export function AppProvider({ children }) {
       } else if (msg.type === 'read' || msg.type === 'ready') {
         loadNotifs();
       } else if (msg.type === 'account' && msg.blocked) {
-        setBlocked(msg.message || 'Akun Anda diblokir oleh admin Nebeng.');
+        setBlocked(msg.message || 'Akun Anda diblokir oleh admin Numpang.');
         signOut();
       }
     });

@@ -247,7 +247,7 @@ func (a *API) onTripStatus(t *Trip, action string, affected []*Booking) {
 			if b.DroppedAt != nil && b.DroppedAt.Before(time.Now().Add(-time.Second)) {
 				continue // already told when they got off
 			}
-			n.Type, n.Title = NotifTripCompleted, "Trip selesai. Terima kasih sudah nebeng!"
+			n.Type, n.Title = NotifTripCompleted, "Trip selesai. Terima kasih sudah numpang!"
 			n.Body = b.leg() + " · " + rupiah(b.AgreedPrice) + " · beri rating pemilik mobil"
 			n.Link = "/trip/" + t.ID + "?rate=" + b.ID
 		case "cancel":

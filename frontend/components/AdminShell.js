@@ -32,7 +32,7 @@ export default function AdminShell({ title, desc, actions, children }) {
           )
         }
       >
-        Halaman ini hanya untuk akun admin Nebeng.
+        Halaman ini hanya untuk akun admin Numpang.
       </Empty>
     );
   return (

@@ -131,7 +131,7 @@ export default function Home() {
           <h1>
             Searah?
             <br />
-            Nebeng aja.
+            Numpang aja.
           </h1>
           <p className="hero-lead">
             Cari pemilik mobil yang lewat dekatmu, naik di titik jemputnya, dan bagi ongkos bensin dan tol. Semua akun terverifikasi wajah dan KTP.
@@ -275,7 +275,7 @@ export default function Home() {
       </section>
 
       <footer className="home-footer">
-        <span>© 2026 Nebeng</span>
+        <span>© 2026 Numpang</span>
         <span className="row" style={{ '--gap': '18px' }}>
           <Link href="/syarat">Syarat &amp; Ketentuan</Link>
           {!user && <Link href="/masuk">Masuk</Link>}

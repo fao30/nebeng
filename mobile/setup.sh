@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the Nebeng React Native (CLI) project on a Mac.
+# Builds the Numpang React Native (CLI) project on a Mac.
 #
 #   bash mobile/setup.sh [target-folder] [google-maps-android-key]
 #
@@ -48,8 +48,8 @@ npm install --save --no-audit --no-fund \
   @react-native-community/datetimepicker@8.2.0 \
   react-native-sse@1.2.1
 
-say "Nama aplikasi: Nebeng"
-node -e "const f='app.json',j=require('./'+f);j.displayName='Nebeng';require('fs').writeFileSync(f,JSON.stringify(j,null,2))"
+say "Nama aplikasi: Numpang"
+node -e "const f='app.json',j=require('./'+f);j.displayName='Numpang';require('fs').writeFileSync(f,JSON.stringify(j,null,2))"
 
 # ---------- Android ----------
 say "Android: izin lokasi, nama, arsitektur lama"
@@ -61,17 +61,17 @@ if [ -n "$MAPS_KEY" ]; then
   grep -q "com.google.android.geo.API_KEY" "$MANIFEST" || perl -0pi -e "s#(\s*)<activity#\$1<meta-data android:name=\"com.google.android.geo.API_KEY\" android:value=\"$MAPS_KEY\" />\$1<activity#" "$MANIFEST"
   sed -i '' "s/export const ANDROID_MAPS = false;/export const ANDROID_MAPS = true;/" src/config.js
 fi
-sed -i '' "s#<string name=\"app_name\">.*</string>#<string name=\"app_name\">Nebeng</string>#" android/app/src/main/res/values/strings.xml
+sed -i '' "s#<string name=\"app_name\">.*</string>#<string name=\"app_name\">Numpang</string>#" android/app/src/main/res/values/strings.xml
 sed -i '' "s/^newArchEnabled=.*/newArchEnabled=false/" android/gradle.properties
 
 # ---------- iOS ----------
 say "iOS: izin kamera, foto, lokasi, nama"
 PLIST="ios/$NAME/Info.plist"
 setp() { /usr/libexec/PlistBuddy -c "Set :$1 $2" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :$1 string $2" "$PLIST"; }
-setp CFBundleDisplayName "Nebeng"
-setp NSCameraUsageDescription "Nebeng memakai kamera untuk verifikasi wajah, foto KTP/SIM, foto mobil, dan STNK."
-setp NSPhotoLibraryUsageDescription "Nebeng membuka galeri untuk memilih foto KTP/SIM, mobil, atau STNK."
-setp NSLocationWhenInUseUsageDescription "Nebeng memakai lokasi untuk titik jemput dan berbagi posisi saat trip berlangsung."
+setp CFBundleDisplayName "Numpang"
+setp NSCameraUsageDescription "Numpang memakai kamera untuk verifikasi wajah, foto KTP/SIM, foto mobil, dan STNK."
+setp NSPhotoLibraryUsageDescription "Numpang membuka galeri untuk memilih foto KTP/SIM, mobil, atau STNK."
+setp NSLocationWhenInUseUsageDescription "Numpang memakai lokasi untuk titik jemput dan berbagi posisi saat trip berlangsung."
 
 say "iOS: CocoaPods (arsitektur lama)"
 cd ios

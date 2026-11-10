@@ -1,7 +1,7 @@
 export default function manifest() {
   return {
-    name: 'Nebeng: berbagi tumpangan',
-    short_name: 'Nebeng',
+    name: 'Numpang: berbagi tumpangan',
+    short_name: 'Numpang',
     description: 'Cari tumpangan searah atau isi kursi kosong mobil Anda, dalam kota maupun antar kota.',
     start_url: '/',
     display: 'standalone',

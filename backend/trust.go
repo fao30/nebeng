@@ -627,7 +627,7 @@ func (a *API) cleanupBlocked(u *User, now time.Time) {
 }
 
 func blockedErr(u *User) error {
-	msg := "Akun Anda diblokir oleh admin Nebeng"
+	msg := "Akun Anda diblokir oleh admin Numpang"
 	if u.BlockedReason != "" {
 		msg += ": " + u.BlockedReason
 	}

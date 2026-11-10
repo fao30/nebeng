@@ -18,7 +18,7 @@ export function accountBlocked(message) {
   if (typeof window === 'undefined') return;
   try {
     localStorage.removeItem('nebeng_token');
-    sessionStorage.setItem('nebeng_blocked', message || 'Akun Anda diblokir oleh admin Nebeng.');
+    sessionStorage.setItem('nebeng_blocked', message || 'Akun Anda diblokir oleh admin Numpang.');
   } catch {
     /* storage unavailable */
   }

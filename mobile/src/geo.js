@@ -41,7 +41,7 @@ export async function askLocationPermission() {
   if (Platform.OS === 'android') {
     const r = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
       title: 'Izin lokasi',
-      message: 'Nebeng memakai lokasi untuk titik jemput dan berbagi posisi saat trip berlangsung.',
+      message: 'Numpang memakai lokasi untuk titik jemput dan berbagi posisi saat trip berlangsung.',
       buttonPositive: 'Izinkan',
       buttonNegative: 'Nanti',
     });

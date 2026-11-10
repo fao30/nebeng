@@ -411,7 +411,7 @@ func (a *API) register(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	if in.Terms != TermsVersion {
-		return errf(400, "setujui Syarat & Ketentuan Nebeng untuk mendaftar")
+		return errf(400, "setujui Syarat & Ketentuan Numpang untuk mendaftar")
 	}
 	in.Email = strings.ToLower(strings.TrimSpace(in.Email))
 	in.Name = strings.TrimSpace(in.Name)

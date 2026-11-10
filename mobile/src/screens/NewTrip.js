@@ -135,7 +135,7 @@ export default function NewTrip({ navigation }) {
             style={[s.input, { fontSize: 20, fontWeight: '800' }]}
             accessibilityLabel="Harga per kursi"
           />
-          {suggestion > 0 && <Text style={t.xs}>Saran Nebeng: {fmtRp(suggestion)}. Harga untuk sebagian rute dihitung otomatis per ruas.</Text>}
+          {suggestion > 0 && <Text style={t.xs}>Saran Numpang: {fmtRp(suggestion)}. Harga untuk sebagian rute dihitung otomatis per ruas.</Text>}
           <Toggle label="Boleh ditawar" value={negotiable} onChange={setNegotiable} />
           <Toggle label="Pesan instan" sub="Penumpang yang membayar harga Anda langsung terkonfirmasi" value={instant} onChange={setInstant} />
         </Card>

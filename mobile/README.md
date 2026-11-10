@@ -1,13 +1,13 @@
-# Nebeng mobile (React Native CLI)
+# Numpang mobile (React Native CLI)
 
-Android and iOS app for Nebeng. Same backend and accounts as the web app
+Android and iOS app for Numpang. Same backend and accounts as the web app
 (`https://nebeng-api.onrender.com`, set in `src/config.js`).
 
 This folder holds the app source (`App.js`, `src/`). The native projects
 (`android/`, `ios/`) are generated on a Mac by `setup.sh`:
 
 ```bash
-git clone https://github.com/fao30/nebeng.git && cd nebeng
+git clone https://github.com/fao30/nebeng.git && cd numpang
 bash mobile/setup.sh ~/Desktop/NebengMobile            # add an Android Maps key as 2nd arg if you have one
 cd ~/Desktop/NebengMobile
 npx react-native run-ios          # Xcode + iOS Simulator

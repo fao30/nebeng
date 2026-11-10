@@ -12,14 +12,14 @@ export function TermsContent() {
     <div className="terms">
       <p className="xs muted">Berlaku sejak 10 November 2026</p>
       <p>
-        Nebeng menghubungkan orang yang ingin <b>nebeng</b> (<b>penumpang</b>) dengan <b>pemilik mobil</b> yang searah dan punya kursi kosong. Dengan membuat akun,
+        Numpang menghubungkan orang yang ingin <b>numpang</b> (<b>penumpang</b>) dengan <b>pemilik mobil</b> yang searah dan punya kursi kosong. Dengan membuat akun,
         Anda setuju dengan ketentuan di bawah ini.
       </p>
 
       <div className="terms-key">
         <div className="terms-key-head">
           <Icon name="shield" />
-          <b>Aturan utama: semua perjalanan dan pembayaran lewat aplikasi Nebeng</b>
+          <b>Aturan utama: semua perjalanan dan pembayaran lewat aplikasi Numpang</b>
         </div>
         <div className="terms-key-cols">
           <div>
@@ -30,7 +30,7 @@ export function TermsContent() {
             <ul>
               <li>
                 <b>Jangan pernah mengambil penumpang di luar aplikasi</b>, termasuk kesepakatan lewat WhatsApp, telepon, atau langsung di jalan tanpa pesanan
-                di Nebeng.
+                di Numpang.
               </li>
               <li>
                 Perjalanan di luar aplikasi <b>tidak bisa dilacak</b>: tidak ada lokasi live, tidak ada kode naik, dan tidak ada data siapa yang ada di mobil
@@ -58,7 +58,7 @@ export function TermsContent() {
         </div>
         <p className="small">
           Nomor telepon yang terlihat setelah pesanan disetujui hanya untuk koordinasi penjemputan trip tersebut, bukan untuk membuat perjalanan baru di luar
-          Nebeng. Pelanggaran aturan ini dapat membuat akun <b>diblokir</b>.
+          Numpang. Pelanggaran aturan ini dapat membuat akun <b>diblokir</b>.
         </p>
       </div>
 
@@ -71,8 +71,8 @@ export function TermsContent() {
 
       <h3>2. Verifikasi identitas dan kendaraan</h3>
       <p>
-        Nebeng berarti naik mobil orang lain atau membawa orang lain di mobil Anda. Supaya setiap orang di dalam mobil jelas identitasnya, semua akun wajib
-        diverifikasi sebelum bisa nebeng atau memberi tumpangan.
+        Numpang berarti naik mobil orang lain atau membawa orang lain di mobil Anda. Supaya setiap orang di dalam mobil jelas identitasnya, semua akun wajib
+        diverifikasi sebelum bisa numpang atau memberi tumpangan.
       </p>
       <ul>
         <li>
@@ -84,7 +84,7 @@ export function TermsContent() {
           masih berlaku. Pelat dan merek mobil di aplikasi harus sama dengan STNK.
         </li>
         <li>
-          Semua data diperiksa <b>manual oleh admin Nebeng, maksimal 1x24 jam</b> sejak dikirim. Hasilnya dikirim lewat notifikasi. Jika ditolak, alasannya
+          Semua data diperiksa <b>manual oleh admin Numpang, maksimal 1x24 jam</b> sejak dikirim. Hasilnya dikirim lewat notifikasi. Jika ditolak, alasannya
           ditampilkan dan Anda bisa mengirim ulang.
         </li>
         <li>Nama akun harus sama dengan nama di KTP/SIM. Setelah diverifikasi, nama dan data mobil hanya bisa diubah lewat admin atau verifikasi ulang.</li>
@@ -94,7 +94,7 @@ export function TermsContent() {
           berwenang.
         </li>
         <li>
-          Foto verifikasi <b>disimpan terenkripsi</b> dan <b>hanya bisa dilihat oleh tim verifikasi Nebeng</b>. Foto KTP/SIM, wajah, STNK, dan nomor
+          Foto verifikasi <b>disimpan terenkripsi</b> dan <b>hanya bisa dilihat oleh tim verifikasi Numpang</b>. Foto KTP/SIM, wajah, STNK, dan nomor
           identitas Anda <b>tidak pernah ditampilkan ke pengguna lain</b>; mereka hanya melihat tanda &ldquo;Terverifikasi&rdquo;. Data ini hanya
           dibagikan kepada aparat penegak hukum jika diwajibkan oleh hukum.
         </li>
@@ -146,7 +146,7 @@ export function TermsContent() {
       <ul>
         <li>Pelecehan, ancaman, kekerasan, atau diskriminasi dalam bentuk apa pun.</li>
         <li>Membawa narkoba, senjata, atau barang terlarang lainnya.</li>
-        <li>Akun palsu, penipuan, atau memakai Nebeng untuk usaha angkutan tanpa izin.</li>
+        <li>Akun palsu, penipuan, atau memakai Numpang untuk usaha angkutan tanpa izin.</li>
       </ul>
 
       <h3>9. Pemblokiran akun</h3>
@@ -163,7 +163,7 @@ export function TermsContent() {
 
       <h3>11. Batas tanggung jawab</h3>
       <p>
-        Nebeng adalah platform penghubung, bukan perusahaan angkutan. Kami tidak bertanggung jawab atas perjalanan, pembayaran, atau kesepakatan yang
+        Numpang adalah platform penghubung, bukan perusahaan angkutan. Kami tidak bertanggung jawab atas perjalanan, pembayaran, atau kesepakatan yang
         dibuat di luar aplikasi.
       </p>
 
@@ -200,9 +200,9 @@ export function TermsModal({ open, onAccept, onClose, busy, acceptLabel = 'Setuj
   if (!open) return null;
   return (
     <div className="sheet-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}>
-      <div className="sheet terms-sheet" role="dialog" aria-modal="true" aria-label="Syarat & Ketentuan Nebeng">
+      <div className="sheet terms-sheet" role="dialog" aria-modal="true" aria-label="Syarat & Ketentuan Numpang">
         <div className="sheet-head">
-          <h3>Syarat & Ketentuan Nebeng</h3>
+          <h3>Syarat & Ketentuan Numpang</h3>
           {onClose && (
             <button className="btn btn-ghost icon-btn" onClick={onClose} aria-label="Tutup">
               <Icon name="x" />
@@ -216,7 +216,7 @@ export function TermsModal({ open, onAccept, onClose, busy, acceptLabel = 'Setuj
           <label className="terms-check">
             <input type="checkbox" checked={ok} onChange={(e) => setOk(e.target.checked)} />
             <span>
-              Saya sudah membaca dan menyetujui Syarat & Ketentuan, dan <b>tidak akan melakukan perjalanan atau pembayaran di luar aplikasi Nebeng</b>.
+              Saya sudah membaca dan menyetujui Syarat & Ketentuan, dan <b>tidak akan melakukan perjalanan atau pembayaran di luar aplikasi Numpang</b>.
             </span>
           </label>
           <button className="btn btn-primary btn-block" disabled={!ok || busy} onClick={onAccept}>
