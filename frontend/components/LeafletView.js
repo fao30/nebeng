@@ -54,9 +54,9 @@ export default function LeafletView({ markers = [], lines = [], circles = [], on
     circles.forEach((c) => {
       L.circle([c.lat, c.lng], {
         radius: c.radiusKm * 1000,
-        color: '#0B5D45',
+        color: '#155DFC',
         weight: 1,
-        fillColor: '#0B5D45',
+        fillColor: '#155DFC',
         fillOpacity: 0.07,
       }).addTo(g);
     });
@@ -65,8 +65,8 @@ export default function LeafletView({ markers = [], lines = [], circles = [], on
       L.polyline(
         pts.map((p) => [p.lat, p.lng]),
         ln.kind === 'walk'
-          ? { color: '#2A2E33', weight: 2, dashArray: '4 6' }
-          : { color: '#0B5D45', weight: 5, opacity: 0.85 },
+          ? { color: '#0B1736', weight: 2, dashArray: '4 6' }
+          : { color: '#155DFC', weight: 5, opacity: 0.85 },
       ).addTo(g);
     });
     markers.forEach((mk) => {
