@@ -185,7 +185,7 @@ function Minta() {
 
 export default function Page() {
   return (
-    <RequireAuth>
+    <RequireAuth kyc="identity">
       <Minta />
     </RequireAuth>
   );

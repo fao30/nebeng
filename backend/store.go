@@ -25,6 +25,7 @@ type Store struct {
 	Reports       map[string]*Report       `json:"reports"`
 	BoardingCodes map[string]string        `json:"boarding_codes"` // booking → code, never sent to drivers
 	CodeTries     map[string]int           `json:"code_tries"`
+	Verifications map[string]*Verification `json:"verifications"` // user:kind → latest submission
 	Settings      *Settings                `json:"settings"`
 
 	path    string
@@ -68,6 +69,9 @@ func NewStore(path string) *Store {
 	}
 	if s.BoardingCodes == nil {
 		s.BoardingCodes = map[string]string{}
+	}
+	if s.Verifications == nil {
+		s.Verifications = map[string]*Verification{}
 	}
 	if s.CodeTries == nil {
 		s.CodeTries = map[string]int{}
@@ -152,7 +156,8 @@ func (s *Store) publicUser(id string, withContact bool) *PublicUser {
 	// model: no surname, phone number or licence plate.
 	p := &PublicUser{ID: u.ID, Name: shortName(u.Name), CarModel: u.CarModel,
 		DriverRating: avg(u.DriverRatingSum, u.DriverRatingCount), DriverRatings: u.DriverRatingCount,
-		PassengerRating: avg(u.PassengerRatingSum, u.PassengerRatingCount), PassengerRatings: u.PassengerRatingCount}
+		PassengerRating: avg(u.PassengerRatingSum, u.PassengerRatingCount), PassengerRatings: u.PassengerRatingCount,
+		Verified: identityOK(u), CarVerified: vehicleOK(u)}
 	if withContact {
 		p.Name, p.Phone, p.CarPlate = u.Name, u.Phone, u.CarPlate
 	}

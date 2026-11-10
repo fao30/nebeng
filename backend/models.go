@@ -20,6 +20,8 @@ type User struct {
 	SavedRoutes          []SavedRoute `json:"saved_routes,omitempty"`
 	TermsVersion         string       `json:"terms_version,omitempty"`
 	TermsAcceptedAt      *time.Time   `json:"terms_accepted_at,omitempty"`
+	IdentityStatus       string       `json:"identity_status,omitempty"` // "", pending, approved, rejected
+	VehicleStatus        string       `json:"vehicle_status,omitempty"`
 	Blocked              bool         `json:"blocked,omitempty"`
 	BlockedReason        string       `json:"blocked_reason,omitempty"`
 	BlockedAt            *time.Time   `json:"blocked_at,omitempty"`
@@ -40,6 +42,8 @@ type PublicUser struct {
 	Phone            string  `json:"phone,omitempty"`
 	CarModel         string  `json:"car_model,omitempty"`
 	CarPlate         string  `json:"car_plate,omitempty"`
+	Verified         bool    `json:"verified,omitempty"`     // identity checked by admin
+	CarVerified      bool    `json:"car_verified,omitempty"` // car + STNK checked by admin
 	DriverRating     float64 `json:"driver_rating,omitempty"`
 	DriverRatings    int     `json:"driver_ratings,omitempty"`
 	PassengerRating  float64 `json:"passenger_rating,omitempty"`

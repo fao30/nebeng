@@ -14,6 +14,8 @@ import LivePanel from '@/components/LivePanel';
 import Participants from '@/components/Participants';
 import Icon from '@/components/Icon';
 import { Person, Stepper, Empty } from '@/components/ui';
+import { KycNotice } from '@/components/KycGate';
+import { identityOK } from '@/lib/kyc';
 import { Landmark } from '@/components/RouteTimeline';
 import { useBroadcastLocation, useLiveStream } from '@/lib/live';
 
@@ -242,6 +244,8 @@ function PassengerView({ trip, user, reload, from, to, setSel, init }) {
             <div className="card">
               <p className="muted">Trip ini sudah {tripStatusLabel[trip.status].toLowerCase()} dan tidak menerima pesanan.</p>
             </div>
+          ) : user && !identityOK(user) ? (
+            <KycNotice need="identity" compact />
           ) : user ? (
             <BookingPanel trip={trip} from={from} to={to} setSel={setSel} init={init} onDone={reload} />
           ) : (

@@ -7,12 +7,14 @@ import Icon from '@/components/Icon';
 import { Person } from '@/components/ui';
 import { Stars } from '@/components/Safety';
 import { fmtDay } from '@/lib/format';
+import Link from 'next/link';
+import { KYC_LABEL, KYC_TONE } from '@/lib/kyc';
 import { useApp } from '../providers';
 
 function ProfileForm() {
   const { user, setUser, signOut, mode, setMode } = useApp();
   const router = useRouter();
-  const [form, setForm] = useState({ name: '', phone: '', car_model: '', car_plate: '' });
+  const [form, setForm] = useState({ name: '', phone: '' });
   const [saved, setSaved] = useState('');
   const [err, setErr] = useState('');
   const [ratings, setRatings] = useState(null);
@@ -24,7 +26,7 @@ function ProfileForm() {
   }, []);
 
   useEffect(() => {
-    setForm({ name: user.name, phone: user.phone || '', car_model: user.car_model || '', car_plate: user.car_plate || '' });
+    setForm({ name: user.name, phone: user.phone || '' });
   }, [user]);
 
   const set = (k) => (e) => {
@@ -65,6 +67,18 @@ function ProfileForm() {
           <Icon name="chevronRight" />
         </a>
       )}
+      <Link href="/verifikasi" className="card row-between kyc-link" style={{ marginBottom: 16, color: 'inherit' }}>
+        <span className="row" style={{ '--gap': '10px' }}>
+          <Icon name="shield" />
+          <span>
+            <b>Verifikasi akun</b>
+            <span className="xs muted" style={{ display: 'block' }}>
+              Identitas: {KYC_LABEL[user.identity_status || '']} · Pemilik mobil: {KYC_LABEL[user.vehicle_status || '']}
+            </span>
+          </span>
+        </span>
+        <Icon name="chevronRight" />
+      </Link>
       <form className="card stack" style={{ '--gap': '14px' }} onSubmit={submit}>
         <h3>Data diri</h3>
         <label className="field">
@@ -77,16 +91,17 @@ function ProfileForm() {
           <span className="help">Hanya terlihat oleh pemilik mobil atau penumpang setelah harga disepakati.</span>
         </label>
         <h3 style={{ marginTop: 6 }}>Kendaraan</h3>
-        <div className="grid-2">
-          <label className="field">
-            <span className="field-label">Mobil</span>
-            <input className="input" value={form.car_model} onChange={set('car_model')} placeholder="Toyota Avanza" />
-          </label>
-          <label className="field">
-            <span className="field-label">Pelat nomor</span>
-            <input className="input" value={form.car_plate} onChange={set('car_plate')} placeholder="B 1234 XYZ" />
-          </label>
-        </div>
+        {user.car_model ? (
+          <p className="small">
+            {user.car_model} · <b>{user.car_plate}</b>{' '}
+            <span className={`chip ${KYC_TONE[user.vehicle_status || '']}`}>{KYC_LABEL[user.vehicle_status || '']}</span>
+          </p>
+        ) : (
+          <p className="small muted">Belum ada mobil terdaftar.</p>
+        )}
+        <span className="help">
+          Mobil diatur lewat <Link href="/verifikasi">verifikasi mobil</Link> (foto mobil tampak depan dan STNK).
+        </span>
         {err && <p className="error">{err}</p>}
         {saved && <p className="ok">{saved}</p>}
         <button className="btn btn-primary">Simpan profil</button>

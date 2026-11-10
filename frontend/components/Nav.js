@@ -7,7 +7,9 @@ import { Avatar } from './ui';
 import { NotificationBell, NotificationToasts } from './Notifications';
 import { TERMS_VERSION, TermsModal } from './Terms';
 import { api } from '@/lib/api';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { onArrival } from '@/lib/notifications';
+import { identityOK } from '@/lib/kyc';
 
 const TABS = {
   passenger: [
@@ -39,6 +41,11 @@ export function BrandGlyph() {
 export default function Nav() {
   const { user, setUser, mode, setMode, signOut } = useApp();
   const [termsBusy, setTermsBusy] = useState(false);
+  // Verification decided by an admin: refresh the account so gates open at once.
+  useEffect(
+    () => onArrival((n) => n.type === 'kyc' && api('/me').then(setUser).catch(() => {})),
+    [setUser],
+  );
   const path = usePathname();
   const router = useRouter();
   if (path.startsWith('/live/')) return null;
@@ -116,6 +123,19 @@ export default function Nav() {
         </div>
       </header>
       {user && <NotificationToasts />}
+      {user && !identityOK(user) && !path.startsWith('/verifikasi') && !path.startsWith('/admin') && !path.startsWith('/syarat') && (
+        <Link href="/verifikasi" className={`kyc-bar ${user.identity_status === 'pending' ? 'is-pending' : ''}`}>
+          <Icon name={user.identity_status === 'pending' ? 'clock' : 'shield'} className="icon-sm" />
+          <span>
+            {user.identity_status === 'pending'
+              ? 'Verifikasi identitas sedang ditinjau admin, maksimal 1x24 jam.'
+              : user.identity_status === 'rejected'
+                ? 'Verifikasi identitas ditolak. Ketuk untuk melihat alasan dan kirim ulang.'
+                : 'Verifikasi wajah dan KTP/SIM untuk mulai nebeng.'}
+          </span>
+          <Icon name="chevronRight" className="icon-sm" />
+        </Link>
+      )}
       {/* Existing accounts accept new or updated terms before continuing. */}
       <TermsModal
         open={!!user && user.terms_version !== TERMS_VERSION && !path.startsWith('/syarat')}

@@ -18,6 +18,7 @@ type API struct {
 	hub    *LiveHub
 	signer Signer
 	loc    *time.Location
+	vault  *Vault
 }
 
 // ---------- helpers ----------
@@ -494,17 +495,20 @@ func (a *API) updateMe(w http.ResponseWriter, r *http.Request, uid string) error
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	u := s.Users[uid]
-	if in.Name != nil && strings.TrimSpace(*in.Name) != "" {
+	// The name must match the verified ID, and the car the verified STNK.
+	if in.Name != nil && strings.TrimSpace(*in.Name) != "" && strings.TrimSpace(*in.Name) != u.Name {
+		if u.IdentityStatus == KYCApproved || u.IdentityStatus == KYCPending {
+			return errf(409, "nama sudah terkunci sesuai KTP/SIM yang diverifikasi. Hubungi admin untuk mengubahnya.")
+		}
 		u.Name = strings.TrimSpace(*in.Name)
 	}
 	if in.Phone != nil {
 		u.Phone = strings.TrimSpace(*in.Phone)
 	}
-	if in.CarModel != nil {
-		u.CarModel = strings.TrimSpace(*in.CarModel)
-	}
-	if in.CarPlate != nil {
-		u.CarPlate = strings.ToUpper(strings.TrimSpace(*in.CarPlate))
+	carChanged := (in.CarModel != nil && strings.TrimSpace(*in.CarModel) != u.CarModel) ||
+		(in.CarPlate != nil && strings.ToUpper(strings.TrimSpace(*in.CarPlate)) != u.CarPlate)
+	if carChanged {
+		return errf(409, "data mobil diatur lewat verifikasi mobil (foto mobil dan STNK) di halaman Verifikasi")
 	}
 	s.Changed()
 	writeJSON(w, 200, selfView(u))
@@ -688,14 +692,11 @@ func (a *API) createTrip(w http.ResponseWriter, r *http.Request, uid string) err
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	u := s.Users[uid]
-	in.Vehicle = strings.TrimSpace(in.Vehicle)
-	in.Plate = strings.ToUpper(strings.TrimSpace(in.Plate))
-	if in.Vehicle == "" {
-		in.Vehicle = u.CarModel
+	if err := requireVehicle(u); err != nil {
+		return err
 	}
-	if in.Plate == "" {
-		in.Plate = u.CarPlate
-	}
+	// Trips always use the verified car.
+	in.Vehicle, in.Plate = u.CarModel, u.CarPlate
 	t := &Trip{ID: newID("trp"), DriverID: uid, Origin: in.Origin, Destination: in.Destination,
 		Stops: in.Stops, Luggage: in.Luggage, MaxLuggage: in.MaxLuggage, SegmentPrices: in.SegmentPrices,
 		DepartAt: in.DepartAt, Seats: in.Seats, PricePerSeat: in.PricePerSeat, Negotiable: in.Negotiable,
@@ -828,6 +829,9 @@ func (a *API) createBooking(w http.ResponseWriter, r *http.Request, uid string) 
 	}
 	if t.DriverID == uid {
 		return errf(400, "tidak bisa memesan trip sendiri")
+	}
+	if err := requireIdentity(s.Users[uid]); err != nil {
+		return err
 	}
 	if t.Status != TripScheduled {
 		return errf(409, "trip sudah tidak menerima penumpang")
@@ -1026,6 +1030,9 @@ func (a *API) createRequest(w http.ResponseWriter, r *http.Request, uid string) 
 	s := a.store
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := requireIdentity(s.Users[uid]); err != nil {
+		return err
+	}
 	req := &RideRequest{ID: newID("req"), PassengerID: uid, Origin: in.Origin, Destination: in.Destination,
 		DepartAt: in.DepartAt, Seats: in.Seats, Luggage: max(0, in.Luggage), Budget: in.Budget, Notes: in.Notes, Status: RequestOpen, CreatedAt: time.Now()}
 	s.Requests[req.ID] = req
@@ -1124,6 +1131,9 @@ func (a *API) offerOnRequest(w http.ResponseWriter, r *http.Request, uid string)
 	req := s.Requests[r.PathValue("id")]
 	if req == nil {
 		return errf(404, "permintaan tidak ditemukan")
+	}
+	if err := requireVehicle(s.Users[uid]); err != nil {
+		return err
 	}
 	if req.Status != RequestOpen {
 		return errf(409, "permintaan sudah tidak terbuka")

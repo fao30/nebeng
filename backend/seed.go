@@ -16,7 +16,11 @@ func Seed(s *Store) {
 	mk := func(name, email, phone, car, plate string) *User {
 		salt := randomToken(16)
 		u := &User{ID: newID("usr"), Name: name, Email: email, Phone: phone, CarModel: car, CarPlate: plate,
-			Salt: salt, PassHash: hashPassword("demo123", salt), CreatedAt: time.Now()}
+			Salt: salt, PassHash: hashPassword("demo123", salt), CreatedAt: time.Now(),
+			IdentityStatus: KYCApproved} // demo accounts are pre-verified
+		if car != "" {
+			u.VehicleStatus = KYCApproved
+		}
 		s.Users[u.ID] = u
 		return u
 	}

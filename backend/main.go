@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 	_ "time/tzdata" // so Asia/Jakarta works in minimal containers
@@ -28,7 +29,8 @@ func main() {
 	}
 
 	store := NewStore(env("DATA_FILE", "data/nebeng.json"))
-	api := &API{store: store, hub: NewLiveHub(), signer: Signer{secret: []byte(secret)}, loc: loc}
+	vault := NewVault(env("UPLOAD_DIR", filepath.Join(filepath.Dir(env("DATA_FILE", "data/nebeng.json")), "kyc")), env("KYC_KEY", secret))
+	api := &API{store: store, hub: NewLiveHub(), signer: Signer{secret: []byte(secret)}, loc: loc, vault: vault}
 	if env("SEED_DEMO", "true") == "true" {
 		Seed(store)
 	}
@@ -79,6 +81,11 @@ func main() {
 	mux.HandleFunc("POST /api/admin/reports/{id}", api.adminOnly(api.adminUpdateReport))
 	mux.HandleFunc("POST /api/admin/users/{id}/block", api.adminOnly(api.adminBlock))
 	mux.HandleFunc("POST /api/me/terms", api.auth(api.acceptTerms))
+	mux.HandleFunc("GET /api/kyc", api.auth(api.kycStatus))
+	mux.HandleFunc("POST /api/kyc/{kind}", api.auth(api.kycSubmit))
+	mux.HandleFunc("GET /api/kyc/files/{id}", api.auth(api.kycFile))
+	mux.HandleFunc("GET /api/admin/verifications", api.adminOnly(api.adminVerifications))
+	mux.HandleFunc("POST /api/admin/verifications/{id}", api.adminOnly(api.adminReviewVerification))
 	mux.HandleFunc("GET /api/settings", api.h(api.getSettings))
 	mux.HandleFunc("PUT /api/admin/settings", api.adminOnly(api.putSettings))
 	mux.HandleFunc("GET /api/admin/stats", api.adminOnly(api.adminStats))

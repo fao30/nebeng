@@ -31,6 +31,11 @@ export function Person({ user, sub, large, rating }) {
       <div className="person-text">
         <b>
           {user.name}
+          {user.verified && (
+            <span className="verified" title={rating === 'driver' && user.car_verified ? 'Identitas dan mobil terverifikasi' : 'Identitas terverifikasi'} aria-label="Terverifikasi">
+              <Icon name="check" />
+            </span>
+          )}
           {rating && <RatingBadge user={user} as={rating} />}
         </b>
         {sub && <span>{sub}</span>}

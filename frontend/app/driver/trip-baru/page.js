@@ -394,7 +394,7 @@ function StopAdder({ onAdd, active, onActivate }) {
 
 export default function Page() {
   return (
-    <RequireAuth>
+    <RequireAuth kyc="vehicle">
       <NewTrip />
     </RequireAuth>
   );

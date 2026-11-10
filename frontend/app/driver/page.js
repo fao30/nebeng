@@ -100,7 +100,7 @@ function DriverHome() {
 
 export default function Page() {
   return (
-    <RequireAuth>
+    <RequireAuth kyc="vehicle">
       <DriverHome />
     </RequireAuth>
   );

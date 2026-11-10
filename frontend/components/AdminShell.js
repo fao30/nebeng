@@ -7,6 +7,7 @@ import { Empty } from './ui';
 
 const TABS = [
   { href: '/admin', label: 'Ringkasan & tarif', icon: 'sliders' },
+  { href: '/admin/verifikasi', label: 'Verifikasi', icon: 'shield' },
   { href: '/admin/trip', label: 'Trip', icon: 'route' },
   { href: '/admin/percakapan', label: 'Percakapan', icon: 'message' },
   { href: '/admin/pengguna', label: 'Pengguna', icon: 'users' },

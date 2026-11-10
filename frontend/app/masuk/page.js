@@ -47,7 +47,8 @@ export default function Masuk() {
       setTerms(false);
       signIn(session);
       const next = new URLSearchParams(window.location.search).get('next');
-      router.push(next && next.startsWith('/') ? next : mode === 'driver' ? '/driver' : '/cari');
+      if (tab === 'register') router.push('/verifikasi?welcome=1');
+      else router.push(next && next.startsWith('/') ? next : mode === 'driver' ? '/driver' : '/cari');
     } catch (e) {
       setErr(e.message);
       setTerms(false);

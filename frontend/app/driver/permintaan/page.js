@@ -318,7 +318,7 @@ function OfferSheet({ req, trips, defaultTrip, onClose, onDone }) {
 
 export default function Page() {
   return (
-    <RequireAuth>
+    <RequireAuth kyc="vehicle">
       <Permintaan />
     </RequireAuth>
   );

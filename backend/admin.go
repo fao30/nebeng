@@ -76,6 +76,8 @@ type AdminUser struct {
 	TripsAsDrv       int        `json:"trips_as_driver"`
 	Bookings         int        `json:"bookings_as_passenger"`
 	Requests         int        `json:"requests"`
+	IdentityStatus   string     `json:"identity_status"`
+	VehicleStatus    string     `json:"vehicle_status"`
 	Blocked          bool       `json:"blocked"`
 	BlockedReason    string     `json:"blocked_reason,omitempty"`
 	BlockedAt        *time.Time `json:"blocked_at,omitempty"`
@@ -95,6 +97,7 @@ func (a *API) adminUser(id string) *AdminUser {
 	au := &AdminUser{ID: u.ID, Name: u.Name, Email: u.Email, Phone: u.Phone, CarModel: u.CarModel,
 		CarPlate: u.CarPlate, IsAdmin: u.IsAdmin, CreatedAt: u.CreatedAt,
 		Blocked: u.Blocked, BlockedReason: u.BlockedReason, BlockedAt: u.BlockedAt,
+		IdentityStatus: u.IdentityStatus, VehicleStatus: u.VehicleStatus,
 		DriverRating: avg(u.DriverRatingSum, u.DriverRatingCount), DriverRatings: u.DriverRatingCount,
 		PassengerRating: avg(u.PassengerRatingSum, u.PassengerRatingCount), PassengerRatings: u.PassengerRatingCount}
 	for _, rp := range a.store.Reports {

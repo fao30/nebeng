@@ -636,7 +636,7 @@ func blockedErr(u *User) error {
 
 // TermsVersion: bump when the Terms & Conditions change; users are asked to
 // accept the new version on their next visit.
-const TermsVersion = "2026-11-10"
+const TermsVersion = "2026-11-10.2"
 
 func (a *API) acceptTerms(w http.ResponseWriter, r *http.Request, uid string) error {
 	var in struct {

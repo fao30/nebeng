@@ -23,7 +23,8 @@ func ensureTeamAccounts(s *Store) {
 			s.Users[id].IsAdmin = true
 			continue
 		}
-		u := &User{ID: newID("usr"), Name: a.Name, Email: a.Email, Salt: a.Salt, PassHash: a.Hash, IsAdmin: true, CreatedAt: time.Now()}
+		u := &User{ID: newID("usr"), Name: a.Name, Email: a.Email, Salt: a.Salt, PassHash: a.Hash, IsAdmin: true, CreatedAt: time.Now(),
+			IdentityStatus: KYCApproved}
 		s.Users[u.ID] = u
 		s.byEmail[u.Email] = u.ID
 		log.Printf("team account ready: %s", a.Email)
