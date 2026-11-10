@@ -49,6 +49,7 @@ export default function Auth() {
       ) : null}
       <Card style={{ gap: 14 }}>
         <Segmented
+          full
           value={tab}
           onChange={(v) => {
             setTab(v);

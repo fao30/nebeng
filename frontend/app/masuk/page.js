@@ -71,15 +71,17 @@ export default function Masuk() {
         </div>
       )}
       <form onSubmit={submit} className="card stack" style={{ '--gap': '14px' }}>
-        <Segmented
-          label="Masuk atau daftar"
-          value={tab}
-          onChange={setTab}
-          options={[
-            { value: 'login', label: 'Masuk' },
-            { value: 'register', label: 'Daftar' },
-          ]}
-        />
+        <div className="seg-full">
+          <Segmented
+            label="Masuk atau daftar"
+            value={tab}
+            onChange={setTab}
+            options={[
+              { value: 'login', label: 'Masuk' },
+              { value: 'register', label: 'Daftar' },
+            ]}
+          />
+        </div>
         {tab === 'register' && (
           <>
             <label className="field">

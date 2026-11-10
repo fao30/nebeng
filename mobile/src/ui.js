@@ -202,11 +202,11 @@ export function Sheet({ open, onClose, title, children, footer }) {
   );
 }
 
-export function Segmented({ value, onChange, options }) {
+export function Segmented({ value, onChange, options, full }) {
   return (
-    <View style={s.seg}>
+    <View style={[s.seg, full && s.segFull]}>
       {options.map((o) => (
-        <Pressable key={o.value} onPress={() => onChange(o.value)} style={[s.segBtn, value === o.value && s.segOn]} accessibilityRole="tab" accessibilityState={{ selected: value === o.value }}>
+        <Pressable key={o.value} onPress={() => onChange(o.value)} style={[s.segBtn, full && s.segBtnFull, value === o.value && s.segOn]} accessibilityRole="tab" accessibilityState={{ selected: value === o.value }}>
           <Text style={[s.segText, value === o.value && { color: colors.ink }]}>{o.label}</Text>
         </Pressable>
       ))}
@@ -267,6 +267,8 @@ export const s = StyleSheet.create({
   sheetFoot: { paddingHorizontal: 16, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.line2 },
   seg: { flexDirection: 'row', backgroundColor: colors.line2, borderRadius: 999, padding: 3, borderWidth: 1, borderColor: colors.line, alignSelf: 'flex-start' },
   segBtn: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999 },
+  segFull: { alignSelf: 'stretch' },
+  segBtnFull: { flex: 1, alignItems: 'center', paddingVertical: 10 },
   segOn: { backgroundColor: colors.surface, ...shadow, shadowOpacity: 0.06, elevation: 1 },
   segText: { fontSize: 14, fontWeight: '700', color: colors.ink2 },
   banner: { flexDirection: 'row', gap: 12, padding: 14, borderRadius: radius.md, alignItems: 'flex-start' },

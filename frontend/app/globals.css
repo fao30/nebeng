@@ -3350,3 +3350,15 @@ h3 {
     display: none;
   }
 }
+
+/* full-width segmented control (sign in / sign up) */
+.seg-full .seg {
+  display: flex;
+  width: 100%;
+}
+.seg-full .seg button {
+  flex: 1;
+  justify-content: center;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+}
