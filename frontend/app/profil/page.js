@@ -52,7 +52,7 @@ function ProfileForm() {
             Penumpang
           </button>
           <button role="tab" aria-selected={mode === 'driver'} onClick={() => setMode('driver')}>
-            Driver
+            Pemilik mobil
           </button>
         </div>
       </div>
@@ -74,7 +74,7 @@ function ProfileForm() {
         <label className="field">
           <span className="field-label">Nomor WhatsApp</span>
           <input className="input" value={form.phone} onChange={set('phone')} autoComplete="tel" placeholder="08xxxxxxxxxx" />
-          <span className="help">Hanya terlihat oleh driver atau penumpang setelah harga disepakati.</span>
+          <span className="help">Hanya terlihat oleh pemilik mobil atau penumpang setelah harga disepakati.</span>
         </label>
         <h3 style={{ marginTop: 6 }}>Kendaraan</h3>
         <div className="grid-2">
@@ -95,7 +95,7 @@ function ProfileForm() {
         <h3>Rating Anda</h3>
         <div className="grid-2">
           {[
-            ['Sebagai driver', user.driver_rating_sum, user.driver_rating_count],
+            ['Sebagai pemilik mobil', user.driver_rating_sum, user.driver_rating_count],
             ['Sebagai penumpang', user.passenger_rating_sum, user.passenger_rating_count],
           ].map(([label, sum, n]) => (
             <div key={label} className="card-sub">
@@ -121,7 +121,7 @@ function ProfileForm() {
                 <div className="row-between">
                   <Stars value={r.stars} size="sm" />
                   <span className="xs muted">
-                    {r.from} · {r.to_role === 'driver' ? 'saat Anda driver' : 'saat Anda penumpang'} · {fmtDay(r.at)}
+                    {r.from} · {r.to_role === 'driver' ? 'saat Anda pemilik mobil' : 'saat Anda penumpang'} · {fmtDay(r.at)}
                   </span>
                 </div>
                 {r.tags?.length > 0 && <div className="xs ink2">{r.tags.join(' · ')}</div>}

@@ -85,7 +85,7 @@ export function BoardingPanel({ booking: b, role, onChange }) {
       <div className="row-between" style={{ alignItems: 'flex-start' }}>
         <div>
           <b>Kode naik</b>
-          <div className="xs muted">Tunjukkan ke driver saat masuk mobil. Driver memasukkan kode ini supaya kalian berdua tahu Anda sudah naik.</div>
+          <div className="xs muted">Tunjukkan ke pemilik mobil saat masuk mobil. Pemilik mobil memasukkan kode ini supaya kalian berdua tahu Anda sudah naik.</div>
         </div>
       </div>
       {code ? (
@@ -191,7 +191,7 @@ export function RatingSheet({ booking: b, toRole, open, onClose, onDone }) {
     <Sheet
       open={open}
       onClose={onClose}
-      title={`Beri rating ${toRole === 'driver' ? 'driver' : 'penumpang'}`}
+      title={`Beri rating ${toRole === 'driver' ? 'pemilik mobil' : 'penumpang'}`}
       footer={
         <button className="btn btn-primary btn-block" disabled={!stars || busy} onClick={submit}>
           Kirim rating
@@ -223,7 +223,7 @@ export function RatingSheet({ booking: b, toRole, open, onClose, onDone }) {
           <textarea className="input" rows={3} maxLength={500} value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Ceritakan perjalanan Anda" />
         </label>
         <p className="xs muted" style={{ textAlign: 'left' }}>
-          Rating tampil di profil {toRole === 'driver' ? 'driver' : 'penumpang'} tanpa nama lengkap Anda.
+          Rating tampil di profil {toRole === 'driver' ? 'pemilik mobil' : 'penumpang'} tanpa nama lengkap Anda.
         </p>
         {err && <p className="error">{err}</p>}
       </div>
@@ -291,7 +291,7 @@ export function ReportSheet({ booking: b, targetRole, open, onClose }) {
     <Sheet
       open={open}
       onClose={close}
-      title={`Laporkan ${targetRole === 'driver' ? 'driver' : 'penumpang'}`}
+      title={`Laporkan ${targetRole === 'driver' ? 'pemilik mobil' : 'penumpang'}`}
       footer={
         sent ? (
           <button className="btn btn-block" onClick={close}>
@@ -313,7 +313,7 @@ export function ReportSheet({ booking: b, targetRole, open, onClose }) {
       ) : (
         <div className="stack" style={{ '--gap': '14px' }}>
           <p className="small ink2">
-            Tentang <b>{other?.name}</b>. Laporan hanya dibaca admin, tidak dikirim ke {targetRole === 'driver' ? 'driver' : 'penumpang'}.
+            Tentang <b>{other?.name}</b>. Laporan hanya dibaca admin, tidak dikirim ke {targetRole === 'driver' ? 'pemilik mobil' : 'penumpang'}.
           </p>
           <div className="reason-list" role="radiogroup" aria-label="Alasan laporan">
             {reasons.map(([k, label]) => (

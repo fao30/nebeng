@@ -6,7 +6,7 @@ import { clearSettingsCache } from '@/lib/settings';
 import AdminShell from '@/components/AdminShell';
 
 const FIELDS = [
-  { key: 'price_per_km', label: 'Harga saran per km', desc: 'Per kursi, untuk 1 km jarak jalan. Dipakai sebagai harga saran saat driver membuat trip.', unit: 'Rp / km', step: 50 },
+  { key: 'price_per_km', label: 'Harga saran per km', desc: 'Per kursi, untuk 1 km jarak jalan. Dipakai sebagai harga saran saat pemilik mobil membuat trip.', unit: 'Rp / km', step: 50 },
   { key: 'min_segment_price', label: 'Harga saran minimum per ruas', desc: 'Ruas yang sangat pendek tidak disarankan di bawah angka ini.', unit: 'Rp', step: 1000 },
   { key: 'min_per_km_intra', label: 'Rata-rata menit per km, dalam kota', desc: 'Dipakai untuk menghitung jam tiba dari titik A ke B di trip dalam kota.', unit: 'menit / km', step: 0.1 },
   { key: 'min_per_km_inter', label: 'Rata-rata menit per km, antar kota', desc: 'Untuk trip antar kota (lebih dari 25 km), biasanya lebih cepat karena lewat tol.', unit: 'menit / km', step: 0.1 },
@@ -114,7 +114,7 @@ function Settings() {
             </div>
           </div>
           <p className="xs muted">
-            Contoh: {km} km ≈ Jakarta–Bandung lewat tol. Driver tetap bisa mengubah harga tiap ruas; angka ini hanya saran awal.
+            Contoh: {km} km ≈ Jakarta–Bandung lewat tol. Pemilik mobil tetap bisa mengubah harga tiap ruas; angka ini hanya saran awal.
           </p>
         </div>
       </aside>

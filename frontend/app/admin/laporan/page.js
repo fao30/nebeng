@@ -63,7 +63,7 @@ export default function AdminReports() {
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
 
   return (
-    <AdminShell title="Laporan" desc="Laporan dari driver tentang penumpang dan dari penumpang tentang driver.">
+    <AdminShell title="Laporan" desc="Laporan dari pemilik mobil tentang penumpang dan dari penumpang tentang pemilik mobil.">
       <div className="stats" style={{ marginBottom: 16 }}>
         {Object.entries(STATUS).map(([k, [label]]) => (
           <button key={k} className={`stat stat-btn ${f.status === k ? 'on' : ''}`} onClick={() => setF({ ...f, status: f.status === k ? '' : k })}>
@@ -120,7 +120,7 @@ export default function AdminReports() {
                     <div>
                       <b>{r.target?.name}</b>
                       <span className="sub">
-                        {r.target_role === 'driver' ? 'Driver' : 'Penumpang'}
+                        {r.target_role === 'driver' ? 'Pemilik mobil' : 'Penumpang'}
                         {r.target?.blocked ? ' · diblokir' : ''}
                         {r.prior_reports ? ` · ${r.prior_reports} laporan lain` : ''}
                       </span>
@@ -155,7 +155,7 @@ export default function AdminReports() {
             </div>
             <div className="grid-2">
               <div className="card-sub">
-                <div className="xs muted">Terlapor ({sel.target_role === 'driver' ? 'driver' : 'penumpang'})</div>
+                <div className="xs muted">Terlapor ({sel.target_role === 'driver' ? 'pemilik mobil' : 'penumpang'})</div>
                 <b>{sel.target?.name}</b>
                 <div className="xs ink2">
                   {sel.target?.email}
@@ -194,7 +194,7 @@ export default function AdminReports() {
             )}
             <label className="field">
               <span className="field-label">Catatan admin (dikirim ke pelapor saat status berubah)</span>
-              <textarea className="input" rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Misal: driver sudah kami peringatkan" />
+              <textarea className="input" rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Misal: pemilik mobil sudah kami peringatkan" />
             </label>
             <div className="row wrap" style={{ '--gap': '8px' }}>
               {sel.status !== 'reviewing' && (

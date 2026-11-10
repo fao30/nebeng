@@ -54,7 +54,7 @@ export default function LivePage() {
             <b>{tripStatusLabel[status]}</b>
           </div>
           <span className="xs muted">
-            {driver ? (ago < 1 ? 'Posisi baru saja diperbarui' : `Posisi ${ago} menit lalu`) : 'Menunggu posisi driver'}
+            {driver ? (ago < 1 ? 'Posisi baru saja diperbarui' : `Posisi ${ago} menit lalu`) : 'Menunggu posisi pemilik mobil'}
           </span>
         </div>
         <h2>

@@ -114,7 +114,7 @@ export const timeBuckets = [
 ];
 
 export const AMENITIES = [
-  { key: 'instant', icon: 'bolt', label: 'Pesan instan', no: 'Perlu persetujuan driver' },
+  { key: 'instant', icon: 'bolt', label: 'Pesan instan', no: 'Perlu persetujuan pemilik mobil' },
   { key: 'max2_back', icon: 'sofa', label: 'Maks. 2 orang di belakang', no: 'Kursi belakang bisa 3 orang' },
   { key: 'luggage', icon: 'luggage', label: 'Boleh bawa koper', no: 'Tidak menerima koper' },
   { key: 'parcel', icon: 'box', label: 'Terima titipan paket', no: 'Tidak menerima paket' },

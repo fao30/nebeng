@@ -111,7 +111,7 @@ export default function NotificationsPage() {
       {loaded && !shown.length && (
         <Empty icon="bell" title={filter === 'all' ? 'Belum ada notifikasi' : 'Tidak ada yang cocok'}>
           {filter === 'all'
-            ? 'Kabar saat driver menerima, menolak, atau menawar, chat baru, trip mulai dan selesai, serta trip baru di rute Anda akan muncul di sini.'
+            ? 'Kabar saat pemilik mobil menerima, menolak, atau menawar, chat baru, trip mulai dan selesai, serta trip baru di rute Anda akan muncul di sini.'
             : 'Coba filter lain.'}
         </Empty>
       )}

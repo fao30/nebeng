@@ -17,7 +17,7 @@ export function RatingBadge({ user, as }) {
   const avg = as === 'driver' ? user?.driver_rating : user?.passenger_rating;
   if (!n) return <span className="rating rating-new">Baru</span>;
   return (
-    <span className="rating" title={`${avg} dari 5, ${n} rating sebagai ${as === 'driver' ? 'driver' : 'penumpang'}`}>
+    <span className="rating" title={`${avg} dari 5, ${n} rating sebagai ${as === 'driver' ? 'pemilik mobil' : 'penumpang'}`}>
       ★ {avg.toFixed(1)} <span className="muted">({n})</span>
     </span>
   );

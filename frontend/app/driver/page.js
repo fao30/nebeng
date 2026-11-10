@@ -29,7 +29,7 @@ function DriverHome() {
       <div className="page-head">
         <div>
           <h1>Trip saya</h1>
-          <p>Trip yang Anda tawarkan sebagai driver.</p>
+          <p>Trip yang Anda tawarkan sebagai pemilik mobil.</p>
         </div>
         <Link className="btn btn-primary" href="/driver/trip-baru">
           <Icon name="plus" />

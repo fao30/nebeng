@@ -57,7 +57,7 @@ export default function Nav() {
         <div className="header-inner">
           <Link href="/" className="brand" aria-label="Nebeng, beranda">
             <BrandGlyph />
-            nebeng
+            <span className={user ? 'brand-word' : ''}>nebeng</span>
           </Link>
           {user && (
             <nav className="nav" aria-label="Menu utama">
@@ -83,7 +83,7 @@ export default function Nav() {
                     Penumpang
                   </button>
                   <button role="tab" aria-selected={mode === 'driver'} onClick={() => switchMode('driver')}>
-                    Driver
+                    Pemilik mobil
                   </button>
                 </div>
                 <NotificationBell userId={user.id} />

@@ -119,7 +119,7 @@ export default function Masuk() {
       </form>
       <TermsModal open={terms} busy={busy} onClose={() => setTerms(false)} onAccept={send} acceptLabel="Setuju dan buat akun" />
       <p className="small muted" style={{ textAlign: 'center', marginTop: 14 }}>
-        Akun demo: <b>budi@demo.id</b> (driver) atau <b>andi@demo.id</b> (penumpang), password <b>demo123</b>
+        Akun demo: <b>budi@demo.id</b> (pemilik mobil) atau <b>andi@demo.id</b> (penumpang), password <b>demo123</b>
       </p>
     </div>
   );

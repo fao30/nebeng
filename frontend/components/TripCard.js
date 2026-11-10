@@ -6,7 +6,7 @@ import { AMENITIES, fmtDuration, fmtRp, hasAmenity, tripStatusLabel } from '@/li
 
 const km = (d) => (d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1).replace('.', ',')} km`);
 
-export default function TripCard({ trip, href, showStatus, children }) {
+export default function TripCard({ trip, href, showStatus, children, radius }) {
   const q = trip.quote;
   const price = q ? q.price_per_seat : trip.price_per_seat;
   const seats = q ? q.seats_available : trip.seats_available;
@@ -20,8 +20,12 @@ export default function TripCard({ trip, href, showStatus, children }) {
         {dur != null && <div className="xs muted" style={{ marginTop: 6, marginLeft: 72 }}>{fmtDuration(dur)} perjalanan</div>}
         {(q?.pickup_walk_km != null || q?.dropoff_walk_km != null) && (
           <div className="row wrap xs" style={{ '--gap': '6px', marginTop: 8, marginLeft: 72 }}>
-            {q.pickup_walk_km != null && <span className="chip">Naik {km(q.pickup_walk_km)} dari titik Anda</span>}
-            {q.dropoff_walk_km != null && <span className="chip">Turun {km(q.dropoff_walk_km)} dari tujuan Anda</span>}
+            {q.pickup_walk_km != null && (
+              <span className={`chip ${radius?.from != null && q.pickup_walk_km > radius.from ? 'chip-warn' : ''}`}>Naik {km(q.pickup_walk_km)} dari titik Anda</span>
+            )}
+            {q.dropoff_walk_km != null && (
+              <span className={`chip ${radius?.to != null && q.dropoff_walk_km > radius.to ? 'chip-warn' : ''}`}>Turun {km(q.dropoff_walk_km)} dari tujuan Anda</span>
+            )}
           </div>
         )}
       </div>

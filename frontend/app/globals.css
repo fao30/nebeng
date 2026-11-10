@@ -787,7 +787,7 @@ input[type='range'] {
 /* ---------- trip card ---------- */
 .trip-card {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 4px 16px;
 }
 .trip-price {
@@ -2476,5 +2476,41 @@ input[type='range'] {
 @media (max-width: 720px) {
   .terms-key-cols {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- search: no match ---------- */
+.nomatch {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: var(--r);
+  background: var(--amber-50);
+  border: 1px solid rgba(185, 116, 9, 0.22);
+  line-height: 1.5;
+}
+.nomatch > .icon {
+  color: var(--amber);
+  flex: none;
+  margin-top: 1px;
+}
+.chip-warn {
+  background: var(--amber-50);
+  color: var(--amber);
+}
+.others-list .trip-card {
+  opacity: 0.85;
+}
+.header .seg button {
+  white-space: nowrap;
+}
+@media (max-width: 440px) {
+  .brand-word {
+    display: none;
+  }
+  .header .seg button {
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }

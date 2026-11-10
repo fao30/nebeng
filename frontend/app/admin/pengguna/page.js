@@ -32,7 +32,7 @@ export default function AdminUsers() {
   }, [load]);
 
   return (
-    <AdminShell title="Pengguna" desc="Semua akun. Satu akun bisa menjadi driver dan penumpang sekaligus. Blokir akun yang melanggar ketentuan.">
+    <AdminShell title="Pengguna" desc="Semua akun. Satu akun bisa menjadi pemilik mobil dan penumpang sekaligus. Blokir akun yang melanggar ketentuan.">
       <div className="filterbar">
         <label className="field">
           <span className="field-label">Cari</span>
@@ -42,7 +42,7 @@ export default function AdminUsers() {
           <span className="field-label">Tampilkan</span>
           <select className="input" value={f.role} onChange={(e) => setF({ ...f, role: e.target.value })}>
             <option value="">Semua</option>
-            <option value="driver">Pernah jadi driver</option>
+            <option value="driver">Pernah jadi pemilik mobil</option>
             <option value="passenger">Pernah jadi penumpang</option>
             <option value="reported">Pernah dilaporkan</option>
             <option value="blocked">Diblokir</option>
@@ -58,7 +58,7 @@ export default function AdminUsers() {
               <th>Nama</th>
               <th>Kontak</th>
               <th>Kendaraan</th>
-              <th>Rating driver</th>
+              <th>Rating pemilik mobil</th>
               <th>Rating penumpang</th>
               <th className="num">Trip</th>
               <th className="num">Pesanan</th>

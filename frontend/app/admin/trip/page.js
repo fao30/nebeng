@@ -33,7 +33,7 @@ export default function AdminTrips() {
   const total = (list || []).reduce((a, t) => a + t.revenue, 0);
 
   return (
-    <AdminShell title="Semua trip" desc="Filter per tanggal berangkat, harga per kursi (rute penuh), dan nama driver atau penumpang.">
+    <AdminShell title="Semua trip" desc="Filter per tanggal berangkat, harga per kursi (rute penuh), dan nama pemilik mobil atau penumpang.">
       <div className="filterbar">
         <label className="field">
           <span className="field-label">Dari tanggal</span>
@@ -58,8 +58,8 @@ export default function AdminTrips() {
         <label className="field">
           <span className="field-label">Cari di</span>
           <select className="input" value={f.who} onChange={set('who')}>
-            <option value="">Driver & penumpang</option>
-            <option value="driver">Driver saja</option>
+            <option value="">Pemilik mobil & penumpang</option>
+            <option value="driver">Pemilik mobil saja</option>
             <option value="passenger">Penumpang saja</option>
           </select>
         </label>
@@ -92,7 +92,7 @@ export default function AdminTrips() {
             <tr>
               <th>Berangkat</th>
               <th>Rute</th>
-              <th>Driver</th>
+              <th>Pemilik mobil</th>
               <th className="num">Harga / kursi</th>
               <th className="num">Kursi</th>
               <th>Penumpang</th>

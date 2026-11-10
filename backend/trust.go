@@ -159,7 +159,7 @@ func (a *API) board(w http.ResponseWriter, r *http.Request, uid string) error {
 		return err
 	}
 	if t.DriverID != uid {
-		return errf(403, "hanya driver trip ini yang bisa memasukkan kode")
+		return errf(403, "hanya pemilik mobil trip ini yang bisa memasukkan kode")
 	}
 	if b.Status != BookingAccepted {
 		return errf(409, "pesanan belum disetujui")
@@ -205,7 +205,7 @@ func (a *API) board(w http.ResponseWriter, r *http.Request, uid string) error {
 	}
 	s.Changed()
 	a.notify(&Notification{UserID: b.PassengerID, Type: NotifBoarded, Title: "Anda sudah naik, selamat jalan!",
-		Body: "Driver " + a.firstName(t.DriverID) + " mengonfirmasi kode naik Anda di " + place(b.Pickup) + " · turun di " + place(b.Dropoff),
+		Body: "Pemilik mobil " + a.firstName(t.DriverID) + " mengonfirmasi kode naik Anda di " + place(b.Pickup) + " · turun di " + place(b.Dropoff),
 		Link: "/trip/" + t.ID, TripID: t.ID, BookingID: b.ID})
 	a.notify(&Notification{UserID: t.DriverID, Type: NotifBoarded, Title: a.firstName(b.PassengerID) + " sudah naik",
 		Body: "Kode cocok · turun di " + place(b.Dropoff), Link: "/trip/" + t.ID, TripID: t.ID, BookingID: b.ID})
@@ -223,7 +223,7 @@ func (a *API) dropoff(w http.ResponseWriter, r *http.Request, uid string) error 
 		return err
 	}
 	if t.DriverID != uid {
-		return errf(403, "hanya driver trip ini")
+		return errf(403, "hanya pemilik mobil trip ini")
 	}
 	if b.BoardedAt == nil {
 		return errf(409, "penumpang belum tercatat naik")
@@ -234,7 +234,7 @@ func (a *API) dropoff(w http.ResponseWriter, r *http.Request, uid string) error 
 	now := time.Now()
 	b.DroppedAt, b.UpdatedAt = &now, now
 	s.Changed()
-	a.notify(&Notification{UserID: b.PassengerID, Type: NotifDroppedOff, Title: "Sampai di " + place(b.Dropoff) + ". Beri rating driver?",
+	a.notify(&Notification{UserID: b.PassengerID, Type: NotifDroppedOff, Title: "Sampai di " + place(b.Dropoff) + ". Beri rating pemilik mobil?",
 		Body: "Bagaimana perjalanan bersama " + a.firstName(t.DriverID) + "? Rating Anda membantu penumpang lain.",
 		Link: "/trip/" + t.ID + "?rate=" + b.ID, TripID: t.ID, BookingID: b.ID})
 	pending := 0
@@ -311,7 +311,7 @@ func (a *API) rate(w http.ResponseWriter, r *http.Request, uid string) error {
 	s.Changed()
 	who := "Penumpang " + a.firstName(uid)
 	if uid == t.DriverID {
-		who = "Driver " + a.firstName(uid)
+		who = "Pemilik mobil " + a.firstName(uid)
 	}
 	a.notify(&Notification{UserID: to, Type: NotifRated, Title: who + " memberi Anda " + strconv.Itoa(in.Stars) + " bintang",
 		Body: strings.Repeat("★", in.Stars) + strings.Repeat("☆", 5-in.Stars) + " · " + b.leg(), Link: "/profil", TripID: t.ID, BookingID: b.ID})
@@ -407,7 +407,7 @@ func (a *API) createReport(w http.ResponseWriter, r *http.Request, uid string) e
 	s.Changed()
 	label := "penumpang"
 	if role == ByDriver {
-		label = "driver"
+		label = "pemilik mobil"
 	}
 	for _, u := range s.Users {
 		if u.IsAdmin && u.ID != uid {

@@ -49,7 +49,7 @@ export default function BlockSheet({ user, onClose, onDone, presetReason = '' })
             mendapat notifikasi.
           </div>
           <div className="small ink2">
-            {user.email} · {user.reports_against || 0} laporan · rating driver {user.driver_ratings ? `★ ${user.driver_rating}` : '—'}, penumpang{' '}
+            {user.email} · {user.reports_against || 0} laporan · rating pemilik mobil {user.driver_ratings ? `★ ${user.driver_rating}` : '—'}, penumpang{' '}
             {user.passenger_ratings ? `★ ${user.passenger_rating}` : '—'}
           </div>
           <div className="tag-pick" style={{ justifyContent: 'flex-start' }}>

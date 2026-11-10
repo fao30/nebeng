@@ -75,7 +75,7 @@ function Minta() {
       <div className="page-head">
         <div>
           <h1>Minta tumpangan</h1>
-          <p>Belum ada trip yang cocok? Pasang permintaan, driver yang searah akan menawarkan harga dan jam jemput.</p>
+          <p>Belum ada trip yang cocok? Pasang permintaan, pemilik mobil yang searah akan menawarkan harga dan jam jemput.</p>
         </div>
       </div>
       <div className="detail">
@@ -124,13 +124,13 @@ function Minta() {
                 </span>
                 {r.budget > 0 && <span className="chip">Budget {fmtRp(r.budget)}</span>}
               </div>
-              {(r.offers || []).length > 0 && <div className="section-title" style={{ margin: '4px 0 0' }}>Tawaran dari driver ({r.offers.length})</div>}
+              {(r.offers || []).length > 0 && <div className="section-title" style={{ margin: '4px 0 0' }}>Tawaran dari pemilik mobil ({r.offers.length})</div>}
               {(r.offers || []).map((b) => (
                 <Negotiation key={b.id} booking={b} role="passenger" onChange={load} showTrip />
               ))}
               {r.status === 'open' && (
                 <div className="row-between">
-                  <span className="xs muted">{(r.offers || []).length ? '' : 'Belum ada driver yang menawari.'}</span>
+                  <span className="xs muted">{(r.offers || []).length ? '' : 'Belum ada pemilik mobil yang menawari.'}</span>
                   <button className="link link-danger small" onClick={() => cancel(r.id)}>
                     Batalkan permintaan
                   </button>

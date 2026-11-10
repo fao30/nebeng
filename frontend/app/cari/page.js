@@ -80,6 +80,8 @@ export default function Cari() {
   const [sheet, setSheet] = useState(false);
   const [view, setView] = useState('list');
   const [others, setOthers] = useState(null); // other trips when the route has none
+  const [near, setNear] = useState(null); // trips just outside the chosen radius
+  const [showOthers, setShowOthers] = useState(false);
   const [remembered, setRemembered] = useState(false);
   const [recent, setRecent] = useState([]);
 
@@ -124,10 +126,32 @@ export default function Cari() {
         })}`,
       );
       setTrips(data);
-      // Nothing on this route: offer whatever else is available.
+      setShowOthers(false);
+      // Nothing within the radius: first look a bit wider on the same route
+      // (clearly marked as outside the radius), then anything else available.
       if (!data.length && (query.from || query.to)) {
-        setOthers(await api(`/trips${qs({ seats: query.seats, date: query.date })}`));
+        const wide = 25;
+        const [nearby, all] = await Promise.all([
+          api(
+            `/trips${qs({
+              from_lat: query.from?.lat,
+              from_lng: query.from?.lng,
+              to_lat: query.to?.lat,
+              to_lng: query.to?.lng,
+              from_radius_km: Math.max(wide, filters.rFrom),
+              to_radius_km: Math.max(wide, filters.rTo),
+              date: query.date,
+              seats: query.seats,
+              order_by: query.from ? 'nearest_pickup' : 'nearest_dropoff',
+            })}`,
+          ),
+          api(`/trips${qs({ seats: query.seats, date: query.date })}`),
+        ]);
+        setNear(nearby);
+        const nearIds = new Set(nearby.map((t) => t.id));
+        setOthers(all.filter((t) => !nearIds.has(t.id)));
       } else {
+        setNear(null);
         setOthers(null);
       }
     } catch (e) {
@@ -173,6 +197,25 @@ export default function Cari() {
     (filters.luggage ? 1 : 0) +
     (filters.order !== 'earliest' ? 1 : 0) +
     (filters.rFrom !== 10 || filters.rTo !== 10 ? 1 : 0);
+
+  // The smallest radius that would bring in the closest "almost" trip.
+  const nearHint = (() => {
+    if (!near?.length) return null;
+    const km1 = (d) => (d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1).replace('.', ',')} km`);
+    let best = null;
+    near.forEach((t) => {
+      const q = t.quote || {};
+      const nf = query?.from && q.pickup_walk_km != null ? Math.max(filters.rFrom, Math.ceil(q.pickup_walk_km)) : filters.rFrom;
+      const nt = query?.to && q.dropoff_walk_km != null ? Math.max(filters.rTo, Math.ceil(q.dropoff_walk_km)) : filters.rTo;
+      const cost = Math.max(nf - filters.rFrom, nt - filters.rTo);
+      if (!best || cost < best.cost) best = { cost, rFrom: Math.min(50, nf), rTo: Math.min(50, nt), q };
+    });
+    const parts = [];
+    if (best.rFrom !== filters.rFrom) parts.push(`${km1(best.q.pickup_walk_km)} dari ${shortPlace(query.from)}`);
+    if (best.rTo !== filters.rTo) parts.push(`${km1(best.q.dropoff_walk_km)} dari ${shortPlace(query.to)}`);
+    const label = [best.rFrom !== filters.rFrom && `jemput ${best.rFrom} km`, best.rTo !== filters.rTo && `antar ${best.rTo} km`].filter(Boolean).join(', ');
+    return parts.length ? { ...best, text: parts.join(' dan '), label } : null;
+  })();
 
   const groups = [];
   shown.forEach((t) => {
@@ -299,24 +342,66 @@ export default function Cari() {
             />
           )}
 
-          {trips && shown.length === 0 && others?.length > 0 && (
+          {trips && shown.length === 0 && (near?.length > 0 || others?.length > 0) && (
+            <div className="nomatch">
+              <Icon name="info" />
+              <div className="grow small">
+                <b>
+                  Tidak ada trip yang lewat
+                  {[
+                    query?.from && ` dalam ${filters.rFrom} km dari ${shortPlace(query.from)}`,
+                    query?.to && ` ${filters.rTo} km dari ${shortPlace(query.to)}`,
+                  ]
+                    .filter(Boolean)
+                    .join(' dan')}
+                  .
+                </b>{' '}
+                {nearHint ? (
+                  <>
+                    Trip terdekat lewat {nearHint.text}.{' '}
+                    <button className="link" onClick={() => setFilters({ ...filters, rFrom: nearHint.rFrom, rTo: nearHint.rTo })}>
+                      Perbesar radius jadi {nearHint.label}
+                    </button>{' '}
+                    atau{' '}
+                  </>
+                ) : (
+                  'Coba ganti tanggal atau '
+                )}
+                <Link href="/minta">pasang permintaan</Link> supaya pemilik mobil searah menawari Anda.
+              </div>
+            </div>
+          )}
+
+          {trips && shown.length === 0 && near?.length > 0 && (
             <>
-              <div className="card row wrap" style={{ '--gap': '12px' }}>
-                <Icon name="info" />
-                <span className="grow small">
-                  Belum ada trip untuk rute ini. Ini trip lain yang tersedia, atau{' '}
-                  <Link href="/minta">pasang permintaan</Link> supaya driver searah menawari Anda.
-                </span>
+              <div className="section-title" style={{ margin: '6px 0 0' }}>
+                Hampir searah, di luar radius Anda ({near.length})
               </div>
               <div className="list">
-                {others.map((t) => (
-                  <TripCard key={t.id} trip={t} href={`/trip/${t.id}`} />
+                {near.map((t) => (
+                  <TripCard key={t.id} trip={t} href={href(t)} radius={{ from: query?.from ? filters.rFrom : null, to: query?.to ? filters.rTo : null }} />
                 ))}
               </div>
             </>
           )}
 
-          {trips && shown.length === 0 && !others?.length && (
+          {trips && shown.length === 0 && others?.length > 0 && (
+            <>
+              <button className="btn btn-soft btn-block" onClick={() => setShowOthers(!showOthers)} aria-expanded={showOthers}>
+                <Icon name={showOthers ? 'arrowUp' : 'arrowDown'} className="icon-sm" />
+                {showOthers ? 'Sembunyikan' : 'Lihat'} trip lain dengan rute berbeda ({others.length})
+              </button>
+              {showOthers && (
+                <div className="list others-list">
+                  {others.map((t) => (
+                    <TripCard key={t.id} trip={t} href={`/trip/${t.id}`} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {trips && shown.length === 0 && !others?.length && !near?.length && (
             <Empty
               icon="megaphone"
               title="Belum ada yang searah"
@@ -326,7 +411,7 @@ export default function Cari() {
                 </Link>
               }
             >
-              Coba perbesar radius jemput atau antar, ganti tanggal, atau pasang permintaan supaya driver yang lewat bisa menawari Anda.
+              Coba perbesar radius jemput atau antar, ganti tanggal, atau pasang permintaan supaya pemilik mobil yang lewat bisa menawari Anda.
             </Empty>
           )}
 

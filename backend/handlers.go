@@ -746,7 +746,7 @@ func (a *API) tripStatus(w http.ResponseWriter, r *http.Request, uid string) err
 		return errf(404, "trip tidak ditemukan")
 	}
 	if t.DriverID != uid {
-		return errf(403, "hanya driver yang bisa mengubah status trip")
+		return errf(403, "hanya pemilik mobil yang bisa mengubah status trip")
 	}
 	now := time.Now()
 	var affected []*Booking
@@ -852,7 +852,7 @@ func (a *API) createBooking(w http.ResponseWriter, r *http.Request, uid string) 
 	var sp Span
 	if in.PickupIndex != nil && in.DropoffIndex != nil {
 		if !validIdx(t, *in.PickupIndex, *in.DropoffIndex) {
-			return errf(400, "pilih titik naik dan turun dari rute driver")
+			return errf(400, "pilih titik naik dan turun dari rute pemilik mobil")
 		}
 		sp = spanIdx(*in.PickupIndex, *in.DropoffIndex)
 	} else {
@@ -954,7 +954,7 @@ func (a *API) respondBooking(w http.ResponseWriter, r *http.Request, uid string)
 				if other.ID != b.ID && other.RequestID == b.RequestID && other.Status == BookingNegotiating {
 					other.Status, other.UpdatedAt = BookingRejected, now
 					if ot := s.Trips[other.TripID]; ot != nil {
-						a.notify(&Notification{UserID: ot.DriverID, Type: NotifBookingRejected, Title: a.firstName(other.PassengerID) + " memilih driver lain",
+						a.notify(&Notification{UserID: ot.DriverID, Type: NotifBookingRejected, Title: a.firstName(other.PassengerID) + " memilih pemilik mobil lain",
 							Body: other.leg() + " · tawaran Anda ditutup", Link: "/driver/permintaan", TripID: ot.ID, BookingID: other.ID})
 					}
 				}
@@ -1257,7 +1257,7 @@ func (a *API) shareLink(w http.ResponseWriter, r *http.Request, uid string) erro
 		return errf(404, "trip tidak ditemukan")
 	}
 	if s.participantRole(t, uid) == "" {
-		return errf(403, "hanya driver/penumpang trip ini yang bisa membagikan lokasi")
+		return errf(403, "hanya pemilik mobil/penumpang trip ini yang bisa membagikan lokasi")
 	}
 	if t.ShareToken == "" {
 		a.ensureShare(t)

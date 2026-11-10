@@ -68,7 +68,7 @@ export default function Home() {
           <ol>
             <li>Tentukan titik jemput, titik antar, dan seberapa jauh Anda mau berjalan dari rute.</li>
             <li>Bayar hanya ruas yang Anda lewati. Pesan instan, atau ajukan harga sendiri.</li>
-            <li>Belum ada trip? Pasang permintaan, biar driver searah yang menawari.</li>
+            <li>Belum ada trip? Pasang permintaan, biar pemilik mobil searah yang menawari.</li>
           </ol>
           <Link href={user ? '/cari' : '/masuk'} className="btn btn-soft" style={{ marginTop: 16 }} onClick={() => setMode('passenger')}>
             Cari tumpangan
@@ -77,7 +77,7 @@ export default function Home() {
         <div className="card">
           <div className="row">
             <Icon name="car" />
-            <h2>Untuk driver</h2>
+            <h2>Untuk pemilik mobil</h2>
           </div>
           <ol>
             <li>Buat trip dengan titik stop di mana saja, harga tiap ruas, kursi, dan koper.</li>
@@ -97,7 +97,7 @@ export default function Home() {
 
       {!user && (
         <p className="demo">
-          Coba dengan akun demo: driver <code>budi@demo.id</code>, penumpang <code>andi@demo.id</code> atau <code>sari@demo.id</code>,
+          Coba dengan akun demo: pemilik mobil <code>budi@demo.id</code>, penumpang <code>andi@demo.id</code> atau <code>sari@demo.id</code>,
           password <code>demo123</code>.
         </p>
       )}

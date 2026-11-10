@@ -26,10 +26,10 @@ export default function AdminChats() {
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
 
   return (
-    <AdminShell title="Percakapan" desc="Chat dan tawar-menawar harga antara driver dan penumpang, per pesanan.">
+    <AdminShell title="Percakapan" desc="Chat dan tawar-menawar harga antara pemilik mobil dan penumpang, per pesanan.">
       <div className="filterbar">
         <label className="field">
-          <span className="field-label">Cari driver atau penumpang</span>
+          <span className="field-label">Cari pemilik mobil atau penumpang</span>
           <input className="input" value={f.q} onChange={set('q')} placeholder="Nama, email, atau telepon" />
         </label>
         <label className="field">
@@ -53,7 +53,7 @@ export default function AdminChats() {
         <table className="table">
           <thead>
             <tr>
-              <th>Penumpang dan driver</th>
+              <th>Penumpang dan pemilik mobil</th>
               <th>Trip</th>
               <th>Pesan terakhir</th>
               <th className="num">Pesan</th>
@@ -77,7 +77,7 @@ export default function AdminChats() {
                     <Avatar name={c.passenger.name} />
                     <div>
                       <b>{c.passenger.name}</b>
-                      <span className="sub">dengan {c.driver.name} (driver)</span>
+                      <span className="sub">dengan {c.driver.name} (pemilik mobil)</span>
                     </div>
                   </div>
                 </td>

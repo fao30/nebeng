@@ -104,7 +104,7 @@ export default function Chat({ bookingId, role, title, open, onClose, readOnly }
       </div>
       {role === 'admin' && b && (
         <p className="xs muted" style={{ marginBottom: 12 }}>
-          Kiri: driver ({b.driver?.name}). Kanan: penumpang ({b.passenger?.name}). Admin hanya bisa membaca.
+          Kiri: pemilik mobil ({b.driver?.name}). Kanan: penumpang ({b.passenger?.name}). Admin hanya bisa membaca.
         </p>
       )}
       <div className="chat">
@@ -120,7 +120,7 @@ export default function Chat({ bookingId, role, title, open, onClose, readOnly }
               {it.kind === 'offer' ? (
                 <div className={`chat-offer ${mine(it.by) ? 'mine' : ''}`}>
                   <Icon name="tag" className="icon-sm" />
-                  {it.by === 'driver' ? 'Driver' : 'Penumpang'} menawarkan <b className="tnum">{fmtRp(it.price)}</b>
+                  {it.by === 'driver' ? 'Pemilik mobil' : 'Penumpang'} menawarkan <b className="tnum">{fmtRp(it.price)}</b>
                   {it.text ? `: ${it.text}` : ''}
                 </div>
               ) : (

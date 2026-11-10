@@ -196,7 +196,7 @@ func (a *API) onBookingResponse(b *Booking, trip *Trip, actor, action string) {
 	who := a.firstName(actor)
 	role := "Penumpang"
 	if actor == trip.DriverID {
-		role = "Driver"
+		role = "Pemilik mobil"
 	}
 	n := &Notification{UserID: other, Link: "/trip/" + trip.ID, TripID: trip.ID, BookingID: b.ID}
 	switch action {
@@ -238,8 +238,8 @@ func (a *API) onTripStatus(t *Trip, action string, affected []*Booking) {
 		n := &Notification{UserID: b.PassengerID, TripID: t.ID, BookingID: b.ID, Link: "/trip/" + t.ID}
 		switch action {
 		case "start":
-			n.Type, n.Title = NotifTripStarted, "Trip dimulai, driver sedang menuju"
-			n.Body = "Jemput di " + place(b.Pickup) + " sekitar " + b.PickupAt.In(a.locOr()).Format("15.04") + " · lacak posisi driver secara live"
+			n.Type, n.Title = NotifTripStarted, "Trip dimulai, pemilik mobil sedang menuju"
+			n.Body = "Jemput di " + place(b.Pickup) + " sekitar " + b.PickupAt.In(a.locOr()).Format("15.04") + " · lacak posisi pemilik mobil secara live"
 			if t.ShareToken != "" {
 				n.Link = "/live/" + t.ShareToken
 			}
@@ -248,10 +248,10 @@ func (a *API) onTripStatus(t *Trip, action string, affected []*Booking) {
 				continue // already told when they got off
 			}
 			n.Type, n.Title = NotifTripCompleted, "Trip selesai. Terima kasih sudah nebeng!"
-			n.Body = b.leg() + " · " + rupiah(b.AgreedPrice) + " · beri rating driver"
+			n.Body = b.leg() + " · " + rupiah(b.AgreedPrice) + " · beri rating pemilik mobil"
 			n.Link = "/trip/" + t.ID + "?rate=" + b.ID
 		case "cancel":
-			n.Type, n.Title = NotifTripCancelled, "Driver membatalkan trip"
+			n.Type, n.Title = NotifTripCancelled, "Pemilik mobil membatalkan trip"
 			n.Body = route + " · " + a.when(t.DepartAt) + " · cari trip lain"
 			n.Link = "/cari"
 		}

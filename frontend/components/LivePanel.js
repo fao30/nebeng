@@ -25,7 +25,7 @@ export default function LivePanel({ sharing, onToggle, broadcast, shareToken, li
         ? `Terkirim ${fmtTime(broadcast.last)}`
         : 'Menunggu sinyal GPS…'
       : passenger
-        ? 'Bagikan lokasi supaya driver mudah menemukan Anda.'
+        ? 'Bagikan lokasi supaya pemilik mobil mudah menemukan Anda.'
         : 'Penumpang bisa melihat posisi mobil Anda di peta.';
 
   return (
@@ -42,7 +42,7 @@ export default function LivePanel({ sharing, onToggle, broadcast, shareToken, li
       </div>
       {passenger && driverPos && (
         <p className="small" style={{ marginTop: 10 }}>
-          <Icon name="car" className="icon-sm" /> Posisi driver diperbarui {fmtTime(driverPos.at)}
+          <Icon name="car" className="icon-sm" /> Posisi pemilik mobil diperbarui {fmtTime(driverPos.at)}
           {driverPos.speed ? `, ${Math.round(driverPos.speed)} km/jam` : ''}
         </p>
       )}

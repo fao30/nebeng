@@ -12,7 +12,7 @@ export function TermsContent() {
     <div className="terms">
       <p className="xs muted">Berlaku sejak 10 November 2026</p>
       <p>
-        Nebeng menghubungkan pemilik mobil yang punya kursi kosong (<b>driver</b>) dengan orang yang searah (<b>penumpang</b>). Dengan membuat akun,
+        Nebeng menghubungkan orang yang ingin <b>nebeng</b> (<b>penumpang</b>) dengan <b>pemilik mobil</b> yang searah dan punya kursi kosong. Dengan membuat akun,
         Anda setuju dengan ketentuan di bawah ini.
       </p>
 
@@ -25,7 +25,7 @@ export function TermsContent() {
           <div>
             <h4>
               <Icon name="car" className="icon-sm" />
-              Untuk driver
+              Untuk pemilik mobil
             </h4>
             <ul>
               <li>
@@ -49,7 +49,7 @@ export function TermsContent() {
                 <b>Jangan mau diajak naik atau membayar di luar aplikasi</b>, walaupun ditawari harga lebih murah.
               </li>
               <li>
-                Perjalanan di luar aplikasi <b>tidak punya riwayat</b>: tidak tercatat siapa drivernya, mobil dan pelatnya, rutenya, dan harganya. Jika terjadi
+                Perjalanan di luar aplikasi <b>tidak punya riwayat</b>: tidak tercatat siapa pemilik mobilnya, mobil dan pelatnya, rutenya, dan harganya. Jika terjadi
                 masalah, kehilangan barang, atau sengketa, kami tidak bisa membantu.
               </li>
               <li>Naik hanya ke mobil yang pelatnya sama dengan yang tertera di aplikasi.</li>
@@ -69,7 +69,7 @@ export function TermsContent() {
         <li>Anda bertanggung jawab atas semua aktivitas di akun Anda.</li>
       </ul>
 
-      <h3>2. Kewajiban driver</h3>
+      <h3>2. Kewajiban pemilik mobil</h3>
       <ul>
         <li>Memiliki SIM dan STNK yang berlaku, dan kendaraan dalam kondisi layak jalan.</li>
         <li>Mobil dan pelat nomor sesuai dengan yang tercantum di trip.</li>
@@ -87,10 +87,10 @@ export function TermsContent() {
       <h3>4. Kode naik dan keselamatan</h3>
       <ul>
         <li>
-          Saat naik, penumpang menunjukkan <b>kode naik</b> dari aplikasi dan driver memasukkannya. Dengan begitu driver dan penumpang sama-sama tahu
+          Saat naik, penumpang menunjukkan <b>kode naik</b> dari aplikasi dan pemilik mobil memasukkannya. Dengan begitu pemilik mobil dan penumpang sama-sama tahu
           penumpang sudah di dalam mobil.
         </li>
-        <li>Penumpang: berikan kode hanya setelah memastikan driver dan pelat nomor sesuai.</li>
+        <li>Penumpang: berikan kode hanya setelah memastikan pemilik mobil dan pelat nomor sesuai.</li>
         <li>Gunakan fitur lokasi live untuk berbagi perjalanan dengan keluarga. Dalam keadaan darurat, hubungi 112.</li>
       </ul>
 
@@ -102,7 +102,7 @@ export function TermsContent() {
 
       <h3>6. Rating dan laporan</h3>
       <ul>
-        <li>Setelah perjalanan, driver dan penumpang dapat saling memberi rating. Berikan rating yang jujur.</li>
+        <li>Setelah perjalanan, pemilik mobil dan penumpang dapat saling memberi rating. Berikan rating yang jujur.</li>
         <li>Gunakan tombol &ldquo;Laporkan&rdquo; untuk melaporkan pelanggaran ke admin. Laporan palsu atau untuk balas dendam dilarang.</li>
       </ul>
 
@@ -122,7 +122,7 @@ export function TermsContent() {
       <h3>9. Data dan privasi</h3>
       <p>
         Kami menyimpan riwayat trip, pesanan, harga, chat, dan lokasi selama trip berlangsung untuk keamanan dan penyelesaian masalah. Admin dapat membaca
-        chat pesanan untuk menangani laporan. Nomor telepon hanya terlihat antara driver dan penumpang di trip yang sudah disetujui.
+        chat pesanan untuk menangani laporan. Nomor telepon hanya terlihat antara pemilik mobil dan penumpang di trip yang sudah disetujui.
       </p>
 
       <h3>10. Batas tanggung jawab</h3>

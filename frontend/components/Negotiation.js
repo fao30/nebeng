@@ -58,7 +58,7 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
   }
 
   const sub = [
-    role === 'driver' ? 'Penumpang' : 'Driver',
+    role === 'driver' ? 'Penumpang' : 'Pemilik mobil',
     `${b.seats} orang`,
     b.luggage ? `${b.luggage} koper` : null,
   ]
@@ -106,7 +106,7 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
         {b.offered_time && (
           <div className="chip chip-primary" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
             <Icon name="clock" />
-            Driver mengusulkan jemput {fmtDay(b.offered_time)}, {fmtTime(b.offered_time)}
+            Pemilik mobil mengusulkan jemput {fmtDay(b.offered_time)}, {fmtTime(b.offered_time)}
           </div>
         )}
       </div>
@@ -116,7 +116,7 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
           <div key={i} className={`bubble ${o.by === role ? 'mine' : ''}`}>
             <b>{fmtRp(o.price)}</b>
             <span>
-              {o.by === role ? 'Anda' : o.by === 'driver' ? 'Driver' : 'Penumpang'}
+              {o.by === role ? 'Anda' : o.by === 'driver' ? 'Pemilik mobil' : 'Penumpang'}
               {o.message ? `: ${o.message}` : ''}
             </span>
           </div>
@@ -124,7 +124,7 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
       </div>
       {b.list_price > 0 && b.status === 'negotiating' && (
         <p className="xs muted" style={{ marginBottom: 10 }}>
-          Harga driver untuk rute ini: {fmtRp(b.list_price)}
+          Harga pemilik mobil untuk rute ini: {fmtRp(b.list_price)}
         </p>
       )}
 
@@ -147,7 +147,7 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
           {rated ? (
             <span className="ok small">
               <Icon name="check" className="icon-sm" />
-              Rating untuk {otherRole === 'driver' ? 'driver' : 'penumpang'} terkirim
+              Rating untuk {otherRole === 'driver' ? 'pemilik mobil' : 'penumpang'} terkirim
             </span>
           ) : (
             <button className="btn btn-soft btn-sm" onClick={() => setRating(true)}>
@@ -160,7 +160,7 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
       <ReportSheet booking={b} targetRole={otherRole} open={report} onClose={() => setReport(false)} />
 
       {b.status === 'negotiating' && !myTurn && (
-        <p className="small muted">Menunggu jawaban {role === 'driver' ? 'penumpang' : 'driver'}.</p>
+        <p className="small muted">Menunggu jawaban {role === 'driver' ? 'penumpang' : 'pemilik mobil'}.</p>
       )}
 
       {myTurn && (
@@ -200,7 +200,7 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
           <span />
         )}
         <div className="row wrap" style={{ '--gap': '14px', justifyContent: 'flex-end' }}>
-          <button className="link small muted-link" onClick={() => setReport(true)} title={`Laporkan ${otherRole === 'driver' ? 'driver' : 'penumpang'} ke admin`}>
+          <button className="link small muted-link" onClick={() => setReport(true)} title={`Laporkan ${otherRole === 'driver' ? 'pemilik mobil' : 'penumpang'} ke admin`}>
             <Icon name="flag" className="icon-sm" />
             Laporkan
           </button>

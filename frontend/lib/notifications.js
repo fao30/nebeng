@@ -133,7 +133,7 @@ export const NOTIF_META = {
 export const NOTIF_LABEL = {
   booking_request: 'Permintaan kursi',
   booking_instant: 'Pesan langsung',
-  booking_offer: 'Tawaran driver',
+  booking_offer: 'Tawaran pemilik mobil',
   booking_counter: 'Tawar harga',
   booking_accepted: 'Diterima',
   booking_rejected: 'Ditolak',

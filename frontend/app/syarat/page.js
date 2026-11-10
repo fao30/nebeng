@@ -7,7 +7,7 @@ export default function TermsPage() {
       <div className="page-head">
         <div>
           <h1>Syarat & Ketentuan</h1>
-          <p>Aturan bersama supaya nebeng tetap aman untuk driver dan penumpang.</p>
+          <p>Aturan bersama supaya nebeng tetap aman untuk pemilik mobil dan penumpang.</p>
         </div>
       </div>
       <div className="card">

@@ -128,7 +128,7 @@ function DriverCard({ trip }) {
           </span>
         ) : (
           <span className="xs muted" style={{ maxWidth: 220 }}>
-            Pelat nomor dan nama lengkap driver terlihat setelah pesanan Anda terkonfirmasi.
+            Pelat nomor dan nama lengkap pemilik mobil terlihat setelah pesanan Anda terkonfirmasi.
           </span>
         )}
       </div>
@@ -318,7 +318,7 @@ function BookingPanel({ trip, from, to, setSel, init, onDone }) {
         method: 'POST',
         body: { pickup_index: pi, dropoff_index: di, pickup: from || undefined, dropoff: to || undefined, seats, luggage, price: offer ? Number(price) : total, message },
       });
-      setDone(b.status === 'accepted' ? 'Kursi Anda terkonfirmasi.' : 'Permintaan terkirim ke driver.');
+      setDone(b.status === 'accepted' ? 'Kursi Anda terkonfirmasi.' : 'Permintaan terkirim ke pemilik mobil.');
       onDone();
     } catch (e) {
       setErr(e.message);
@@ -370,7 +370,7 @@ function BookingPanel({ trip, from, to, setSel, init, onDone }) {
           <Landmark note={q.dropoff.note} />
         </label>
         <p className="help">
-          Penumpang naik dan turun di titik yang ditentukan driver.
+          Penumpang naik dan turun di titik yang ditentukan pemilik mobil.
           {from || to ? ' Titik terdekat dari lokasi Anda sudah dipilih otomatis.' : ''}
         </p>
       </div>
@@ -413,7 +413,7 @@ function BookingPanel({ trip, from, to, setSel, init, onDone }) {
         <label className="toggle" style={{ padding: 0 }}>
           <span className="toggle-text">
             <b>Ajukan harga sendiri</b>
-            <span className="help">Driver bisa menerima, menolak, atau menawar balik.</span>
+            <span className="help">Pemilik mobil bisa menerima, menolak, atau menawar balik.</span>
           </span>
           <input type="checkbox" className="switch" checked={offer} onChange={(e) => setOffer(e.target.checked)} />
         </label>
@@ -424,7 +424,7 @@ function BookingPanel({ trip, from, to, setSel, init, onDone }) {
           <Stepper label="harga" wide value={Number(price)} onChange={setPrice} min={1000} max={total * 2} step={5000} format={fmtRp} />
         </div>
       )}
-      <input className="input" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Pesan untuk driver (opsional)" />
+      <input className="input" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Pesan untuk pemilik mobil (opsional)" />
 
       <ul className="breakdown">
         <li className="total">
@@ -441,13 +441,13 @@ function BookingPanel({ trip, from, to, setSel, init, onDone }) {
             Pesan sekarang
           </>
         ) : (
-          'Kirim permintaan ke driver'
+          'Kirim permintaan ke pemilik mobil'
         )}
       </button>
       <p className="xs muted" style={{ textAlign: 'center' }}>
         {trip.instant_booking && !offer
-          ? 'Kursi langsung terkonfirmasi. Bayar langsung ke driver.'
-          : 'Driver akan mengonfirmasi atau menawar balik. Bayar langsung ke driver.'}
+          ? 'Kursi langsung terkonfirmasi. Bayar langsung ke pemilik mobil.'
+          : 'Pemilik mobil akan mengonfirmasi atau menawar balik. Bayar langsung ke pemilik mobil.'}
       </p>
     </form>
   );

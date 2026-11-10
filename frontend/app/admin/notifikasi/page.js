@@ -46,7 +46,7 @@ export default function AdminNotifications() {
   const sum = (prefix) => Object.entries(counts).reduce((n, [k, v]) => (k.startsWith(prefix) ? n + v : n), 0);
 
   return (
-    <AdminShell title="Log notifikasi" desc="Semua notifikasi yang dikirim ke driver dan penumpang: pesanan, chat, dan status trip.">
+    <AdminShell title="Log notifikasi" desc="Semua notifikasi yang dikirim ke pemilik mobil dan penumpang: pesanan, chat, dan status trip.">
       <div className="stats" style={{ marginBottom: 16 }}>
         {[
           ['Pesanan', sum('booking'), 'ticket'],

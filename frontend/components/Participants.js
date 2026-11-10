@@ -15,11 +15,11 @@ export default function Participants({ list, meId }) {
     <div className="card stack" style={{ '--gap': '14px' }}>
       <div>
         <h3>Peserta trip</h3>
-        <p className="xs muted">Nomor telepon hanya bisa dilihat antara driver dan penumpang. Sesama penumpang tidak bisa melihat nomor satu sama lain.</p>
+        <p className="xs muted">Nomor telepon hanya bisa dilihat antara pemilik mobil dan penumpang. Sesama penumpang tidak bisa melihat nomor satu sama lain.</p>
       </div>
       {list.map((p) => {
         const me = p.user.id === meId;
-        const sub = p.role === 'driver' ? `Driver${p.user.car_model ? ` · ${p.user.car_model} ${p.user.car_plate || ''}` : ''}` : `Penumpang · ${p.seats} orang${p.luggage ? ` · ${p.luggage} koper` : ''}`;
+        const sub = p.role === 'driver' ? `Pemilik mobil${p.user.car_model ? ` · ${p.user.car_model} ${p.user.car_plate || ''}` : ''}` : `Penumpang · ${p.seats} orang${p.luggage ? ` · ${p.luggage} koper` : ''}`;
         return (
           <div key={p.user.id + p.role} className="participant">
             <div className="row-between" style={{ alignItems: 'flex-start' }}>
