@@ -1,0 +1,31 @@
+import './globals.css';
+import { Providers } from './providers';
+import Nav from '@/components/Nav';
+
+export const metadata = {
+  title: 'Nebeng — berbagi tumpangan',
+  description: 'Cari tumpangan searah atau isi kursi kosong mobil Anda, dalam kota maupun antar kota.',
+};
+
+export const viewport = { width: 'device-width', initialScale: 1, themeColor: '#ffffff' };
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="id">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        />
+      </head>
+      <body>
+        <Providers>
+          <Nav />
+          <main className="page">{children}</main>
+        </Providers>
+      </body>
+    </html>
+  );
+}

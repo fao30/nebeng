@@ -1,0 +1,17 @@
+# Render Blueprint: deploys the Go API. Frontend goes to Vercel (see README).
+services:
+  - type: web
+    name: nebeng-api
+    runtime: docker
+    rootDir: backend
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: "*"
+      - key: SEED_DEMO
+        value: "true"
+      - key: APP_TIMEZONE
+        value: Asia/Jakarta
