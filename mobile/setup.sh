@@ -54,7 +54,7 @@ node -e "const f='app.json',j=require('./'+f);j.displayName='Numpang';require('f
 # ---------- Android ----------
 say "Android: izin lokasi, nama, arsitektur lama"
 MANIFEST=android/app/src/main/AndroidManifest.xml
-for P in ACCESS_FINE_LOCATION ACCESS_COARSE_LOCATION; do
+for P in ACCESS_FINE_LOCATION ACCESS_COARSE_LOCATION VIBRATE; do
   grep -q "android.permission.$P" "$MANIFEST" || perl -0pi -e "s#(<uses-permission android:name=\"android.permission.INTERNET\" />)#\$1\n    <uses-permission android:name=\"android.permission.$P\" />#" "$MANIFEST"
 done
 if [ -n "$MAPS_KEY" ]; then

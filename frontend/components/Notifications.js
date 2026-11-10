@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Icon from './Icon';
+import { patternFor, playSound } from '@/lib/sound';
 import { markRead, metaFor, onArrival, timeAgo, useNotificationFeed, useNotifications } from '@/lib/notifications';
 
 /** Bell with unread badge, for the header. */
@@ -51,6 +52,7 @@ export function NotificationToasts() {
   useEffect(
     () =>
       onArrival((n) => {
+        playSound(patternFor(n.type, metaFor(n.type).tone), { dedupeKey: `${n.id}|${n.at}` });
         if (path === '/notifikasi') return;
         setList((l) => [n, ...l.filter((x) => x.id !== n.id)].slice(0, 3));
         setTimeout(() => setList((l) => l.filter((x) => x.id !== n.id || x.at !== n.at)), 6000);

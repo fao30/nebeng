@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { Vibration } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EventSource from 'react-native-sse';
 import { api, getToken, loadToken, setBlockedHandler, setToken } from './api';
@@ -90,6 +91,12 @@ export function AppProvider({ children }) {
           return { items, unread: items.filter((x) => !x.read_at).length };
         });
         setToast(n);
+        // Short buzz pattern per kind (system sound needs push notifications, planned later).
+        try {
+          Vibration.vibrate(n.type === 'chat' ? 40 : [0, 60, 80, 60]);
+        } catch {
+          /* no vibrator */
+        }
         listeners.current.forEach((fn) => fn(n));
         if (n.type === 'kyc') refreshUser();
       } else if (msg.type === 'read' || msg.type === 'ready') {

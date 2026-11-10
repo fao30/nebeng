@@ -7,6 +7,7 @@ import Icon from '@/components/Icon';
 import { Empty, Segmented } from '@/components/ui';
 import { NotificationItem } from '@/components/Notifications';
 import { markRead, metaFor, useNotifications } from '@/lib/notifications';
+import { onSoundChange, setSoundEnabled, soundEnabled } from '@/lib/sound';
 
 const FILTERS = [
   { value: 'all', label: 'Semua' },
@@ -86,12 +87,15 @@ export default function NotificationsPage() {
             <span className={`live-dot ${live ? 'on' : ''}`} title={live ? 'Tersambung langsung' : 'Menyambung ulang…'} />
           </p>
         </div>
-        {unread > 0 && (
-          <button className="btn btn-soft btn-sm" onClick={() => markRead()}>
-            <Icon name="check" className="icon-sm" />
-            Tandai semua dibaca
-          </button>
-        )}
+        <div className="row" style={{ gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <SoundToggle />
+          {unread > 0 && (
+            <button className="btn btn-soft btn-sm" onClick={() => markRead()}>
+              <Icon name="check" className="icon-sm" />
+              Tandai semua dibaca
+            </button>
+          )}
+        </div>
       </div>
 
       {perm === 'default' && (
@@ -128,5 +132,25 @@ export default function NotificationsPage() {
         </section>
       ))}
     </div>
+  );
+}
+
+function SoundToggle() {
+  const [on, setOn] = useState(true);
+  useEffect(() => {
+    setOn(soundEnabled());
+    return onSoundChange(setOn);
+  }, []);
+  return (
+    <button
+      type="button"
+      className={`btn btn-sm ${on ? 'btn-soft' : 'btn-ghost'}`}
+      onClick={() => setSoundEnabled(!on)}
+      aria-pressed={on}
+      title={on ? 'Matikan suara notifikasi' : 'Nyalakan suara notifikasi'}
+    >
+      <Icon name={on ? 'volume' : 'mute'} className="icon-sm" />
+      {on ? 'Suara nyala' : 'Suara mati'}
+    </button>
   );
 }
