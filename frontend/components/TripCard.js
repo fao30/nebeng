@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Icon from './Icon';
 import { Person } from './ui';
 import RouteTimeline from './RouteTimeline';
+import MiniRoute from './MiniRoute';
 import { AMENITIES, fmtDuration, fmtRp, hasAmenity, tripStatusLabel } from '@/lib/format';
 
 const km = (d) => (d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1).replace('.', ',')} km`);
@@ -30,6 +31,7 @@ export default function TripCard({ trip, href, showStatus, children, radius }) {
         )}
       </div>
       <div className="trip-price">
+        <MiniRoute points={[trip.origin, ...(trip.stops || []), trip.destination]} from={q?.pickup_index} to={q?.dropoff_index} size={84} />
         <b>{fmtRp(price)}</b>
         <span className="xs">per kursi</span>
         {showStatus && trip.status !== 'scheduled' && (

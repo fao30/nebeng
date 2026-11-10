@@ -79,6 +79,15 @@ export default function Cari() {
   const [err, setErr] = useState('');
   const [sheet, setSheet] = useState(false);
   const [view, setView] = useState('list');
+  // Wide screens keep the map open beside the results (map-first layout).
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1280px)');
+    const on = () => setWide(mq.matches);
+    on();
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
   const [others, setOthers] = useState(null); // other trips when the route has none
   const [near, setNear] = useState(null); // trips just outside the chosen radius
   const [showOthers, setShowOthers] = useState(false);
@@ -299,15 +308,17 @@ export default function Cari() {
                 Filter
                 {activeCount > 0 && <span className="count">{activeCount}</span>}
               </button>
-              <Segmented
-                label="Tampilan"
-                value={view}
-                onChange={setView}
-                options={[
-                  { value: 'list', label: 'Daftar', icon: 'list' },
-                  { value: 'map', label: 'Peta', icon: 'map' },
-                ]}
-              />
+              {!wide && (
+                <Segmented
+                  label="Tampilan"
+                  value={view}
+                  onChange={setView}
+                  options={[
+                    { value: 'list', label: 'Daftar', icon: 'list' },
+                    { value: 'map', label: 'Peta', icon: 'map' },
+                  ]}
+                />
+              )}
             </div>
           </div>
 
@@ -332,7 +343,7 @@ export default function Cari() {
 
           {err && <p className="error">{err}</p>}
 
-          {view === 'map' && (
+          {view === 'map' && !wide && (
             <MapView
               markers={markers}
               circles={circles}
@@ -415,7 +426,7 @@ export default function Cari() {
             </Empty>
           )}
 
-          {view === 'list' &&
+          {(view === 'list' || wide) &&
             groups.map((g) => (
               <div key={g.day}>
                 <div className="day-head">{g.day}</div>
@@ -427,6 +438,17 @@ export default function Cari() {
               </div>
             ))}
         </section>
+        {wide && (
+          <aside className="results-map" aria-label="Peta trip">
+            <MapView
+              markers={markers}
+              circles={circles}
+              lines={(shown.length ? shown : near || []).slice(0, 20).map((t) => ({ points: routeOf(t), kind: 'route' }))}
+              fitKey={`${shown.length}-${query?.from?.lat}-${query?.to?.lat}`}
+              height="calc(100vh - var(--header-h) - 48px)"
+            />
+          </aside>
+        )}
       </div>
 
       <Sheet

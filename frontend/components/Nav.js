@@ -31,7 +31,7 @@ export function BrandGlyph() {
     <span className="brand-glyph" aria-hidden>
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round">
         <circle cx="6" cy="18" r="2.2" fill="#fff" stroke="none" />
-        <circle cx="18" cy="6" r="2.2" fill="#fff" stroke="none" />
+        <circle cx="18" cy="6" r="2.2" fill="#7fe0ee" stroke="none" />
         <path d="M6 18c0-6 12-6 12-12" />
       </svg>
     </span>

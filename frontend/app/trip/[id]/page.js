@@ -217,7 +217,7 @@ function PassengerView({ trip, user, reload, from, to, setSel, init }) {
             />
             {q && !active && (
               <p className="xs muted" style={{ marginTop: 12 }}>
-                Bagian ungu adalah ruas yang Anda tempuh, sekitar {fmtDuration(new Date(q.dropoff_at) - new Date(q.pickup_at))}. Jam tiba
+                Bagian biru adalah ruas yang Anda tempuh, sekitar {fmtDuration(new Date(q.dropoff_at) - new Date(q.pickup_at))}. Jam tiba
                 adalah perkiraan.
               </p>
             )}
