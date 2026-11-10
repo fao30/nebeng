@@ -10,26 +10,40 @@ type Point struct {
 }
 
 type User struct {
-	ID          string       `json:"id"`
-	Name        string       `json:"name"`
-	Email       string       `json:"email"`
-	Phone       string       `json:"phone"`
-	CarModel    string       `json:"car_model"`
-	CarPlate    string       `json:"car_plate"`
-	IsAdmin     bool         `json:"is_admin"`
-	SavedRoutes []SavedRoute `json:"saved_routes,omitempty"`
-	PassHash    string       `json:"pass_hash,omitempty"`
-	Salt        string       `json:"salt,omitempty"`
-	CreatedAt   time.Time    `json:"created_at"`
+	ID                   string       `json:"id"`
+	Name                 string       `json:"name"`
+	Email                string       `json:"email"`
+	Phone                string       `json:"phone"`
+	CarModel             string       `json:"car_model"`
+	CarPlate             string       `json:"car_plate"`
+	IsAdmin              bool         `json:"is_admin"`
+	SavedRoutes          []SavedRoute `json:"saved_routes,omitempty"`
+	TermsVersion         string       `json:"terms_version,omitempty"`
+	TermsAcceptedAt      *time.Time   `json:"terms_accepted_at,omitempty"`
+	Blocked              bool         `json:"blocked,omitempty"`
+	BlockedReason        string       `json:"blocked_reason,omitempty"`
+	BlockedAt            *time.Time   `json:"blocked_at,omitempty"`
+	BlockedBy            string       `json:"blocked_by,omitempty"`
+	DriverRatingSum      int          `json:"driver_rating_sum,omitempty"`
+	DriverRatingCount    int          `json:"driver_rating_count,omitempty"`
+	PassengerRatingSum   int          `json:"passenger_rating_sum,omitempty"`
+	PassengerRatingCount int          `json:"passenger_rating_count,omitempty"`
+	PassHash             string       `json:"pass_hash,omitempty"`
+	Salt                 string       `json:"salt,omitempty"`
+	CreatedAt            time.Time    `json:"created_at"`
 }
 
 // PublicUser is what other users may see.
 type PublicUser struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Phone    string `json:"phone,omitempty"`
-	CarModel string `json:"car_model,omitempty"`
-	CarPlate string `json:"car_plate,omitempty"`
+	ID               string  `json:"id"`
+	Name             string  `json:"name"`
+	Phone            string  `json:"phone,omitempty"`
+	CarModel         string  `json:"car_model,omitempty"`
+	CarPlate         string  `json:"car_plate,omitempty"`
+	DriverRating     float64 `json:"driver_rating,omitempty"`
+	DriverRatings    int     `json:"driver_ratings,omitempty"`
+	PassengerRating  float64 `json:"passenger_rating,omitempty"`
+	PassengerRatings int     `json:"passenger_ratings,omitempty"`
 }
 
 const (
@@ -118,13 +132,17 @@ type Booking struct {
 	OfferedTime *time.Time `json:"offered_time,omitempty"` // driver-proposed pickup time
 	// The passenger's own places (where they come from / go to). Pickup and
 	// Dropoff above are always the driver's route points.
-	PassengerFrom *Point    `json:"passenger_from,omitempty"`
-	PassengerTo   *Point    `json:"passenger_to,omitempty"`
-	Status        string    `json:"status"`
-	Offers        []Offer   `json:"offers"`
-	AgreedPrice   int64     `json:"agreed_price"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	PassengerFrom    *Point     `json:"passenger_from,omitempty"`
+	PassengerTo      *Point     `json:"passenger_to,omitempty"`
+	Status           string     `json:"status"`
+	Offers           []Offer    `json:"offers"`
+	AgreedPrice      int64      `json:"agreed_price"`
+	BoardedAt        *time.Time `json:"boarded_at,omitempty"`
+	DroppedAt        *time.Time `json:"dropped_at,omitempty"`
+	RatedByPassenger bool       `json:"rated_by_passenger,omitempty"`
+	RatedByDriver    bool       `json:"rated_by_driver,omitempty"`
+	CreatedAt        time.Time  `json:"created_at"`
+	UpdatedAt        time.Time  `json:"updated_at"`
 }
 
 // Route returns origin, stops and destination in travel order.

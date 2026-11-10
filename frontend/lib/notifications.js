@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useSyncExternalStore } from 'react';
-import { API_URL, api, getToken } from './api';
+import { API_URL, accountBlocked, api, getToken } from './api';
 
 /**
  * One shared notification feed per tab: loaded once, then kept fresh over
@@ -53,6 +53,7 @@ function connect() {
     }
     if (msg.type === 'notification') upsert(msg.notification);
     else if (msg.type === 'read') refresh(); // read on another tab or device
+    else if (msg.type === 'account' && msg.blocked) accountBlocked(msg.message);
     else if (msg.type === 'ready') refresh(); // (re)connected: catch up on anything missed
   };
   poll = setInterval(() => !state.live && refresh(), 30000);
@@ -122,6 +123,11 @@ export const NOTIF_META = {
   trip_reminder: { icon: 'clock', tone: 'amber', group: 'trip' },
   trip_new: { icon: 'route', tone: 'primary', group: 'trip' },
   request_new: { icon: 'megaphone', tone: 'primary', group: 'pesanan' },
+  boarded: { icon: 'shield', tone: 'mint', group: 'trip' },
+  dropped_off: { icon: 'flag', tone: 'mint', group: 'trip' },
+  rated: { icon: 'star', tone: 'amber', group: 'trip' },
+  report_new: { icon: 'flag', tone: 'red', group: 'lain' },
+  report_updated: { icon: 'shield', tone: 'primary', group: 'lain' },
 };
 
 export const NOTIF_LABEL = {
@@ -139,6 +145,11 @@ export const NOTIF_LABEL = {
   trip_reminder: 'Pengingat',
   trip_new: 'Trip baru',
   request_new: 'Permintaan penumpang',
+  boarded: 'Naik (kode cocok)',
+  dropped_off: 'Diantar',
+  rated: 'Rating',
+  report_new: 'Laporan baru',
+  report_updated: 'Laporan diproses',
 };
 
 export const metaFor = (type) => NOTIF_META[type] || { icon: 'info', tone: 'primary', group: 'lain' };

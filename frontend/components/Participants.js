@@ -23,7 +23,7 @@ export default function Participants({ list, meId }) {
         return (
           <div key={p.user.id + p.role} className="participant">
             <div className="row-between" style={{ alignItems: 'flex-start' }}>
-              <Person user={{ ...p.user, name: me ? `${p.user.name} (Anda)` : p.user.name }} sub={sub} />
+              <Person user={{ ...p.user, name: me ? `${p.user.name} (Anda)` : p.user.name }} sub={sub} rating={p.role} />
               {!me && p.user.phone && (
                 <div className="row" style={{ '--gap': '6px' }}>
                   <a className="btn btn-sm icon-btn" href={`tel:${p.user.phone}`} aria-label={`Telepon ${p.user.name}`} title={p.user.phone}>

@@ -35,7 +35,7 @@ export default function TripCard({ trip, href, showStatus, children }) {
         )}
       </div>
       <div className="trip-foot">
-        <Person user={trip.driver} sub={trip.vehicle || 'Kendaraan belum diisi'} />
+        <Person user={trip.driver} sub={trip.vehicle || 'Kendaraan belum diisi'} rating="driver" />
         <div className="amen" aria-label="Fasilitas">
           {icons.map((a) => (
             <Icon key={a.key} name={a.icon} title={a.label} />

@@ -25,12 +25,13 @@ type API struct {
 type apiError struct {
 	status int
 	msg    string
+	code   string
 }
 
 func (e apiError) Error() string { return e.msg }
 
 func errf(status int, format string, a ...any) error {
-	return apiError{status, fmt.Sprintf(format, a...)}
+	return apiError{status: status, msg: fmt.Sprintf(format, a...)}
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {
@@ -42,7 +43,11 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 func writeErr(w http.ResponseWriter, err error) {
 	var ae apiError
 	if errors.As(err, &ae) {
-		writeJSON(w, ae.status, map[string]string{"error": ae.msg})
+		body := map[string]string{"error": ae.msg}
+		if ae.code != "" {
+			body["code"] = ae.code
+		}
+		writeJSON(w, ae.status, body)
 		return
 	}
 	writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
@@ -78,10 +83,17 @@ func (a *API) auth(fn authedFunc) http.HandlerFunc {
 			return errf(401, "%s", err.Error())
 		}
 		a.store.mu.RLock()
-		_, ok := a.store.Users[uid]
+		u, ok := a.store.Users[uid]
+		var blocked error
+		if ok && u.Blocked {
+			blocked = blockedErr(u)
+		}
 		a.store.mu.RUnlock()
 		if !ok {
 			return errf(401, "akun tidak ditemukan")
+		}
+		if blocked != nil {
+			return blocked
 		}
 		return fn(w, r, uid)
 	})
@@ -392,9 +404,13 @@ func (a *API) register(w http.ResponseWriter, r *http.Request) error {
 		Email    string `json:"email"`
 		Phone    string `json:"phone"`
 		Password string `json:"password"`
+		Terms    string `json:"accept_terms"` // version of the terms the user agreed to
 	}
 	if err := readJSON(r, &in); err != nil {
 		return err
+	}
+	if in.Terms != TermsVersion {
+		return errf(400, "setujui Syarat & Ketentuan Nebeng untuk mendaftar")
 	}
 	in.Email = strings.ToLower(strings.TrimSpace(in.Email))
 	in.Name = strings.TrimSpace(in.Name)
@@ -416,6 +432,8 @@ func (a *API) register(w http.ResponseWriter, r *http.Request) error {
 	salt := randomToken(16)
 	u := &User{ID: newID("usr"), Name: in.Name, Email: in.Email, Phone: strings.TrimSpace(in.Phone),
 		Salt: salt, PassHash: hashPassword(in.Password, salt), CreatedAt: time.Now()}
+	now := time.Now()
+	u.TermsVersion, u.TermsAcceptedAt = TermsVersion, &now
 	s.Users[u.ID] = u
 	s.byEmail[u.Email] = u.ID
 	s.Changed()
@@ -437,6 +455,9 @@ func (a *API) login(w http.ResponseWriter, r *http.Request) error {
 	u := s.Users[s.byEmail[strings.ToLower(strings.TrimSpace(in.Email))]]
 	if u == nil || !checkPassword(u, in.Password) {
 		return errf(401, "email atau password salah")
+	}
+	if u.Blocked {
+		return blockedErr(u)
 	}
 	writeJSON(w, 200, a.session(u))
 	return nil
@@ -526,6 +547,9 @@ func (a *API) searchTrips(w http.ResponseWriter, r *http.Request) error {
 	out := []*TripView{}
 	for _, t := range s.Trips {
 		if t.Status != TripScheduled || t.DepartAt.Before(now.Add(-time.Hour)) {
+			continue
+		}
+		if d := s.Users[t.DriverID]; d == nil || d.Blocked {
 			continue
 		}
 		if kind != "" && t.Kind != kind {
@@ -743,6 +767,11 @@ func (a *API) tripStatus(w http.ResponseWriter, r *http.Request, uid string) err
 			return errf(409, "trip harus berjalan sebelum diselesaikan")
 		}
 		t.Status, t.CompletedAt = TripCompleted, &now
+		for _, b := range affected {
+			if b.BoardedAt != nil && b.DroppedAt == nil {
+				b.DroppedAt = &now
+			}
+		}
 	case "cancel":
 		if t.Status != TripScheduled {
 			return errf(409, "hanya trip terjadwal yang bisa dibatalkan")

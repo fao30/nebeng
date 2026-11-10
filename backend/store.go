@@ -21,6 +21,10 @@ type Store struct {
 	Requests      map[string]*RideRequest  `json:"requests"`
 	Messages      map[string]*Message      `json:"messages"`
 	Notifications map[string]*Notification `json:"notifications"`
+	Ratings       map[string]*Rating       `json:"ratings"`
+	Reports       map[string]*Report       `json:"reports"`
+	BoardingCodes map[string]string        `json:"boarding_codes"` // booking → code, never sent to drivers
+	CodeTries     map[string]int           `json:"code_tries"`
 	Settings      *Settings                `json:"settings"`
 
 	path    string
@@ -55,6 +59,18 @@ func NewStore(path string) *Store {
 	}
 	if s.Notifications == nil {
 		s.Notifications = map[string]*Notification{}
+	}
+	if s.Ratings == nil {
+		s.Ratings = map[string]*Rating{}
+	}
+	if s.Reports == nil {
+		s.Reports = map[string]*Report{}
+	}
+	if s.BoardingCodes == nil {
+		s.BoardingCodes = map[string]string{}
+	}
+	if s.CodeTries == nil {
+		s.CodeTries = map[string]int{}
 	}
 	if s.Settings == nil || s.Settings.valid() != nil {
 		s.Settings = defaultSettings()
@@ -134,7 +150,9 @@ func (s *Store) publicUser(id string, withContact bool) *PublicUser {
 	}
 	// Before a booking is confirmed, others only see a short name and the car
 	// model: no surname, phone number or licence plate.
-	p := &PublicUser{ID: u.ID, Name: shortName(u.Name), CarModel: u.CarModel}
+	p := &PublicUser{ID: u.ID, Name: shortName(u.Name), CarModel: u.CarModel,
+		DriverRating: avg(u.DriverRatingSum, u.DriverRatingCount), DriverRatings: u.DriverRatingCount,
+		PassengerRating: avg(u.PassengerRatingSum, u.PassengerRatingCount), PassengerRatings: u.PassengerRatingCount}
 	if withContact {
 		p.Name, p.Phone, p.CarPlate = u.Name, u.Phone, u.CarPlate
 	}

@@ -41,7 +41,7 @@ export default function TripPage() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     setPlaces({ from: parsePoint(q.get('p')), to: parsePoint(q.get('d')) });
-    setInit({ seats: Number(q.get('s')) || 1, luggage: Number(q.get('k')) || 0, chat: q.get('chat') || '' });
+    setInit({ seats: Number(q.get('s')) || 1, luggage: Number(q.get('k')) || 0, chat: q.get('chat') || '', rate: q.get('rate') || '' });
   }, []);
 
   const load = useCallback(() => {
@@ -73,7 +73,7 @@ export default function TripPage() {
 
   const isDriver = user && trip.driver_id === user.id;
   return isDriver ? (
-    <DriverView trip={trip} reload={load} chatId={init.chat} />
+    <DriverView trip={trip} reload={load} chatId={init.chat} rateId={init.rate} />
   ) : (
     <PassengerView
       trip={trip}
@@ -121,7 +121,7 @@ function DriverCard({ trip }) {
   return (
     <div className="card stack">
       <div className="row-between wrap">
-        <Person user={trip.driver} sub={trip.vehicle || 'Kendaraan belum diisi'} large />
+        <Person user={trip.driver} sub={trip.vehicle || 'Kendaraan belum diisi'} large rating="driver" />
         {trip.plate ? (
           <span className="plate" aria-label="Pelat nomor">
             {trip.plate}
@@ -232,7 +232,7 @@ function PassengerView({ trip, user, reload, from, to, setSel, init }) {
         <aside className="detail-aside stack" style={{ '--gap': '16px' }} id="pesan">
           {active ? (
             <>
-              <Negotiation booking={active} role="passenger" onChange={reload} openChat={active.id === init?.chat} />
+              <Negotiation booking={active} role="passenger" onChange={reload} openChat={active.id === init?.chat} openRate={active.id === init?.rate} />
               <Participants list={trip.participants} meId={user?.id} />
               {accepted && trip.status !== 'completed' && trip.status !== 'cancelled' && (
                 <LivePanel sharing={sharing} onToggle={() => setSharing(!sharing)} broadcast={broadcast} shareToken={shareToken} live={live} passenger />
@@ -261,7 +261,7 @@ function PassengerView({ trip, user, reload, from, to, setSel, init }) {
               {mine
                 .filter((b) => b !== active)
                 .map((b) => (
-                  <Negotiation key={b.id} booking={b} role="passenger" openChat={b.id === init?.chat} />
+                  <Negotiation key={b.id} booking={b} role="passenger" openChat={b.id === init?.chat} openRate={b.id === init?.rate} onChange={reload} />
                 ))}
             </div>
           )}
@@ -455,7 +455,7 @@ function BookingPanel({ trip, from, to, setSel, init, onDone }) {
 
 /* ---------- driver ---------- */
 
-function DriverView({ trip, reload, chatId }) {
+function DriverView({ trip, reload, chatId, rateId }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [sharing, setSharing] = useState(false);
@@ -573,7 +573,7 @@ function DriverView({ trip, reload, chatId }) {
               </Empty>
             )}
             {[...pending, ...accepted, ...closed].map((b) => (
-              <Negotiation key={b.id} booking={b} role="driver" onChange={reload} openChat={b.id === chatId} />
+              <Negotiation key={b.id} booking={b} role="driver" onChange={reload} openChat={b.id === chatId} openRate={b.id === rateId} />
             ))}
           </section>
         </div>

@@ -5,6 +5,9 @@ import { useApp } from '@/app/providers';
 import Icon from './Icon';
 import { Avatar } from './ui';
 import { NotificationBell, NotificationToasts } from './Notifications';
+import { TERMS_VERSION, TermsModal } from './Terms';
+import { api } from '@/lib/api';
+import { useState } from 'react';
 
 const TABS = {
   passenger: [
@@ -34,7 +37,8 @@ export function BrandGlyph() {
 }
 
 export default function Nav() {
-  const { user, mode, setMode, signOut } = useApp();
+  const { user, setUser, mode, setMode, signOut } = useApp();
+  const [termsBusy, setTermsBusy] = useState(false);
   const path = usePathname();
   const router = useRouter();
   if (path.startsWith('/live/')) return null;
@@ -112,6 +116,31 @@ export default function Nav() {
         </div>
       </header>
       {user && <NotificationToasts />}
+      {/* Existing accounts accept new or updated terms before continuing. */}
+      <TermsModal
+        open={!!user && user.terms_version !== TERMS_VERSION && !path.startsWith('/syarat')}
+        busy={termsBusy}
+        acceptLabel="Setuju"
+        onAccept={async () => {
+          setTermsBusy(true);
+          try {
+            setUser(await api('/me/terms', { method: 'POST', body: { version: TERMS_VERSION } }));
+          } finally {
+            setTermsBusy(false);
+          }
+        }}
+        footerExtra={
+          <button
+            className="link small"
+            onClick={() => {
+              signOut();
+              router.push('/');
+            }}
+          >
+            Tidak setuju, keluar
+          </button>
+        }
+      />
       {user && (
         <nav className="tabbar" aria-label="Menu">
           {tabs.map((t) => (

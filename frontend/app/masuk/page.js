@@ -1,10 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useApp } from '../providers';
 import { Segmented } from '@/components/ui';
 import { BrandGlyph } from '@/components/Nav';
+import { TERMS_VERSION, TermsLink, TermsModal } from '@/components/Terms';
 
 export default function Masuk() {
   const { signIn, mode } = useApp();
@@ -13,19 +14,43 @@ export default function Masuk() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [terms, setTerms] = useState(false);
+  const [blocked, setBlocked] = useState('');
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
-  async function submit(e) {
+  useEffect(() => {
+    try {
+      const m = sessionStorage.getItem('nebeng_blocked');
+      if (m) {
+        setBlocked(m);
+        sessionStorage.removeItem('nebeng_blocked');
+      }
+    } catch {
+      /* storage unavailable */
+    }
+  }, []);
+
+  function submit(e) {
     e.preventDefault();
+    setErr('');
+    // Sign-up goes through the Terms & Conditions popup first.
+    if (tab === 'register') setTerms(true);
+    else send();
+  }
+
+  async function send() {
     setBusy(true);
     setErr('');
     try {
-      const session = await api(tab === 'login' ? '/auth/login' : '/auth/register', { method: 'POST', body: form });
+      const body = tab === 'register' ? { ...form, accept_terms: TERMS_VERSION } : form;
+      const session = await api(tab === 'login' ? '/auth/login' : '/auth/register', { method: 'POST', body });
+      setTerms(false);
       signIn(session);
       const next = new URLSearchParams(window.location.search).get('next');
       router.push(next && next.startsWith('/') ? next : mode === 'driver' ? '/driver' : '/cari');
     } catch (e) {
       setErr(e.message);
+      setTerms(false);
     } finally {
       setBusy(false);
     }
@@ -38,6 +63,12 @@ export default function Masuk() {
         <h1>{tab === 'login' ? 'Selamat datang kembali' : 'Buat akun Nebeng'}</h1>
         <p className="muted">Satu akun untuk nebeng dan memberi tumpangan.</p>
       </div>
+      {blocked && (
+        <div className="banner banner-danger" role="alert" style={{ marginBottom: 14 }}>
+          <b>Akun diblokir</b>
+          <span className="small">{blocked}</span>
+        </div>
+      )}
       <form onSubmit={submit} className="card stack" style={{ '--gap': '14px' }}>
         <Segmented
           label="Masuk atau daftar"
@@ -78,9 +109,15 @@ export default function Masuk() {
         </label>
         {err && <p className="error">{err}</p>}
         <button className="btn btn-primary btn-lg" disabled={busy}>
-          {tab === 'login' ? 'Masuk' : 'Buat akun'}
+          {tab === 'login' ? 'Masuk' : 'Lanjut'}
         </button>
+        {tab === 'register' && (
+          <p className="xs muted" style={{ textAlign: 'center' }}>
+            Sebelum akun dibuat, Anda akan diminta menyetujui <TermsLink />.
+          </p>
+        )}
       </form>
+      <TermsModal open={terms} busy={busy} onClose={() => setTerms(false)} onAccept={send} acceptLabel="Setuju dan buat akun" />
       <p className="small muted" style={{ textAlign: 'center', marginTop: 14 }}>
         Akun demo: <b>budi@demo.id</b> (driver) atau <b>andi@demo.id</b> (penumpang), password <b>demo123</b>
       </p>

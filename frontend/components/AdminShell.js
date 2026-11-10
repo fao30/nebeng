@@ -10,6 +10,7 @@ const TABS = [
   { href: '/admin/trip', label: 'Trip', icon: 'route' },
   { href: '/admin/percakapan', label: 'Percakapan', icon: 'message' },
   { href: '/admin/pengguna', label: 'Pengguna', icon: 'users' },
+  { href: '/admin/laporan', label: 'Laporan', icon: 'flag' },
   { href: '/admin/notifikasi', label: 'Log notifikasi', icon: 'bell' },
 ];
 

@@ -65,17 +65,26 @@ func (a *API) putSettings(w http.ResponseWriter, r *http.Request, uid string) er
 }
 
 type AdminUser struct {
-	ID         string    `json:"id"`
-	Name       string    `json:"name"`
-	Email      string    `json:"email"`
-	Phone      string    `json:"phone"`
-	CarModel   string    `json:"car_model"`
-	CarPlate   string    `json:"car_plate"`
-	IsAdmin    bool      `json:"is_admin"`
-	CreatedAt  time.Time `json:"created_at"`
-	TripsAsDrv int       `json:"trips_as_driver"`
-	Bookings   int       `json:"bookings_as_passenger"`
-	Requests   int       `json:"requests"`
+	ID               string     `json:"id"`
+	Name             string     `json:"name"`
+	Email            string     `json:"email"`
+	Phone            string     `json:"phone"`
+	CarModel         string     `json:"car_model"`
+	CarPlate         string     `json:"car_plate"`
+	IsAdmin          bool       `json:"is_admin"`
+	CreatedAt        time.Time  `json:"created_at"`
+	TripsAsDrv       int        `json:"trips_as_driver"`
+	Bookings         int        `json:"bookings_as_passenger"`
+	Requests         int        `json:"requests"`
+	Blocked          bool       `json:"blocked"`
+	BlockedReason    string     `json:"blocked_reason,omitempty"`
+	BlockedAt        *time.Time `json:"blocked_at,omitempty"`
+	DriverRating     float64    `json:"driver_rating"`
+	DriverRatings    int        `json:"driver_ratings"`
+	PassengerRating  float64    `json:"passenger_rating"`
+	PassengerRatings int        `json:"passenger_ratings"`
+	ReportsAgainst   int        `json:"reports_against"`
+	OpenReports      int        `json:"open_reports"`
 }
 
 func (a *API) adminUser(id string) *AdminUser {
@@ -84,7 +93,18 @@ func (a *API) adminUser(id string) *AdminUser {
 		return nil
 	}
 	au := &AdminUser{ID: u.ID, Name: u.Name, Email: u.Email, Phone: u.Phone, CarModel: u.CarModel,
-		CarPlate: u.CarPlate, IsAdmin: u.IsAdmin, CreatedAt: u.CreatedAt}
+		CarPlate: u.CarPlate, IsAdmin: u.IsAdmin, CreatedAt: u.CreatedAt,
+		Blocked: u.Blocked, BlockedReason: u.BlockedReason, BlockedAt: u.BlockedAt,
+		DriverRating: avg(u.DriverRatingSum, u.DriverRatingCount), DriverRatings: u.DriverRatingCount,
+		PassengerRating: avg(u.PassengerRatingSum, u.PassengerRatingCount), PassengerRatings: u.PassengerRatingCount}
+	for _, rp := range a.store.Reports {
+		if rp.TargetID == id {
+			au.ReportsAgainst++
+			if rp.Status == ReportOpen || rp.Status == ReportReviewing {
+				au.OpenReports++
+			}
+		}
+	}
 	for _, t := range a.store.Trips {
 		if t.DriverID == id {
 			au.TripsAsDrv++
@@ -265,7 +285,8 @@ func (a *API) adminUsers(w http.ResponseWriter, r *http.Request, uid string) err
 			continue
 		}
 		au := a.adminUser(id)
-		if (role == "driver" && au.TripsAsDrv == 0) || (role == "passenger" && au.Bookings+au.Requests == 0) || (role == "admin" && !au.IsAdmin) {
+		if (role == "driver" && au.TripsAsDrv == 0) || (role == "passenger" && au.Bookings+au.Requests == 0) || (role == "admin" && !au.IsAdmin) ||
+			(role == "blocked" && !au.Blocked) || (role == "reported" && au.ReportsAgainst == 0) {
 			continue
 		}
 		out = append(out, au)

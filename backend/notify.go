@@ -244,8 +244,12 @@ func (a *API) onTripStatus(t *Trip, action string, affected []*Booking) {
 				n.Link = "/live/" + t.ShareToken
 			}
 		case "complete":
+			if b.DroppedAt != nil && b.DroppedAt.Before(time.Now().Add(-time.Second)) {
+				continue // already told when they got off
+			}
 			n.Type, n.Title = NotifTripCompleted, "Trip selesai. Terima kasih sudah nebeng!"
-			n.Body = b.leg() + " · " + rupiah(b.AgreedPrice)
+			n.Body = b.leg() + " · " + rupiah(b.AgreedPrice) + " · beri rating driver"
+			n.Link = "/trip/" + t.ID + "?rate=" + b.ID
 		case "cancel":
 			n.Type, n.Title = NotifTripCancelled, "Driver membatalkan trip"
 			n.Body = route + " · " + a.when(t.DepartAt) + " · cari trip lain"
@@ -255,7 +259,7 @@ func (a *API) onTripStatus(t *Trip, action string, affected []*Booking) {
 	}
 	if action == "complete" {
 		a.notify(&Notification{UserID: t.DriverID, Type: NotifTripCompleted, Title: "Trip selesai",
-			Body: route + " · " + strconv.Itoa(len(affected)) + " penumpang diantar", Link: "/trip/" + t.ID, TripID: t.ID})
+			Body: route + " · " + strconv.Itoa(len(affected)) + " penumpang diantar · beri rating penumpang", Link: "/trip/" + t.ID, TripID: t.ID})
 	}
 }
 

@@ -13,6 +13,18 @@ export function getToken() {
   }
 }
 
+/** The admin blocked this account: sign out and explain on the sign-in page. */
+export function accountBlocked(message) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem('nebeng_token');
+    sessionStorage.setItem('nebeng_blocked', message || 'Akun Anda diblokir oleh admin Nebeng.');
+  } catch {
+    /* storage unavailable */
+  }
+  if (!window.location.pathname.startsWith('/masuk')) window.location.href = '/masuk?blocked=1';
+}
+
 export async function api(path, { method = 'GET', body, token } = {}) {
   const t = token ?? getToken();
   const res = await fetch(`${API_URL}/api${path}`, {
@@ -31,6 +43,7 @@ export async function api(path, { method = 'GET', body, token } = {}) {
     /* empty body */
   }
   if (!res.ok) {
+    if (res.status === 403 && data?.code === 'account_blocked' && t) accountBlocked(data.error);
     const err = new Error(data?.error || `Server membalas ${res.status}`);
     err.status = res.status;
     throw err;

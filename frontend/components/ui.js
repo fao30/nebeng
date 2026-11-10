@@ -11,13 +11,28 @@ export function Avatar({ name, large }) {
   );
 }
 
-export function Person({ user, sub, large }) {
+/** Star average for a user as driver or passenger, e.g. ★ 4.8 (12). */
+export function RatingBadge({ user, as }) {
+  const n = as === 'driver' ? user?.driver_ratings : user?.passenger_ratings;
+  const avg = as === 'driver' ? user?.driver_rating : user?.passenger_rating;
+  if (!n) return <span className="rating rating-new">Baru</span>;
+  return (
+    <span className="rating" title={`${avg} dari 5, ${n} rating sebagai ${as === 'driver' ? 'driver' : 'penumpang'}`}>
+      ★ {avg.toFixed(1)} <span className="muted">({n})</span>
+    </span>
+  );
+}
+
+export function Person({ user, sub, large, rating }) {
   if (!user) return null;
   return (
     <div className="person">
       <Avatar name={user.name} large={large} />
       <div className="person-text">
-        <b>{user.name}</b>
+        <b>
+          {user.name}
+          {rating && <RatingBadge user={user} as={rating} />}
+        </b>
         {sub && <span>{sub}</span>}
       </div>
     </div>
