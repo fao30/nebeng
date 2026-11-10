@@ -80,21 +80,28 @@ type Trip struct {
 	Luggage     bool      `json:"luggage"`     // accepts suitcases
 	MaxLuggage  int       `json:"max_luggage"` // max suitcases at once
 	// SegmentPrices[i] is the price per seat between route[i] and route[i+1].
-	SegmentPrices  []int64    `json:"segment_prices"`
-	PricePerSeat   int64      `json:"price_per_seat"` // full route = sum of segments
-	Negotiable     bool       `json:"negotiable"`
-	InstantBooking bool       `json:"instant_booking"` // book at list price without driver approval
-	Amenities      Amenities  `json:"amenities"`
-	Kind           string     `json:"kind"`
-	Vehicle        string     `json:"vehicle"`         // make & model, shown to everyone
-	Plate          string     `json:"plate,omitempty"` // shown only to confirmed participants
-	Notes          string     `json:"notes"`
-	Status         string     `json:"status"`
-	ShareToken     string     `json:"share_token,omitempty"`
-	Reminded       bool       `json:"reminded,omitempty"`
-	StartedAt      *time.Time `json:"started_at,omitempty"`
-	CompletedAt    *time.Time `json:"completed_at,omitempty"`
-	CreatedAt      time.Time  `json:"created_at"`
+	SegmentPrices  []int64   `json:"segment_prices"`
+	PricePerSeat   int64     `json:"price_per_seat"` // full route = sum of segments
+	Negotiable     bool      `json:"negotiable"`
+	InstantBooking bool      `json:"instant_booking"` // book at list price without driver approval
+	Amenities      Amenities `json:"amenities"`
+	Kind           string    `json:"kind"`
+	Vehicle        string    `json:"vehicle"`         // make & model, shown to everyone
+	Plate          string    `json:"plate,omitempty"` // shown only to confirmed participants
+	Notes          string    `json:"notes"`
+	// Road routing measured by the app when the trip was created (Google
+	// Routes / OpenStreetMap). One entry per leg route[i]→route[i+1]; empty for
+	// older trips, which fall back to the straight-line estimate.
+	LegKm       []float64  `json:"leg_km,omitempty"`
+	LegMinutes  []float64  `json:"leg_minutes,omitempty"`
+	RouteSrc    string     `json:"route_source,omitempty"` // google | osm
+	Path        string     `json:"path,omitempty"`         // encoded polyline along the roads
+	Status      string     `json:"status"`
+	ShareToken  string     `json:"share_token,omitempty"`
+	Reminded    bool       `json:"reminded,omitempty"`
+	StartedAt   *time.Time `json:"started_at,omitempty"`
+	CompletedAt *time.Time `json:"completed_at,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
 }
 
 const (

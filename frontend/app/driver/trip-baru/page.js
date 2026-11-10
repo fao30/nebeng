@@ -7,6 +7,8 @@ import MapView from '@/components/MapView';
 import PointField, { pointFromClick } from '@/components/PointField';
 import RequireAuth from '@/components/RequireAuth';
 import RouteTimeline from '@/components/RouteTimeline';
+import RouteSummary from '@/components/RouteSummary';
+import { encodePath, etasFromLegs, fmtKm, fmtMin, thinPath, useRoute } from '@/lib/routing';
 import Icon from '@/components/Icon';
 import { Stepper, Toggle } from '@/components/ui';
 import { useApp } from '../../providers';
@@ -48,7 +50,10 @@ function NewTrip() {
     setPrices((prev) => segKm.map((km, i) => (prev.length === segKm.length && prev[i] ? prev[i] : suggestSegmentPrice(km, cfg))));
   }, [segKm, cfg]);
 
-  const etas = route ? estimateEtas(route, new Date(departAt).toISOString(), kind, cfg) : [];
+  // Road route (Google Routes / OpenStreetMap): real path, distance and time per leg.
+  const { route: road } = useRoute(route, { kind, departAt });
+  const roadOK = road && road.source !== 'estimate' && road.legs.length === (route?.length || 0) - 1;
+  const etas = route ? (roadOK ? etasFromLegs(departAt, road.legs) : estimateEtas(route, new Date(departAt).toISOString(), kind, cfg)) : [];
   const preview = route && {
     origin,
     destination: dest,
@@ -112,6 +117,14 @@ function NewTrip() {
           vehicle,
           plate,
           notes,
+          ...(roadOK
+            ? {
+                leg_km: road.legs.map((l) => Math.round(l.km * 10) / 10),
+                leg_minutes: road.legs.map((l) => Math.round(l.min * 10) / 10),
+                route_source: road.source,
+                path: encodePath(thinPath(road.path)),
+              }
+            : {}),
         },
       });
       router.push(`/trip/${t.id}`);
@@ -166,9 +179,11 @@ function NewTrip() {
             <PointField label="Tujuan akhir" kind="dest" value={dest} onChange={setDest} active={active === 'dest'} onActivate={() => setActive('dest')} withNote notePlaceholder="Patokan tujuan (opsional)" />
             {route && (
               <p className="small muted">
-                ±{Math.round(segKm.reduce((a, b) => a + b, 0))} km{stops.length ? `, ${stops.length} titik stop` : ''}, {kind === 'antar_kota' ? 'antar kota' : 'dalam kota'}
+                {stops.length ? `${stops.length} titik stop, ` : ''}
+                {kind === 'antar_kota' ? 'antar kota' : 'dalam kota'}
               </p>
             )}
+            {route && <RouteSummary points={route} road={road} title="Rute lewat jalan" />}
           </div>
         )}
 
@@ -183,9 +198,10 @@ function NewTrip() {
               <div className="section-title">Perkiraan jam di tiap titik</div>
               <RouteTimeline trip={preview} />
               <p className="xs muted" style={{ marginTop: 12 }}>
-                Dihitung dari jarak dan kecepatan rata-rata. Penumpang melihat jam ini sebagai perkiraan.
+                {roadOK ? 'Dihitung dari rute jalan sebenarnya.' : 'Dihitung dari jarak dan kecepatan rata-rata.'} Penumpang melihat jam ini sebagai perkiraan.
               </p>
             </div>
+            <RouteSummary points={route} road={road} />
           </div>
         )}
 
@@ -201,7 +217,7 @@ function NewTrip() {
                       {shortPlace(route[i])} ke {shortPlace(route[i + 1])}
                     </b>
                     <span className="xs muted">
-                      ±{Math.round(segKm[i])} km, saran {fmtRp(suggestSegmentPrice(segKm[i], cfg))}
+                      {roadOK ? `${fmtKm(road.legs[i].km)} · ± ${fmtMin(road.legs[i].min)}` : `±${Math.round(segKm[i])} km`}, saran {fmtRp(suggestSegmentPrice(segKm[i], cfg))}
                     </span>
                   </div>
                   <Stepper
@@ -362,7 +378,7 @@ function NewTrip() {
             ...stops.map((s, i) => ({ ...s, kind: 'stop', popup: `Stop ${i + 1}: ${s.label}` })),
             ...(dest ? [{ ...dest, kind: 'dest', popup: dest.label }] : []),
           ]}
-          lines={route ? [{ points: route, kind: 'route' }] : []}
+          lines={route ? [{ points: road?.path || route, kind: 'route' }] : []}
           onClick={onMapClick}
           fitKey={`${origin?.lat}${dest?.lat}${stops.length}`}
           height={step === 0 ? 560 : 420}

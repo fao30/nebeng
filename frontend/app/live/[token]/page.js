@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import { fmtDay, fmtTime, routeOf, shortPlace, tripStatusLabel } from '@/lib/format';
 import { useLiveStream } from '@/lib/live';
+import { useTripRoad } from '@/lib/routing';
 import MapView from '@/components/MapView';
 import { Person } from '@/components/ui';
 
@@ -13,6 +14,7 @@ export default function LivePage() {
   const [err, setErr] = useState('');
   const live = useLiveStream(token);
   const [, tick] = useState(0);
+  const road = useTripRoad(snap?.trip);
 
   useEffect(() => {
     api(`/live/${token}`)
@@ -42,7 +44,7 @@ export default function LivePage() {
     <div className="live-page">
       <MapView
         markers={markers}
-        lines={[{ points: routeOf(snap.trip), kind: 'route' }]}
+        lines={[{ points: road?.path || routeOf(snap.trip), kind: 'route' }]}
         fitKey={driver ? 'driver' : 'none'}
         height="100%"
         className="map-full"

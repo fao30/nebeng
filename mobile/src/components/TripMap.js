@@ -9,7 +9,7 @@ import { routeOf } from '../format';
  * Route of a trip with its points and, while the trip runs, live positions.
  * iOS uses Apple Maps (no key). Android needs a Google Maps key first.
  */
-export default function TripMap({ trip, live = [], highlight, height = 220 }) {
+export default function TripMap({ trip, live = [], highlight, height = 220, path }) {
   const ref = useRef(null);
   const pts = routeOf(trip);
   const coords = pts.map((p) => ({ latitude: p.lat, longitude: p.lng }));
@@ -34,7 +34,7 @@ export default function TripMap({ trip, live = [], highlight, height = 220 }) {
         showsUserLocation
         toolbarEnabled={false}
       >
-        <Polyline coordinates={coords} strokeColor={colors.primary} strokeWidth={4} />
+        <Polyline coordinates={path?.length > 1 ? path.map((p) => ({ latitude: p.lat, longitude: p.lng })) : coords} strokeColor={colors.primary} strokeWidth={4} />
         {pts.map((p, i) => (
           <Marker
             key={i}

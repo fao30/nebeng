@@ -10,6 +10,8 @@ import { Banner, Button, Card, Chip, ErrorText, Loading, Person, Row, Screen, s 
 import { RouteTimeline, SectionTitle } from '../components/TripBits';
 import BookingCard from '../components/BookingCard';
 import TripMap from '../components/TripMap';
+import RouteLegs from '../components/RouteLegs';
+import { useTripRoad } from '../routing';
 import KycNotice from '../components/KycNotice';
 import { watchPosition } from '../geo';
 import { identityOK, useApp, useLiveRefresh } from '../state';
@@ -263,6 +265,7 @@ export default function Trip({ route, navigation }) {
   }, [load]);
   useLiveRefresh(load, { tripId: id });
   const live = useLive(trip?.share_token);
+  const road = useTripRoad(trip);
 
   useEffect(() => {
     if (trip) navigation.setOptions({ title: `${shortPlace(trip.origin)} → ${shortPlace(trip.destination)}` });
@@ -312,7 +315,8 @@ export default function Trip({ route, navigation }) {
           </Row>
         </View>
 
-        <TripMap trip={trip} live={live} highlight={q ? [q.pickup_index, q.dropoff_index] : null} />
+        <TripMap trip={trip} live={live} path={road?.path} highlight={q ? [q.pickup_index, q.dropoff_index] : null} />
+        <RouteLegs points={routeOf(trip)} road={road} />
 
         <Card>
           <Person user={trip.driver} rating="driver" sub={`${trip.vehicle || 'Kendaraan'}${trip.plate ? ` · ${trip.plate}` : ''}`} size={46} />

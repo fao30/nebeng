@@ -9,6 +9,8 @@ const km = (d) => (d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1).replace
 import { useApp } from '../../providers';
 import MapView from '@/components/MapView';
 import RouteTimeline from '@/components/RouteTimeline';
+import RouteSummary from '@/components/RouteSummary';
+import { useTripRoad } from '@/lib/routing';
 import Negotiation from '@/components/Negotiation';
 import LivePanel from '@/components/LivePanel';
 import Participants from '@/components/Participants';
@@ -165,6 +167,7 @@ function PassengerView({ trip, user, reload, from, to, setSel, init }) {
   const live = useLiveStream(accepted ? shareToken : '');
   const broadcast = useBroadcastLocation(trip.id, sharing && accepted && trip.status !== 'completed');
   const q = trip.quote;
+  const road = useTripRoad(trip);
 
   useEffect(() => {
     if (accepted && trip.status !== 'completed' && trip.status !== 'cancelled') {
@@ -224,10 +227,11 @@ function PassengerView({ trip, user, reload, from, to, setSel, init }) {
           </div>
           <MapView
             markers={markers}
-            lines={[{ points: routeOf(trip), kind: 'route' }, ...walkLines]}
+            lines={[{ points: road?.path || routeOf(trip), kind: 'route' }, ...walkLines]}
             fitKey={`${trip.id}-${board.lat}-${alight.lat}`}
             height={320}
           />
+          <RouteSummary points={routeOf(trip)} road={road} />
           <DriverCard trip={trip} />
         </div>
 
@@ -502,6 +506,7 @@ function DriverView({ trip, reload, chatId, rateId }) {
   }
 
   const route = routeOf(trip);
+  const road = useTripRoad(trip);
   const bookings = trip.bookings || [];
   const accepted = bookings.filter((b) => b.status === 'accepted');
   const pending = bookings.filter((b) => b.status === 'negotiating');
@@ -556,7 +561,8 @@ function DriverView({ trip, reload, chatId, rateId }) {
               </li>
             </ul>
           </div>
-          <MapView markers={markers} lines={[{ points: route, kind: 'route' }]} fitKey={`${trip.id}-${accepted.length}`} height={340} />
+          <MapView markers={markers} lines={[{ points: road?.path || route, kind: 'route' }]} fitKey={`${trip.id}-${accepted.length}`} height={340} />
+          <RouteSummary points={route} road={road} />
 
           <section className="stack">
             <div className="row-between">

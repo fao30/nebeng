@@ -157,12 +157,32 @@ func (s *Store) available(t *Trip, sp Span) (seats, luggage int) {
 // etas estimates the arrival time at each route point.
 func etas(t *Trip) []time.Time {
 	out := []time.Time{t.DepartAt}
+	if n := len(t.Route()) - 1; len(t.LegMinutes) == n {
+		acc := 0.0
+		for _, m := range t.LegMinutes {
+			acc += m
+			out = append(out, t.DepartAt.Add(time.Duration(acc*float64(time.Minute))).Truncate(5*time.Minute))
+		}
+		return out
+	}
 	acc := 0.0
 	for _, k := range segmentKm(t.Route()) {
 		acc += k
 		out = append(out, t.DepartAt.Add(travelDuration(acc, t.Kind)).Truncate(5*time.Minute))
 	}
 	return out
+}
+
+// tripKm is the road distance when measured, else the straight-line route length.
+func tripKm(t *Trip) float64 {
+	if len(t.LegKm) == len(t.Route())-1 && len(t.LegKm) > 0 {
+		sum := 0.0
+		for _, k := range t.LegKm {
+			sum += k
+		}
+		return sum
+	}
+	return routeKm(t.Route())
 }
 
 // etaAt estimates the time the car passes route position pos.

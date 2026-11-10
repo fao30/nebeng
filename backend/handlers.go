@@ -310,7 +310,7 @@ func (a *API) tripView(t *Trip, viewer string) *TripView {
 		Driver:           a.store.publicUser(t.DriverID, role != ""),
 		SeatsAvailable:   seats,
 		LuggageAvailable: lug,
-		DistanceKm:       round1(routeKm(t.Route())),
+		DistanceKm:       round1(tripKm(t)),
 		MyRole:           role,
 		Etas:             etas(t),
 	}
@@ -633,6 +633,30 @@ type tripInput struct {
 	Vehicle        string    `json:"vehicle"`
 	Plate          string    `json:"plate"`
 	Notes          string    `json:"notes"`
+	LegKm          []float64 `json:"leg_km"`
+	LegMinutes     []float64 `json:"leg_minutes"`
+	RouteSrc       string    `json:"route_source"`
+	Path           string    `json:"path"`
+}
+
+// cleanRouting keeps measured road legs only when they are complete and sane.
+func cleanRouting(in *tripInput, nseg int) {
+	ok := len(in.LegKm) == nseg && len(in.LegMinutes) == nseg
+	for i := 0; ok && i < nseg; i++ {
+		if in.LegKm[i] <= 0 || in.LegKm[i] > 3000 || in.LegMinutes[i] <= 0 || in.LegMinutes[i] > 72*60 {
+			ok = false
+		}
+	}
+	if !ok {
+		in.LegKm, in.LegMinutes, in.RouteSrc, in.Path = nil, nil, "", ""
+		return
+	}
+	if in.RouteSrc != "google" && in.RouteSrc != "osm" {
+		in.RouteSrc = ""
+	}
+	if len(in.Path) > 40000 {
+		in.Path = ""
+	}
 }
 
 func (a *API) createTrip(w http.ResponseWriter, r *http.Request, uid string) error {
@@ -688,6 +712,7 @@ func (a *API) createTrip(w http.ResponseWriter, r *http.Request, uid string) err
 	if in.Kind != KindInter && in.Kind != KindIntra {
 		in.Kind = AutoKind(in.Origin, in.Destination)
 	}
+	cleanRouting(&in, nseg)
 	s := a.store
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -701,7 +726,8 @@ func (a *API) createTrip(w http.ResponseWriter, r *http.Request, uid string) err
 		Stops: in.Stops, Luggage: in.Luggage, MaxLuggage: in.MaxLuggage, SegmentPrices: in.SegmentPrices,
 		DepartAt: in.DepartAt, Seats: in.Seats, PricePerSeat: in.PricePerSeat, Negotiable: in.Negotiable,
 		InstantBooking: in.InstantBooking, Amenities: in.Amenities,
-		Kind: in.Kind, Vehicle: in.Vehicle, Plate: in.Plate, Notes: in.Notes, Status: TripScheduled, CreatedAt: time.Now()}
+		Kind: in.Kind, Vehicle: in.Vehicle, Plate: in.Plate, Notes: in.Notes, Status: TripScheduled, CreatedAt: time.Now(),
+		LegKm: in.LegKm, LegMinutes: in.LegMinutes, RouteSrc: in.RouteSrc, Path: in.Path}
 	normalizeTrip(t)
 	s.Trips[t.ID] = t
 	s.Changed()

@@ -6,6 +6,8 @@ import { fmtRp, haversine, suggestPrice } from '../format';
 import { Banner, Button, Card, ErrorText, Field, Row, Screen, s } from '../ui';
 import PlaceField from '../components/PlaceField';
 import DateTimeField from '../components/DateTimeField';
+import RouteLegs from '../components/RouteLegs';
+import { autoKind, encodePath, thinPath, useRoute } from '../routing';
 
 function Toggle({ label, sub, value, onChange }) {
   return (
@@ -46,6 +48,9 @@ export default function NewTrip({ navigation }) {
   }, []);
   const pts = [origin, ...stops, dest].filter(Boolean);
   const suggestion = origin && dest ? suggestPrice(pts, cfg) : 0;
+  const kind = autoKind(origin, dest);
+  const road = useRoute(origin && dest ? pts : [], kind);
+  const roadOK = road && road.legs.length === pts.length - 1;
   useEffect(() => {
     if (!touched && suggestion) setPrice(String(suggestion));
   }, [suggestion, touched]);
@@ -68,6 +73,14 @@ export default function NewTrip({ navigation }) {
           negotiable,
           instant_booking: instant,
           notes,
+          ...(roadOK
+            ? {
+                leg_km: road.legs.map((l) => Math.round(l.km * 10) / 10),
+                leg_minutes: road.legs.map((l) => Math.round(l.min * 10) / 10),
+                route_source: road.source,
+                path: encodePath(thinPath(road.path)),
+              }
+            : {}),
         },
       });
       setOrigin(null);
@@ -97,8 +110,9 @@ export default function NewTrip({ navigation }) {
           ))}
           {stops.length < 5 && <Button small kind="soft" icon="plus" title="Tambah titik stop" onPress={() => setStops([...stops, null])} />}
           <PlaceField label="Tujuan akhir" value={dest} onChange={setDest} kind="dest" near={origin} withNote />
-          {km > 0 && <Text style={t.xs}>Perkiraan jarak jalan {Math.round(km)} km</Text>}
+          {km > 0 && !roadOK && <Text style={t.xs}>Perkiraan jarak jalan {Math.round(km)} km</Text>}
         </Card>
+        {roadOK && <RouteLegs points={pts} road={road} title="Rute lewat jalan" />}
 
         <Card>
           <DateTimeField label="Waktu berangkat" value={depart} onChange={(d) => d && setDepart(d)} mode="datetime" />
