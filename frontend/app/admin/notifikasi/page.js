@@ -6,6 +6,7 @@ import AdminShell from '@/components/AdminShell';
 import Icon from '@/components/Icon';
 import { Avatar } from '@/components/ui';
 import { NOTIF_LABEL, metaFor } from '@/lib/notifications';
+import { DateField } from '@/components/DatePicker';
 
 const GROUPS = [
   { value: '', label: 'Semua jenis' },
@@ -80,11 +81,11 @@ export default function AdminNotifications() {
         </label>
         <label className="field">
           <span className="field-label">Dari tanggal</span>
-          <input className="input" type="date" value={f.date_from} onChange={set('date_from')} />
+          <DateField quick={false} value={f.date_from} onChange={(v) => set('date_from')({ target: { value: v } })} placeholder="Semua" label="Dari tanggal" />
         </label>
         <label className="field">
           <span className="field-label">Sampai</span>
-          <input className="input" type="date" value={f.date_to} onChange={set('date_to')} />
+          <DateField quick={false} value={f.date_to} onChange={(v) => set('date_to')({ target: { value: v } })} placeholder="Semua" label="Sampai tanggal" />
         </label>
       </div>
       {err && <p className="error">{err}</p>}

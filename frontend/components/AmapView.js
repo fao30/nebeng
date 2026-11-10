@@ -56,10 +56,10 @@ export default function AmapView({ markers = [], lines = [], circles = [], onCli
         new AMap.Circle({
           center: [c.lng, c.lat],
           radius: c.radiusKm * 1000,
-          strokeColor: '#26337A',
+          strokeColor: '#155DFC',
           strokeWeight: 1,
           strokeOpacity: 0.6,
-          fillColor: '#26337A',
+          fillColor: '#155DFC',
           fillOpacity: 0.07,
           bubble: true,
         }),
@@ -72,7 +72,7 @@ export default function AmapView({ markers = [], lines = [], circles = [], onCli
       next.push(
         new AMap.Polyline({
           path: pts.map((p) => [p.lng, p.lat]),
-          strokeColor: walk ? '#1C2452' : '#26337A',
+          strokeColor: walk ? '#0B1736' : '#155DFC',
           strokeWeight: walk ? 2 : 5,
           strokeOpacity: walk ? 0.8 : 0.85,
           strokeStyle: walk ? 'dashed' : 'solid',

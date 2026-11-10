@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import { fmtDay, fmtRp, fmtTime, localInputValue } from '@/lib/format';
+import { fmtDay, fmtRp, fmtTime, localInputValue, todayISO } from '@/lib/format';
 import MapView from '@/components/MapView';
 import PointField, { pointFromClick } from '@/components/PointField';
 import Negotiation from '@/components/Negotiation';
@@ -9,6 +9,7 @@ import RequireAuth from '@/components/RequireAuth';
 import Icon from '@/components/Icon';
 import { Empty, Stepper } from '@/components/ui';
 import { Landmark } from '@/components/RouteTimeline';
+import { DateTimeField } from '@/components/DatePicker';
 
 const reqStatus = {
   open: ['Menunggu tawaran', 'chip-amber'],
@@ -154,7 +155,7 @@ function Minta() {
             />
             <label className="field">
               <span className="field-label">Berangkat</span>
-              <input className="input" type="datetime-local" required value={departAt} onChange={(e) => setDepartAt(e.target.value)} />
+              <DateTimeField required value={departAt} min={todayISO()} onChange={setDepartAt} label="Berangkat" />
             </label>
             <div className="qty-row">
               <b>Penumpang</b>

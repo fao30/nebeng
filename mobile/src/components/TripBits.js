@@ -30,7 +30,7 @@ export function RouteTimeline({ trip, from, to, compact }) {
                   marginTop: 4,
                   backgroundColor: i === pts.length - 1 || i === to ? colors.teal : i === 0 || i === from ? colors.primary : colors.surface,
                   borderWidth: 3,
-                  borderColor: !active ? colors.line : i === pts.length - 1 || i === to ? colors.teal : colors.primary,
+                  borderColor: !active ? colors.line : i === pts.length - 1 || i === to ? colors.ink : colors.primary,
                 }}
               />
               {!last && <View style={{ width: 2, flex: 1, minHeight: compact ? 18 : 24, backgroundColor: active && i < (to ?? pts.length) ? colors.primary : colors.line }} />}

@@ -57,7 +57,7 @@ export default function PlaceField({ label, value, onChange, kind = 'origin', pl
     }
   }
 
-  const dot = kind === 'dest' ? { backgroundColor: colors.teal } : kind === 'stop' ? { backgroundColor: colors.surface, borderWidth: 2.5, borderColor: colors.indigo } : { backgroundColor: colors.primary };
+  const dot = kind === 'dest' ? { backgroundColor: colors.teal, borderWidth: 2, borderColor: colors.ink } : kind === 'stop' ? { backgroundColor: colors.surface, borderWidth: 2.5, borderColor: colors.indigo } : { backgroundColor: colors.primary };
   return (
     <View style={{ gap: 6 }}>
       <Pressable onPress={() => setOpen(true)} style={[s.input, { flexDirection: 'row', alignItems: 'center', gap: 10, height: 54 }]} accessibilityLabel={label}>

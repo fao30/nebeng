@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api, qs } from '@/lib/api';
-import { fmtDay, fmtRp, fmtTime, localInputValue, routeOf, shortPlace } from '@/lib/format';
+import { fmtDay, fmtRp, fmtTime, localInputValue, routeOf, shortPlace, todayISO } from '@/lib/format';
 import MapView from '@/components/MapView';
 import PointField from '@/components/PointField';
 import Negotiation from '@/components/Negotiation';
@@ -10,6 +10,7 @@ import RequireAuth from '@/components/RequireAuth';
 import Icon from '@/components/Icon';
 import { Empty, Person, Segmented, Sheet, Stepper } from '@/components/ui';
 import { Landmark } from '@/components/RouteTimeline';
+import { DateTimeField } from '@/components/DatePicker';
 
 function Permintaan() {
   const [trips, setTrips] = useState(null);
@@ -303,7 +304,7 @@ function OfferSheet({ req, trips, defaultTrip, onClose, onDone }) {
           </div>
           <label className="field">
             <span className="field-label">Jam jemput yang Anda usulkan</span>
-            <input className="input" type="datetime-local" value={time} onChange={(e) => setTime(e.target.value)} />
+            <DateTimeField value={time} min={todayISO()} onChange={setTime} label="Jam jemput" />
           </label>
           <label className="field">
             <span className="field-label">Pesan</span>

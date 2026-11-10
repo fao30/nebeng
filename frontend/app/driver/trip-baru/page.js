@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { AMENITIES, estimateEtas, fmtDay, fmtRp, fmtTime, haversine, localInputValue, shortPlace, suggestSegmentPrice } from '@/lib/format';
+import { AMENITIES, estimateEtas, fmtDay, fmtRp, fmtTime, haversine, localInputValue, shortPlace, suggestSegmentPrice, todayISO } from '@/lib/format';
 import MapView from '@/components/MapView';
 import PointField, { pointFromClick } from '@/components/PointField';
 import RequireAuth from '@/components/RequireAuth';
@@ -11,6 +11,7 @@ import Icon from '@/components/Icon';
 import { Stepper, Toggle } from '@/components/ui';
 import { useApp } from '../../providers';
 import { useSettings } from '@/lib/settings';
+import { DateTimeField } from '@/components/DatePicker';
 
 const STEPS = ['Rute', 'Waktu', 'Harga', 'Detail', 'Tinjau'];
 const MAX_STOPS = 10;
@@ -176,7 +177,7 @@ function NewTrip() {
             <h1>Kapan berangkat?</h1>
             <label className="field">
               <span className="field-label">Tanggal dan jam</span>
-              <input className="input" type="datetime-local" value={departAt} onChange={(e) => setDepartAt(e.target.value)} />
+              <DateTimeField value={departAt} min={todayISO()} onChange={setDepartAt} />
             </label>
             <div className="card">
               <div className="section-title">Perkiraan jam di tiap titik</div>

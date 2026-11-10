@@ -8,13 +8,14 @@ import { fmtRp, routeOf, shortPlace, todayISO } from '@/lib/format';
 import PointField from '@/components/PointField';
 import Icon from '@/components/Icon';
 import MiniRoute from '@/components/MiniRoute';
+import { DateField } from '@/components/DatePicker';
 
 /** Decorative map for the hero: a route, a car on its way and the boarding code. */
 function HeroMap() {
   return (
     <div className="hero-map" aria-hidden>
       <svg viewBox="0 0 560 560" preserveAspectRatio="xMidYMid slice">
-        <rect width="560" height="560" fill="#eceef7" />
+        <rect width="560" height="560" fill="#e8eefc" />
         <g fill="#e1e4f1">
           <rect x="40" y="40" width="120" height="90" rx="6" />
           <rect x="250" y="170" width="140" height="100" rx="6" />
@@ -37,14 +38,14 @@ function HeroMap() {
             Tol Jakarta–Cikampek
           </text>
         </g>
-        <path d="M80 500 L200 470 L205 300 L330 305 L405 300 L410 145 L500 120" stroke="#26337a" strokeWidth="7" fill="none" strokeLinejoin="round" strokeLinecap="round" />
-        <path d="M410 145 L500 120" stroke="#33b5c9" strokeWidth="7" fill="none" strokeLinecap="round" />
-        <path d="M140 540 L170 520 L195 480" stroke="#26337a" strokeWidth="4" strokeDasharray="1 9" strokeLinecap="round" fill="none" />
-        <circle cx="140" cy="540" r="28" fill="rgba(51,181,201,0.18)" />
-        <circle cx="140" cy="540" r="10" fill="#33b5c9" stroke="#fff" strokeWidth="4" />
-        <circle cx="80" cy="500" r="11" fill="#26337a" stroke="#fff" strokeWidth="4" />
-        <circle cx="205" cy="300" r="8" fill="#fff" stroke="#26337a" strokeWidth="4" />
-        <circle cx="500" cy="120" r="11" fill="#33b5c9" stroke="#fff" strokeWidth="4" />
+        <path d="M80 500 L200 470 L205 300 L330 305 L405 300 L410 145 L500 120" stroke="#155dfc" strokeWidth="7" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+        <path d="M410 145 L500 120" stroke="#0b1736" strokeWidth="7" fill="none" strokeLinecap="round" />
+        <path d="M140 540 L170 520 L195 480" stroke="#155dfc" strokeWidth="4" strokeDasharray="1 9" strokeLinecap="round" fill="none" />
+        <circle cx="140" cy="540" r="28" fill="rgba(21,93,252,0.18)" />
+        <circle cx="140" cy="540" r="10" fill="#f9ff52" stroke="#0b1736" strokeWidth="4" />
+        <circle cx="80" cy="500" r="11" fill="#155dfc" stroke="#fff" strokeWidth="4" />
+        <circle cx="205" cy="300" r="8" fill="#fff" stroke="#155dfc" strokeWidth="4" />
+        <circle cx="500" cy="120" r="11" fill="#f9ff52" stroke="#0b1736" strokeWidth="4" />
       </svg>
       <span className="hero-car">
         <Icon name="car" />
@@ -156,7 +157,7 @@ export default function Home() {
               </div>
             </div>
             <div className="route-search-row">
-              <input className="input" type="date" value={date} min={todayISO()} onChange={(e) => setDate(e.target.value)} aria-label="Tanggal berangkat" />
+              <DateField compact value={date} min={todayISO()} onChange={setDate} />
               <select className="input" value={seats} onChange={(e) => setSeats(Number(e.target.value))} aria-label="Jumlah penumpang">
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                   <option key={n} value={n}>
@@ -268,7 +269,7 @@ export default function Home() {
           <Link href={user ? '/driver/trip-baru' : '/masuk'} className="btn btn-teal btn-lg" onClick={() => setMode('driver')}>
             Mulai beri tumpangan
           </Link>
-          <span className="small" style={{ color: '#d3d8f2', textAlign: 'center' }}>
+          <span className="small" style={{ color: '#d0dbf6', textAlign: 'center' }}>
             Verifikasi maksimal 1x24 jam
           </span>
         </div>

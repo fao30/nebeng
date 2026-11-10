@@ -7,6 +7,7 @@ import AdminShell from '@/components/AdminShell';
 import Chat from '@/components/Chat';
 import Icon from '@/components/Icon';
 import { Landmark } from '@/components/RouteTimeline';
+import { DateField } from '@/components/DatePicker';
 
 const EMPTY = { date_from: '', date_to: '', price_min: '', price_max: '', q: '', who: '', status: '' };
 const statusChip = { scheduled: 'chip-primary', ongoing: 'chip-mint', completed: '', cancelled: 'chip-red' };
@@ -37,11 +38,11 @@ export default function AdminTrips() {
       <div className="filterbar">
         <label className="field">
           <span className="field-label">Dari tanggal</span>
-          <input className="input" type="date" value={f.date_from} onChange={set('date_from')} />
+          <DateField quick={false} value={f.date_from} onChange={(v) => set('date_from')({ target: { value: v } })} placeholder="Semua" label="Dari tanggal" />
         </label>
         <label className="field">
           <span className="field-label">Sampai tanggal</span>
-          <input className="input" type="date" value={f.date_to} onChange={set('date_to')} />
+          <DateField quick={false} value={f.date_to} onChange={(v) => set('date_to')({ target: { value: v } })} placeholder="Semua" label="Sampai tanggal" />
         </label>
         <label className="field">
           <span className="field-label">Harga min (Rp)</span>

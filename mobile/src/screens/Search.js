@@ -126,8 +126,8 @@ export default function Search({ navigation }) {
         <Row gap={12} style={{ alignItems: 'stretch' }}>
           <View style={{ alignItems: 'center', paddingVertical: 22 }}>
             <View style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: colors.primary }} />
-            <View style={{ width: 2, flex: 1, backgroundColor: '#CDD2E8', marginVertical: 2 }} />
-            <View style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: colors.teal }} />
+            <View style={{ width: 2, flex: 1, backgroundColor: '#CBD5EF', marginVertical: 2 }} />
+            <View style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: colors.teal, borderWidth: 2, borderColor: colors.ink }} />
           </View>
           <View style={{ flex: 1, gap: 8 }}>
             <PlaceField label="Dari" value={from} onChange={setFrom} placeholder="Titik jemput kamu" hideDot />

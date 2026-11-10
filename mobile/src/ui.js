@@ -84,7 +84,7 @@ const btn = {
   danger: { bg: colors.red, fg: '#fff' },
   dangerGhost: { bg: 'transparent', fg: colors.red },
   mint: { bg: colors.mint, fg: '#fff' },
-  teal: { bg: colors.teal, fg: '#0B2A30' },
+  teal: { bg: colors.teal, fg: '#0B1736' },
 };
 
 export function LinkText({ children, onPress, danger, style }) {

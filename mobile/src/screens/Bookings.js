@@ -74,7 +74,7 @@ function NextTrip({ b, onPress }) {
     <Pressable onPress={onPress} style={({ pressed }) => [{ backgroundColor: colors.primary, borderRadius: 22, padding: 16, gap: 12, opacity: pressed ? 0.9 : 1 }]}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.teal }} />
+          <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.teal, borderWidth: 2, borderColor: colors.ink }} />
           <Text style={{ color: '#9EE6F0', fontWeight: '800', fontSize: 13 }}>
             {b.boarded_at ? 'Kamu sudah naik' : ongoing ? 'Pemilik mobil sedang menuju' : `${fmtDay(b.pickup_at)}, jemput ${fmtTime(b.pickup_at)}`}
           </Text>
@@ -85,7 +85,7 @@ function NextTrip({ b, onPress }) {
         <View style={{ alignItems: 'center', paddingTop: 5 }}>
           <View style={{ width: 9, height: 9, borderRadius: 5, backgroundColor: '#FFFFFF' }} />
           <View style={{ width: 1.5, flex: 1, backgroundColor: 'rgba(255,255,255,0.35)', minHeight: 20 }} />
-          <View style={{ width: 9, height: 9, borderRadius: 5, backgroundColor: colors.teal }} />
+          <View style={{ width: 9, height: 9, borderRadius: 5, backgroundColor: colors.teal, borderWidth: 2, borderColor: colors.ink }} />
         </View>
         <View style={{ gap: 10, flex: 1 }}>
           <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 15 }}>{shortPlace(b.pickup)}</Text>
