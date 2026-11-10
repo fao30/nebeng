@@ -196,24 +196,47 @@ type Quote struct {
 	LuggageAvailable int       `json:"luggage_available"`
 	PickupAt         time.Time `json:"pickup_at"`
 	DropoffAt        time.Time `json:"dropoff_at"`
+	PickupIndex      int       `json:"pickup_index"`
+	DropoffIndex     int       `json:"dropoff_index"`
+	Pickup           Point     `json:"pickup"`  // driver's point where the passenger boards
+	Dropoff          Point     `json:"dropoff"` // driver's point where the passenger gets off
+	PickupWalkKm     *float64  `json:"pickup_walk_km,omitempty"`
+	DropoffWalkKm    *float64  `json:"dropoff_walk_km,omitempty"`
 }
 
 // quote for riding from `from` to `to` (nil = trip origin / destination). Caller holds a lock.
 func (a *API) quote(t *Trip, from, to *Point) *Quote {
-	sp := fullSpan(t)
-	if from != nil || to != nil {
-		p, d := t.Origin, t.Destination
-		if from != nil {
-			p = *from
-		}
-		if to != nil {
-			d = *to
-		}
-		sp = spanFor(t, p, d)
+	route := t.Route()
+	pi, di := 0, len(route)-1
+	if p, d, _, _, ok := bestStops(route, from, to, math.Inf(1), math.Inf(1)); ok {
+		pi, di = p, d
 	}
+	return a.quoteIdx(t, pi, di, from, to)
+}
+
+// quoteIdx prices riding from route point pi to di. from/to (optional) are the
+// passenger's own places, used only to report walking distance. Caller holds a lock.
+func (a *API) quoteIdx(t *Trip, pi, di int, from, to *Point) *Quote {
+	route := t.Route()
+	sp := spanIdx(pi, di)
 	seats, lug := a.store.available(t, sp)
-	return &Quote{Span: sp, PricePerSeat: pricePerSeat(t, sp), SeatsAvailable: seats, LuggageAvailable: lug,
-		PickupAt: etaAt(t, sp.FromPos), DropoffAt: etaAt(t, sp.ToPos)}
+	q := &Quote{Span: sp, PricePerSeat: pricePerSeat(t, sp), SeatsAvailable: seats, LuggageAvailable: lug,
+		PickupAt: etaAt(t, sp.FromPos), DropoffAt: etaAt(t, sp.ToPos),
+		PickupIndex: pi, DropoffIndex: di, Pickup: route[pi], Dropoff: route[di]}
+	if from != nil {
+		v := round1(HaversineKm(*from, route[pi]))
+		q.PickupWalkKm = &v
+	}
+	if to != nil {
+		v := round1(HaversineKm(*to, route[di]))
+		q.DropoffWalkKm = &v
+	}
+	return q
+}
+
+// validIdx checks a boarding/alighting pair of route point indexes.
+func validIdx(t *Trip, pi, di int) bool {
+	return pi >= 0 && di > pi && di < len(t.Route())
 }
 
 // checkCapacity: caller holds the lock.
@@ -511,7 +534,7 @@ func (a *API) searchTrips(w http.ResponseWriter, r *http.Request) error {
 				continue
 			}
 		}
-		ok, dFrom, dTo := RouteMatch(t.Route(), from, to, rFrom, rTo)
+		pi, di, dFrom, dTo, ok := bestStops(t.Route(), from, to, rFrom, rTo)
 		if !ok {
 			continue
 		}
@@ -522,7 +545,7 @@ func (a *API) searchTrips(w http.ResponseWriter, r *http.Request) error {
 			continue
 		}
 		tv := a.tripView(t, viewer)
-		tv.Quote = a.quote(t, from, to)
+		tv.Quote = a.quoteIdx(t, pi, di, from, to)
 		if tv.Quote.SeatsAvailable < seats {
 			continue
 		}
@@ -668,7 +691,14 @@ func (a *API) getTrip(w http.ResponseWriter, r *http.Request) error {
 		return errf(404, "trip tidak ditemukan")
 	}
 	tv := a.tripView(t, viewer)
-	tv.Quote = a.quote(t, qPoint(r, "from"), qPoint(r, "to"))
+	from, to := qPoint(r, "from"), qPoint(r, "to")
+	pi, err1 := strconv.Atoi(r.URL.Query().Get("pickup_index"))
+	di, err2 := strconv.Atoi(r.URL.Query().Get("dropoff_index"))
+	if err1 == nil && err2 == nil && validIdx(t, pi, di) {
+		tv.Quote = a.quoteIdx(t, pi, di, from, to)
+	} else {
+		tv.Quote = a.quote(t, from, to)
+	}
 	writeJSON(w, 200, tv)
 	return nil
 }
@@ -734,6 +764,11 @@ func (a *API) ensureShare(t *Trip) {
 
 func (a *API) createBooking(w http.ResponseWriter, r *http.Request, uid string) error {
 	var in struct {
+		// Preferred: indexes of the driver's route points to board / get off.
+		PickupIndex  *int `json:"pickup_index"`
+		DropoffIndex *int `json:"dropoff_index"`
+		// The passenger's own places; snapped to the nearest driver points
+		// when indexes are not given, and kept for the driver's information.
 		Pickup  *Point `json:"pickup"`
 		Dropoff *Point `json:"dropoff"`
 		Seats   int    `json:"seats"`
@@ -767,14 +802,25 @@ func (a *API) createBooking(w http.ResponseWriter, r *http.Request, uid string) 
 	}
 	cleanPoint(in.Pickup)
 	cleanPoint(in.Dropoff)
-	pickup, dropoff := t.Origin, t.Destination
-	if in.Pickup != nil && validPoint(*in.Pickup) {
-		pickup = *in.Pickup
+	if in.Pickup != nil && !validPoint(*in.Pickup) {
+		in.Pickup = nil
 	}
-	if in.Dropoff != nil && validPoint(*in.Dropoff) {
-		dropoff = *in.Dropoff
+	if in.Dropoff != nil && !validPoint(*in.Dropoff) {
+		in.Dropoff = nil
 	}
-	sp := spanFor(t, pickup, dropoff)
+	route := t.Route()
+	var sp Span
+	if in.PickupIndex != nil && in.DropoffIndex != nil {
+		if !validIdx(t, *in.PickupIndex, *in.DropoffIndex) {
+			return errf(400, "pilih titik naik dan turun dari rute driver")
+		}
+		sp = spanIdx(*in.PickupIndex, *in.DropoffIndex)
+	} else {
+		q := a.quote(t, in.Pickup, in.Dropoff)
+		sp = q.Span
+	}
+	// Passengers always board and leave at the driver's own points.
+	pickup, dropoff := route[sp.Start], route[sp.End]
 	if err := a.checkCapacity(t, sp, in.Seats, in.Luggage); err != nil {
 		return err
 	}
@@ -786,7 +832,8 @@ func (a *API) createBooking(w http.ResponseWriter, r *http.Request, uid string) 
 	b := &Booking{ID: newID("bkg"), TripID: t.ID, PassengerID: uid, Source: SourcePassenger,
 		Pickup: pickup, Dropoff: dropoff, Seats: in.Seats, Luggage: in.Luggage, Status: BookingNegotiating,
 		SegStart: sp.Start, SegEnd: sp.End, FromPos: sp.FromPos, ToPos: sp.ToPos, ListPrice: listPrice,
-		PickupAt:  etaAt(t, sp.FromPos),
+		PickupAt:      etaAt(t, sp.FromPos),
+		PassengerFrom: in.Pickup, PassengerTo: in.Dropoff,
 		Offers:    []Offer{{By: ByPassenger, Price: in.Price, Message: in.Message, At: now}},
 		CreatedAt: now, UpdatedAt: now}
 	// Instant booking: paying the driver's price confirms the seat right away.
@@ -978,7 +1025,7 @@ func (a *API) listRequests(w http.ResponseWriter, r *http.Request, uid string) e
 		}
 		var dFrom, dTo float64
 		if trip != nil {
-			ok, df, dt := RouteMatch(trip.Route(), &req.Origin, &req.Destination, rFrom, rTo)
+			_, _, df, dt, ok := bestStops(trip.Route(), &req.Origin, &req.Destination, rFrom, rTo)
 			if !ok {
 				continue
 			}
@@ -1048,6 +1095,8 @@ func (a *API) offerOnRequest(w http.ResponseWriter, r *http.Request, uid string)
 		return errf(409, "trip harus berstatus terjadwal")
 	}
 	sp := spanFor(t, req.Origin, req.Destination)
+	route := t.Route()
+	reqFrom, reqTo := req.Origin, req.Destination
 	if err := a.checkCapacity(t, sp, req.Seats, req.Luggage); err != nil {
 		return err
 	}
@@ -1066,7 +1115,8 @@ func (a *API) offerOnRequest(w http.ResponseWriter, r *http.Request, uid string)
 	}
 	now := time.Now()
 	b := &Booking{ID: newID("bkg"), TripID: t.ID, PassengerID: req.PassengerID, RequestID: req.ID,
-		Source: SourceDriverOffer, Pickup: req.Origin, Dropoff: req.Destination, Seats: req.Seats, Luggage: req.Luggage,
+		Source: SourceDriverOffer, Pickup: route[sp.Start], Dropoff: route[sp.End],
+		PassengerFrom: &reqFrom, PassengerTo: &reqTo, Seats: req.Seats, Luggage: req.Luggage,
 		SegStart: sp.Start, SegEnd: sp.End, FromPos: sp.FromPos, ToPos: sp.ToPos, ListPrice: listPrice,
 		PickupAt: pickupAt, OfferedTime: in.OfferedTime,
 		Status:    BookingNegotiating,

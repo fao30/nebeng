@@ -3,16 +3,18 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { api, qs } from '@/lib/api';
-import { AMENITIES, fmtDay, fmtDuration, fmtRp, fmtTime, hasAmenity, kindLabel, routeOf, shortPlace, tripStatusLabel } from '@/lib/format';
+import { AMENITIES, fmtDay, fmtDuration, fmtRp, fmtTime, hasAmenity, haversine, kindLabel, routeOf, shortPlace, tripStatusLabel } from '@/lib/format';
+
+const km = (d) => (d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1).replace('.', ',')} km`);
 import { useApp } from '../../providers';
 import MapView from '@/components/MapView';
-import PointField, { pointFromClick } from '@/components/PointField';
 import RouteTimeline from '@/components/RouteTimeline';
 import Negotiation from '@/components/Negotiation';
 import LivePanel from '@/components/LivePanel';
 import Participants from '@/components/Participants';
 import Icon from '@/components/Icon';
 import { Person, Stepper, Empty } from '@/components/ui';
+import { Landmark } from '@/components/RouteTimeline';
 import { useBroadcastLocation, useLiveStream } from '@/lib/live';
 
 function parsePoint(s) {
@@ -29,28 +31,35 @@ export default function TripPage() {
   const { user, ready } = useApp();
   const [trip, setTrip] = useState(null);
   const [err, setErr] = useState('');
-  const [pickup, setPickup] = useState(undefined);
-  const [dropoff, setDropoff] = useState(undefined);
+  // The passenger's own places (from the search), used to suggest the
+  // nearest driver points and show walking distance. Passengers always board
+  // and leave at the driver's points; `sel` is their chosen pair of indexes.
+  const [places, setPlaces] = useState(undefined);
+  const [sel, setSel] = useState(null);
   const [init, setInit] = useState({ seats: 1, luggage: 0 });
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
-    setPickup(parsePoint(q.get('p')));
-    setDropoff(parsePoint(q.get('d')));
+    setPlaces({ from: parsePoint(q.get('p')), to: parsePoint(q.get('d')) });
     setInit({ seats: Number(q.get('s')) || 1, luggage: Number(q.get('k')) || 0 });
   }, []);
 
-  // Refetch the quote only when the points move, not while typing a landmark.
-  const pk = pickup === undefined ? undefined : pickup ? `${pickup.lat},${pickup.lng}` : '';
-  const dk = dropoff ? `${dropoff.lat},${dropoff.lng}` : '';
   const load = useCallback(() => {
-    if (pk === undefined) return;
-    const [fl, fg] = pk ? pk.split(',') : [];
-    const [tl, tg] = dk ? dk.split(',') : [];
-    api(`/trips/${id}${qs({ from_lat: fl, from_lng: fg, to_lat: tl, to_lng: tg })}`)
+    if (places === undefined) return;
+    const { from, to } = places;
+    api(
+      `/trips/${id}${qs({
+        from_lat: from?.lat,
+        from_lng: from?.lng,
+        to_lat: to?.lat,
+        to_lng: to?.lng,
+        pickup_index: sel?.pi,
+        dropoff_index: sel?.di,
+      })}`,
+    )
       .then(setTrip)
       .catch((e) => setErr(e.message));
-  }, [id, pk, dk]);
+  }, [id, places, sel]);
 
   useEffect(() => {
     if (!ready) return;
@@ -70,10 +79,9 @@ export default function TripPage() {
       trip={trip}
       user={user}
       reload={load}
-      pickup={pickup || trip.origin}
-      dropoff={dropoff || trip.destination}
-      setPickup={setPickup}
-      setDropoff={setDropoff}
+      from={places?.from}
+      to={places?.to}
+      setSel={setSel}
       init={init}
     />
   );
@@ -146,11 +154,10 @@ function DriverCard({ trip }) {
 
 /* ---------- passenger ---------- */
 
-function PassengerView({ trip, user, reload, pickup, dropoff, setPickup, setDropoff, init }) {
+function PassengerView({ trip, user, reload, from, to, setSel, init }) {
   const mine = trip.my_bookings || [];
   const active = mine.find((b) => b.status === 'negotiating' || b.status === 'accepted');
   const accepted = active?.status === 'accepted';
-  const [activeField, setActiveField] = useState(null);
   const [sharing, setSharing] = useState(false);
   const [shareToken, setShareToken] = useState('');
   const live = useLiveStream(accepted ? shareToken : '');
@@ -165,21 +172,24 @@ function PassengerView({ trip, user, reload, pickup, dropoff, setPickup, setDrop
     }
   }, [accepted, trip.id, trip.status]);
 
-  async function onMapClick(ll) {
-    if (!activeField || active) return;
-    const p = await pointFromClick(ll);
-    activeField === 'pickup' ? setPickup(p) : setDropoff(p);
-  }
-
-  const shownPickup = active ? active.pickup : pickup;
-  const shownDrop = active ? active.dropoff : dropoff;
+  // Driver points where this passenger boards / gets off, and their own places.
+  const board = active ? active.pickup : q?.pickup || trip.origin;
+  const alight = active ? active.dropoff : q?.dropoff || trip.destination;
+  const myFrom = active ? active.passenger_from : from;
+  const myTo = active ? active.passenger_to : to;
   const markers = [
     { ...trip.origin, kind: 'origin', popup: trip.origin.label },
     ...(trip.stops || []).map((s) => ({ ...s, kind: 'stop', popup: s.label })),
     { ...trip.destination, kind: 'dest', popup: trip.destination.label },
-    { ...shownPickup, kind: 'pickup', text: 'A', popup: `Jemput: ${shownPickup.label}` },
-    { ...shownDrop, kind: 'drop', text: 'B', popup: `Antar: ${shownDrop.label}` },
+    { ...board, kind: 'pickup', text: 'A', popup: `Naik di ${board.label}` },
+    { ...alight, kind: 'drop', text: 'B', popup: `Turun di ${alight.label}` },
+    ...(myFrom ? [{ ...myFrom, kind: 'me', popup: `Lokasi Anda: ${myFrom.label}` }] : []),
+    ...(myTo ? [{ ...myTo, kind: 'me', popup: `Tujuan Anda: ${myTo.label}` }] : []),
     ...live.positions.map((p) => ({ lat: p.lat, lng: p.lng, kind: p.role, popup: `${p.name}, ${fmtTime(p.at)}` })),
+  ];
+  const walkLines = [
+    ...(myFrom ? [{ from: myFrom, to: board, kind: 'walk' }] : []),
+    ...(myTo ? [{ from: alight, to: myTo, kind: 'walk' }] : []),
   ];
 
   return (
@@ -200,8 +210,8 @@ function PassengerView({ trip, user, reload, pickup, dropoff, setPickup, setDrop
             <RouteTimeline
               trip={trip}
               quote={active ? { from_pos: active.from_pos, to_pos: active.to_pos, pickup_at: active.pickup_at } : q}
-              pickup={active ? active.pickup : pickup}
-              dropoff={active ? active.dropoff : dropoff}
+              pickup={board}
+              dropoff={alight}
             />
             {q && !active && (
               <p className="xs muted" style={{ marginTop: 12 }}>
@@ -212,12 +222,8 @@ function PassengerView({ trip, user, reload, pickup, dropoff, setPickup, setDrop
           </div>
           <MapView
             markers={markers}
-            lines={[
-              { points: routeOf(trip), kind: 'route' },
-              { from: shownPickup, to: shownDrop, kind: 'walk' },
-            ]}
-            onClick={onMapClick}
-            fitKey={`${trip.id}-${shownPickup.lat}-${shownDrop.lat}`}
+            lines={[{ points: routeOf(trip), kind: 'route' }, ...walkLines]}
+            fitKey={`${trip.id}-${board.lat}-${alight.lat}`}
             height={320}
           />
           <DriverCard trip={trip} />
@@ -237,17 +243,7 @@ function PassengerView({ trip, user, reload, pickup, dropoff, setPickup, setDrop
               <p className="muted">Trip ini sudah {tripStatusLabel[trip.status].toLowerCase()} dan tidak menerima pesanan.</p>
             </div>
           ) : user ? (
-            <BookingPanel
-              trip={trip}
-              pickup={pickup}
-              dropoff={dropoff}
-              setPickup={setPickup}
-              setDropoff={setDropoff}
-              activeField={activeField}
-              setActiveField={setActiveField}
-              init={init}
-              onDone={reload}
-            />
+            <BookingPanel trip={trip} from={from} to={to} setSel={setSel} init={init} onDone={reload} />
           ) : (
             <div className="card stack">
               <div className="price-big">{fmtRp(q?.price_per_seat)}</div>
@@ -265,7 +261,7 @@ function PassengerView({ trip, user, reload, pickup, dropoff, setPickup, setDrop
               {mine
                 .filter((b) => b !== active)
                 .map((b) => (
-                  <Negotiation key={b.id + b.updated_at} booking={b} role="passenger" />
+                  <Negotiation key={b.id} booking={b} role="passenger" />
                 ))}
             </div>
           )}
@@ -287,8 +283,13 @@ function PassengerView({ trip, user, reload, pickup, dropoff, setPickup, setDrop
   );
 }
 
-function BookingPanel({ trip, pickup, dropoff, setPickup, setDropoff, activeField, setActiveField, init, onDone }) {
+function BookingPanel({ trip, from, to, setSel, init, onDone }) {
   const q = trip.quote;
+  const route = routeOf(trip);
+  const etas = trip.etas || [];
+  const pi = q.pickup_index;
+  const di = q.dropoff_index;
+  const away = (place, p) => (place ? ` · ${km(haversine(place, p))} dari ${shortPlace(place)}` : '');
   const [seats, setSeats] = useState(Math.min(init.seats, Math.max(1, q.seats_available)));
   const [luggage, setLuggage] = useState(trip.luggage ? Math.min(init.luggage, q.luggage_available) : 0);
   const [offer, setOffer] = useState(false);
@@ -315,7 +316,7 @@ function BookingPanel({ trip, pickup, dropoff, setPickup, setDropoff, activeFiel
     try {
       const b = await api(`/trips/${trip.id}/bookings`, {
         method: 'POST',
-        body: { pickup, dropoff, seats, luggage, price: offer ? Number(price) : total, message },
+        body: { pickup_index: pi, dropoff_index: di, pickup: from || undefined, dropoff: to || undefined, seats, luggage, price: offer ? Number(price) : total, message },
       });
       setDone(b.status === 'accepted' ? 'Kursi Anda terkonfirmasi.' : 'Permintaan terkirim ke driver.');
       onDone();
@@ -331,13 +332,47 @@ function BookingPanel({ trip, pickup, dropoff, setPickup, setDropoff, activeFiel
     <form className="card stack" style={{ '--gap': '16px' }} onSubmit={submit}>
       <div>
         <div className="price-big">{fmtRp(q.price_per_seat)}</div>
-        <span className="small muted">per kursi, {shortPlace(pickup)} ke {shortPlace(dropoff)}</span>
+        <span className="small muted">
+          per kursi, {shortPlace(q.pickup)} ke {shortPlace(q.dropoff)}
+        </span>
       </div>
 
-      <div className="stack" style={{ '--gap': '8px' }}>
-        <PointField label="Titik jemput" kind="origin" value={pickup} onChange={(p) => setPickup(p || trip.origin)} active={activeField === 'pickup'} onActivate={() => setActiveField('pickup')} withNote notePlaceholder="Patokan jemput, misal: depan Indomaret, baju biru" />
-        <PointField label="Titik antar" kind="dest" value={dropoff} onChange={(p) => setDropoff(p || trip.destination)} active={activeField === 'drop'} onActivate={() => setActiveField('drop')} withNote notePlaceholder="Patokan turun (opsional)" />
-        <p className="help">Pilih titik di sepanjang rute. Bisa juga klik di peta setelah memilih kolom.</p>
+      <div className="stack" style={{ '--gap': '10px' }}>
+        <label className="field">
+          <span className="field-label">Naik di</span>
+          <select className="input" value={pi} onChange={(e) => {
+            const np = Number(e.target.value);
+            setSel({ pi: np, di: Math.max(np + 1, di) });
+          }}>
+            {route.slice(0, -1).map((p, i) => (
+              <option key={i} value={i}>
+                {etas[i] ? `${fmtTime(etas[i])} · ` : ''}
+                {shortPlace(p)}
+                {away(from, p)}
+              </option>
+            ))}
+          </select>
+          <Landmark note={q.pickup.note} />
+        </label>
+        <label className="field">
+          <span className="field-label">Turun di</span>
+          <select className="input" value={di} onChange={(e) => setSel({ pi, di: Number(e.target.value) })}>
+            {route.map((p, i) =>
+              i > pi ? (
+                <option key={i} value={i}>
+                  {etas[i] ? `${fmtTime(etas[i])} · ` : ''}
+                  {shortPlace(p)}
+                  {away(to, p)}
+                </option>
+              ) : null,
+            )}
+          </select>
+          <Landmark note={q.dropoff.note} />
+        </label>
+        <p className="help">
+          Penumpang naik dan turun di titik yang ditentukan driver.
+          {from || to ? ' Titik terdekat dari lokasi Anda sudah dipilih otomatis.' : ''}
+        </p>
       </div>
 
       {segs.length > 1 && (
@@ -538,7 +573,7 @@ function DriverView({ trip, reload }) {
               </Empty>
             )}
             {[...pending, ...accepted, ...closed].map((b) => (
-              <Negotiation key={b.id + b.updated_at} booking={b} role="driver" onChange={reload} />
+              <Negotiation key={b.id} booking={b} role="driver" onChange={reload} />
             ))}
           </section>
         </div>

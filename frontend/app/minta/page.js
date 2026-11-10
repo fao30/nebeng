@@ -126,7 +126,7 @@ function Minta() {
               </div>
               {(r.offers || []).length > 0 && <div className="section-title" style={{ margin: '4px 0 0' }}>Tawaran dari driver ({r.offers.length})</div>}
               {(r.offers || []).map((b) => (
-                <Negotiation key={b.id + b.updated_at} booking={b} role="passenger" onChange={load} showTrip />
+                <Negotiation key={b.id} booking={b} role="passenger" onChange={load} showTrip />
               ))}
               {r.status === 'open' && (
                 <div className="row-between">

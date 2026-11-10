@@ -59,7 +59,7 @@ function Pesanan() {
       )}
       <div className="list">
         {shown.map((b) => (
-          <div key={b.id + b.updated_at} className="stack" style={{ '--gap': '8px' }}>
+          <div key={b.id} className="stack" style={{ '--gap': '8px' }}>
             <Negotiation booking={b} role="passenger" onChange={load} showTrip />
             {isActive(b) && (
               <Link className="small row" style={{ '--gap': '6px', marginLeft: 4 }} href={`/trip/${b.trip_id}`}>

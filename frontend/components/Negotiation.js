@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { bookingStatusChip, bookingStatusLabel, fmtDay, fmtRp, fmtTime, shortPlace } from '@/lib/format';
@@ -15,6 +15,12 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
   const [msg, setMsg] = useState('');
   const [countering, setCountering] = useState(false);
   const [chat, setChat] = useState(false);
+  // The card stays mounted while the booking updates (so an open chat stays
+  // open); follow the latest offer unless the user is typing a counter-offer.
+  useEffect(() => {
+    if (!countering) setPrice(last?.price || 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [last?.price, b.offers.length]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const myTurn = b.status === 'negotiating' && b.awaiting === role;
@@ -81,6 +87,12 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
             <Landmark note={b.dropoff.note} />
           </span>
         </div>
+        {role === 'driver' && (b.passenger_from || b.passenger_to) && (
+          <div className="xs muted" style={{ marginTop: 2 }}>
+            Penumpang aslinya dari {b.passenger_from ? shortPlace(b.passenger_from) : 'titik naik'} ke{' '}
+            {b.passenger_to ? shortPlace(b.passenger_to) : 'titik turun'}
+          </div>
+        )}
         {b.offered_time && (
           <div className="chip chip-primary" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
             <Icon name="clock" />

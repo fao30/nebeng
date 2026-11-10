@@ -4,7 +4,9 @@ import { Person } from './ui';
 import RouteTimeline from './RouteTimeline';
 import { AMENITIES, fmtDuration, fmtRp, hasAmenity, tripStatusLabel } from '@/lib/format';
 
-export default function TripCard({ trip, href, pickup, dropoff, showStatus, children }) {
+const km = (d) => (d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1).replace('.', ',')} km`);
+
+export default function TripCard({ trip, href, showStatus, children }) {
   const q = trip.quote;
   const price = q ? q.price_per_seat : trip.price_per_seat;
   const seats = q ? q.seats_available : trip.seats_available;
@@ -14,8 +16,14 @@ export default function TripCard({ trip, href, pickup, dropoff, showStatus, chil
   const body = (
     <article className="card trip-card">
       <div>
-        <RouteTimeline trip={trip} quote={q} pickup={pickup} dropoff={dropoff} compact />
+        <RouteTimeline trip={trip} quote={q} pickup={q?.pickup} dropoff={q?.dropoff} compact />
         {dur != null && <div className="xs muted" style={{ marginTop: 6, marginLeft: 72 }}>{fmtDuration(dur)} perjalanan</div>}
+        {(q?.pickup_walk_km != null || q?.dropoff_walk_km != null) && (
+          <div className="row wrap xs" style={{ '--gap': '6px', marginTop: 8, marginLeft: 72 }}>
+            {q.pickup_walk_km != null && <span className="chip">Naik {km(q.pickup_walk_km)} dari titik Anda</span>}
+            {q.dropoff_walk_km != null && <span className="chip">Turun {km(q.dropoff_walk_km)} dari tujuan Anda</span>}
+          </div>
+        )}
       </div>
       <div className="trip-price">
         <b>{fmtRp(price)}</b>

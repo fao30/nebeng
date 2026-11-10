@@ -25,19 +25,54 @@ func fullSpan(t *Trip) Span {
 	return Span{FromPos: 0, ToPos: float64(n), Start: 0, End: n}
 }
 
-func spanFor(t *Trip, pickup, dropoff Point) Span {
-	route := t.Route()
-	n := len(route) - 1
-	_, pf := nearestOnRoute(pickup, route)
-	_, pt := nearestOnRoute(dropoff, route)
-	if pt < pf {
-		pt = pf
+// Passengers board and leave only at the driver's own points (origin, stops,
+// destination). Their own locations are used to find trips and to pick the
+// nearest driver points; they then walk/ride to those points.
+
+// bestStops picks the boarding point index pi and alighting index di (pi < di)
+// that minimise the passenger's distance from `from` to route[pi] plus from
+// `to` to route[di], keeping each within its radius. Nil from/to means the
+// passenger takes the route from its start / to its end.
+func bestStops(route []Point, from, to *Point, rFrom, rTo float64) (pi, di int, dFrom, dTo float64, ok bool) {
+	n := len(route)
+	best := math.Inf(1)
+	for i := 0; i < n-1; i++ {
+		df := 0.0
+		if from != nil {
+			if df = HaversineKm(*from, route[i]); df > rFrom {
+				continue
+			}
+		} else if i != 0 {
+			continue
+		}
+		for j := i + 1; j < n; j++ {
+			dt := 0.0
+			if to != nil {
+				if dt = HaversineKm(*to, route[j]); dt > rTo {
+					continue
+				}
+			} else if j != n-1 {
+				continue
+			}
+			if df+dt < best {
+				best, pi, di, dFrom, dTo, ok = df+dt, i, j, df, dt, true
+			}
+		}
 	}
-	start := int(math.Floor(pf))
-	end := int(math.Ceil(pt))
-	start = max(0, min(start, n-1))
-	end = max(start+1, min(end, n))
-	return Span{FromPos: pf, ToPos: pt, Start: start, End: end}
+	return
+}
+
+func spanIdx(pi, di int) Span {
+	return Span{FromPos: float64(pi), ToPos: float64(di), Start: pi, End: di}
+}
+
+// spanFor snaps a passenger's own pickup/drop-off places to the driver's points.
+func spanFor(t *Trip, pickup, dropoff Point) Span {
+	pi, di, _, _, ok := bestStops(t.Route(), &pickup, &dropoff, math.Inf(1), math.Inf(1))
+	if !ok {
+		return fullSpan(t)
+	}
+	return spanIdx(pi, di)
 }
 
 // segmentKm returns the length of every segment.

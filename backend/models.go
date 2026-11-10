@@ -114,11 +114,15 @@ type Booking struct {
 	ListPrice   int64      `json:"list_price"` // driver's price for this span × seats
 	PickupAt    time.Time  `json:"pickup_at"`
 	OfferedTime *time.Time `json:"offered_time,omitempty"` // driver-proposed pickup time
-	Status      string     `json:"status"`
-	Offers      []Offer    `json:"offers"`
-	AgreedPrice int64      `json:"agreed_price"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	// The passenger's own places (where they come from / go to). Pickup and
+	// Dropoff above are always the driver's route points.
+	PassengerFrom *Point    `json:"passenger_from,omitempty"`
+	PassengerTo   *Point    `json:"passenger_to,omitempty"`
+	Status        string    `json:"status"`
+	Offers        []Offer   `json:"offers"`
+	AgreedPrice   int64     `json:"agreed_price"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // Route returns origin, stops and destination in travel order.

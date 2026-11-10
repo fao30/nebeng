@@ -202,7 +202,7 @@ function RequestCard({ n, req, canOffer, onOffer, onChange }) {
       </div>
       {req.notes && <p className="small ink2">“{req.notes}”</p>}
       {(req.offers || []).map((b) => (
-        <Negotiation key={b.id + b.updated_at} booking={b} role="driver" onChange={onChange} />
+        <Negotiation key={b.id} booking={b} role="driver" onChange={onChange} />
       ))}
       {canOffer && !activeOffer && (
         <button className="btn btn-primary" onClick={onOffer}>
@@ -291,7 +291,9 @@ function OfferSheet({ req, trips, defaultTrip, onClose, onDone }) {
           </div>
           {quote && (
             <p className="small muted">
-              Harga trip Anda untuk ruas ini {fmtRp(quote.price_per_seat)} per kursi. Perkiraan lewat titik jemput {fmtTime(quote.pickup_at)}.
+              Penumpang naik di <b>{shortPlace(quote.pickup)}</b> ({quote.pickup_walk_km} km dari lokasinya) dan turun di{' '}
+              <b>{shortPlace(quote.dropoff)}</b> ({quote.dropoff_walk_km} km dari tujuannya). Harga ruas ini {fmtRp(quote.price_per_seat)} per kursi,
+              perkiraan lewat titik naik {fmtTime(quote.pickup_at)}.
               {quote.seats_available < req.seats && <span className="error"> Kursi di ruas ini tidak cukup.</span>}
             </p>
           )}

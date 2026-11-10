@@ -68,6 +68,12 @@ func Seed(s *Store) {
 	cawang := p(-6.2425, 106.8731, "Cawang, Jakarta Timur")
 	purwakarta := p(-6.5569, 107.4431, "Rest Area KM 97, Purwakarta")
 	tambun := p(-6.2628, 107.0571, "Tambun, Bekasi")
+	// Driver meeting-point notes (titik kumpul).
+	monas.Note = "Pintu Barat Daya, dekat halte TransJakarta"
+	purwakarta.Note = "Depan musala rest area"
+	cawang.Note = "Halte Cawang UKI, sisi timur"
+	semanggi.Note = "Lobi Plaza Semanggi"
+	bekasi.Note = "Depan Stasiun Bekasi, pintu utara"
 
 	monasTrip := trip(budi, monas, bandung, []Point{cawang, purwakarta}, day(1, 7, 0), 3, 0,
 		opt{luggage: 3, nego: true, instant: true, segments: []int64{15000, 60000, 45000},
@@ -101,7 +107,10 @@ func Seed(s *Store) {
 		now := time.Now()
 		sp := spanFor(t, pick, drop)
 		list := pricePerSeat(t, sp) * int64(seats)
-		b := &Booking{ID: newID("bkg"), TripID: t.ID, PassengerID: u.ID, Source: SourcePassenger, Pickup: pick, Dropoff: drop,
+		route := t.Route()
+		from, to := pick, drop
+		b := &Booking{ID: newID("bkg"), TripID: t.ID, PassengerID: u.ID, Source: SourcePassenger,
+			Pickup: route[sp.Start], Dropoff: route[sp.End], PassengerFrom: &from, PassengerTo: &to,
 			Seats: seats, Luggage: lug, SegStart: sp.Start, SegEnd: sp.End, FromPos: sp.FromPos, ToPos: sp.ToPos,
 			ListPrice: list, PickupAt: etaAt(t, sp.FromPos), Status: status, Offers: offers, CreatedAt: now, UpdatedAt: now}
 		if status == BookingAccepted {
@@ -117,18 +126,10 @@ func Seed(s *Store) {
 			s.Messages[id] = &Message{ID: id, BookingID: b.ID, SenderID: sender, Text: m[1], At: now.Add(time.Duration(i-len(chat)) * 7 * time.Minute)}
 		}
 	}
-	monasNote := monas
-	monasNote.Note = "Pintu Barat Daya, dekat halte TransJakarta"
-	km97 := purwakarta
-	km97.Note = "Depan musala rest area"
-	book(monasTrip, sari, monasNote, km97, 2, 1, BookingAccepted,
+	book(monasTrip, sari, monas, purwakarta, 2, 1, BookingAccepted,
 		[]Offer{{By: ByPassenger, Price: 150000, Message: "Berdua dengan adik", At: time.Now().Add(-time.Hour)}},
 		[][2]string{{"p", "Pak, saya pakai baju biru, nunggu di halte ya"}, {"d", "Siap, mobil Avanza hitam, B 1234 XYZ. Jam 7 tepat jalan."}, {"p", "Oke, terima kasih Pak"}})
-	tambunNote := tambun
-	tambunNote.Note = "Stasiun Tambun, pintu selatan"
-	semNote := semanggi
-	semNote.Note = "Lobi Plaza Semanggi"
-	book(ckTrip, andi, semNote, tambunNote, 1, 1, BookingNegotiating,
+	book(ckTrip, andi, semanggi, tambun, 1, 1, BookingNegotiating,
 		[]Offer{{By: ByPassenger, Price: 25000, Message: "Boleh 25 ribu?", At: time.Now().Add(-time.Hour)}},
 		[][2]string{{"p", "Pak, kopernya kecil kok, muat di kabin"}})
 

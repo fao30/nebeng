@@ -1951,3 +1951,30 @@ input[type='range'] {
   color: var(--muted);
   padding: 4px 10px 2px;
 }
+/* passenger's own place (where they walk from / to) */
+.pin-me {
+  width: 14px;
+  height: 14px;
+  margin: 7px;
+  background: var(--mint);
+  border: 3px solid #fff;
+}
+.recent-routes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.recent-chip {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  padding: 6px 12px;
+}
+.recent-chip:hover {
+  background: var(--primary-100);
+  color: var(--primary);
+}

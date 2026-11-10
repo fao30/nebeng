@@ -18,6 +18,44 @@ const SORTS = [
 
 const DEFAULT_FILTERS = { order: 'earliest', times: [], rFrom: 10, rTo: 10, amen: [], luggage: 0 };
 
+const LAST_KEY = 'nebeng_last_search';
+
+// The passenger's last searched route, kept in this browser.
+function readLast() {
+  try {
+    const v = JSON.parse(localStorage.getItem(LAST_KEY));
+    return v && (v.from || v.to) ? v : null;
+  } catch {
+    return null;
+  }
+}
+const RECENT_KEY = 'nebeng_recent_routes';
+const sameRoute = (a, b) =>
+  ['from', 'to'].every((k) => (!a[k] && !b[k]) || (a[k] && b[k] && Math.abs(a[k].lat - b[k].lat) < 1e-4 && Math.abs(a[k].lng - b[k].lng) < 1e-4));
+
+function readRecent() {
+  try {
+    const v = JSON.parse(localStorage.getItem(RECENT_KEY));
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+
+// Remember the last route (searched first next time) and the 3 most recent
+// distinct routes (shown as shortcuts) — e.g. a daily Tambun → MT Haryono commute.
+function saveLast(q) {
+  if (!q.from && !q.to) return;
+  const r = { from: q.from || null, to: q.to || null, seats: q.seats || 1 };
+  try {
+    localStorage.setItem(LAST_KEY, JSON.stringify(r));
+    const recent = [r, ...readRecent().filter((x) => !sameRoute(x, r))].slice(0, 3);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 function parse(q, key) {
   try {
     const v = JSON.parse(q.get(key));
@@ -35,10 +73,27 @@ export default function Cari() {
   const [err, setErr] = useState('');
   const [sheet, setSheet] = useState(false);
   const [view, setView] = useState('list');
+  const [others, setOthers] = useState(null); // other trips when the route has none
+  const [remembered, setRemembered] = useState(false);
+  const [recent, setRecent] = useState([]);
 
   useEffect(() => {
+    setRecent(readRecent());
     const q = new URLSearchParams(window.location.search);
-    setQuery({ from: parse(q, 'from'), to: parse(q, 'to'), date: q.get('date') || '', seats: Number(q.get('seats')) || 1 });
+    const fromUrl = { from: parse(q, 'from'), to: parse(q, 'to'), date: q.get('date') || '', seats: Number(q.get('seats')) || 1 };
+    if (fromUrl.from || fromUrl.to) {
+      saveLast(fromUrl);
+      setQuery(fromUrl);
+      return;
+    }
+    // No route in the link: start with the route this passenger searched last.
+    const last = readLast();
+    if (last) {
+      setRemembered(true);
+      setQuery({ from: last.from || null, to: last.to || null, date: '', seats: last.seats || 1 });
+    } else {
+      setQuery(fromUrl);
+    }
   }, []);
 
   const load = useCallback(async () => {
@@ -63,6 +118,12 @@ export default function Cari() {
         })}`,
       );
       setTrips(data);
+      // Nothing on this route: offer whatever else is available.
+      if (!data.length && (query.from || query.to)) {
+        setOthers(await api(`/trips${qs({ seats: query.seats, date: query.date })}`));
+      } else {
+        setOthers(null);
+      }
     } catch (e) {
       setErr(e.message);
     } finally {
@@ -75,6 +136,9 @@ export default function Cari() {
   }, [load]);
 
   function onSearch(v) {
+    setRemembered(false);
+    saveLast(v);
+    setRecent(readRecent());
     setQuery(v);
     const q = new URLSearchParams();
     if (v.from) q.set('from', JSON.stringify(v.from));
@@ -137,7 +201,25 @@ export default function Cari() {
 
   return (
     <div>
-      {query && <SearchBar initial={query} onSearch={onSearch} busy={busy} />}
+      {query && <SearchBar key={`${query.from?.lat}|${query.to?.lat}`} initial={query} onSearch={onSearch} busy={busy} />}
+      {recent.length > 0 && (
+        <div className="recent-routes" aria-label="Rute terakhir">
+          <span className="xs muted">Rute terakhir</span>
+          {recent.map((r, i) => {
+            const on = query && sameRoute(r, query);
+            return (
+              <button
+                key={i}
+                className={`chip recent-chip ${on ? 'chip-primary' : ''}`}
+                onClick={() => onSearch({ from: r.from, to: r.to, date: '', seats: r.seats || 1 })}
+              >
+                <Icon name="clock" />
+                {r.from ? shortPlace(r.from) : 'Mana saja'} → {r.to ? shortPlace(r.to) : 'mana saja'}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <div className="results-layout">
         <aside className="filters card desktop-only" aria-label="Filter">
@@ -180,6 +262,25 @@ export default function Cari() {
             </div>
           </div>
 
+          {remembered && (query?.from || query?.to) && (
+            <div className="row wrap small" style={{ background: 'var(--primary-50)', padding: '10px 14px', borderRadius: 12 }}>
+              <Icon name="clock" className="icon-sm" />
+              <span className="grow">
+                Menampilkan rute terakhir yang Anda cari: <b>{query.from ? shortPlace(query.from) : 'mana saja'}</b> ke{' '}
+                <b>{query.to ? shortPlace(query.to) : 'mana saja'}</b>
+              </span>
+              <button
+                className="link small"
+                onClick={() => {
+                  setRemembered(false);
+                  setQuery({ from: null, to: null, date: '', seats: query.seats });
+                }}
+              >
+                Lihat semua trip
+              </button>
+            </div>
+          )}
+
           {err && <p className="error">{err}</p>}
 
           {view === 'map' && (
@@ -192,7 +293,24 @@ export default function Cari() {
             />
           )}
 
-          {trips && shown.length === 0 && (
+          {trips && shown.length === 0 && others?.length > 0 && (
+            <>
+              <div className="card row wrap" style={{ '--gap': '12px' }}>
+                <Icon name="info" />
+                <span className="grow small">
+                  Belum ada trip untuk rute ini. Ini trip lain yang tersedia, atau{' '}
+                  <Link href="/minta">pasang permintaan</Link> supaya driver searah menawari Anda.
+                </span>
+              </div>
+              <div className="list">
+                {others.map((t) => (
+                  <TripCard key={t.id} trip={t} href={`/trip/${t.id}`} />
+                ))}
+              </div>
+            </>
+          )}
+
+          {trips && shown.length === 0 && !others?.length && (
             <Empty
               icon="megaphone"
               title="Belum ada yang searah"
@@ -212,7 +330,7 @@ export default function Cari() {
                 <div className="day-head">{g.day}</div>
                 <div className="list">
                   {g.items.map((t) => (
-                    <TripCard key={t.id} trip={t} href={href(t)} pickup={query?.from} dropoff={query?.to} />
+                    <TripCard key={t.id} trip={t} href={href(t)} />
                   ))}
                 </div>
               </div>
