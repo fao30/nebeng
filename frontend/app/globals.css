@@ -1922,3 +1922,19 @@ input[type='range'] {
   width: 8px;
   height: 8px;
 }
+/* Indonesian licence plate: black with white letters */
+.plate {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #17142e;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px #17142e;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}

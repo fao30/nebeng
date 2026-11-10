@@ -24,7 +24,6 @@ func Seed(s *Store) {
 	rina := mk("Rina Wijaya", "rina@demo.id", "081200000002", "Honda Brio", "D 4321 ABC")
 	sari := mk("Sari Lestari", "sari@demo.id", "081200000003", "", "")
 	mk("Andi Pratama", "andi@demo.id", "081200000004", "", "")
-	mk("Admin Nebeng", "admin@demo.id", "081200000000", "", "").IsAdmin = true
 
 	p := func(lat, lng float64, label string) Point { return Point{Lat: lat, Lng: lng, Label: label} }
 	day := func(d, h, m int) time.Time {
@@ -46,7 +45,7 @@ func Seed(s *Store) {
 		t := &Trip{ID: newID("trp"), DriverID: driver.ID, Origin: o, Destination: d, Stops: stops, DepartAt: at, Seats: seats,
 			Luggage: op.luggage > 0, MaxLuggage: op.luggage, PricePerSeat: price, SegmentPrices: op.segments,
 			Negotiable: op.nego, InstantBooking: op.instant, Amenities: op.am,
-			Kind: AutoKind(o, d), Vehicle: driver.CarModel + " " + driver.CarPlate,
+			Kind: AutoKind(o, d), Vehicle: driver.CarModel, Plate: driver.CarPlate,
 			Notes: notes, Status: TripScheduled, CreatedAt: time.Now()}
 		normalizeTrip(t)
 		s.Trips[t.ID] = t

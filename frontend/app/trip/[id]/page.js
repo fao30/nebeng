@@ -112,7 +112,18 @@ function TripHeader({ trip, back }) {
 function DriverCard({ trip }) {
   return (
     <div className="card stack">
-      <Person user={trip.driver} sub={trip.vehicle || 'Kendaraan belum diisi'} large />
+      <div className="row-between wrap">
+        <Person user={trip.driver} sub={trip.vehicle || 'Kendaraan belum diisi'} large />
+        {trip.plate ? (
+          <span className="plate" aria-label="Pelat nomor">
+            {trip.plate}
+          </span>
+        ) : (
+          <span className="xs muted" style={{ maxWidth: 220 }}>
+            Pelat nomor dan nama lengkap driver terlihat setelah pesanan Anda terkonfirmasi.
+          </span>
+        )}
+      </div>
       {trip.notes && <p className="ink2">“{trip.notes}”</p>}
       <hr className="divider" style={{ margin: '4px 0' }} />
       <div className="amen-list">

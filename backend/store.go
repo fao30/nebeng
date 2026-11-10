@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 )
@@ -126,11 +127,23 @@ func (s *Store) publicUser(id string, withContact bool) *PublicUser {
 	if u == nil {
 		return nil
 	}
-	p := &PublicUser{ID: u.ID, Name: u.Name, CarModel: u.CarModel, CarPlate: u.CarPlate}
+	// Before a booking is confirmed, others only see a short name and the car
+	// model: no surname, phone number or licence plate.
+	p := &PublicUser{ID: u.ID, Name: shortName(u.Name), CarModel: u.CarModel}
 	if withContact {
-		p.Phone = u.Phone
+		p.Name, p.Phone, p.CarPlate = u.Name, u.Phone, u.CarPlate
 	}
 	return p
+}
+
+// shortName turns "Budi Santoso" into "Budi S.".
+func shortName(name string) string {
+	parts := strings.Fields(name)
+	if len(parts) < 2 {
+		return name
+	}
+	r := []rune(parts[len(parts)-1])
+	return parts[0] + " " + string(r[0]) + "."
 }
 
 // isParticipant: driver, or passenger with an accepted booking.

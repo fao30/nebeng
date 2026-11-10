@@ -251,6 +251,7 @@ type TripSummary struct {
 	InstantBooking bool        `json:"instant_booking"`
 	Amenities      Amenities   `json:"amenities"`
 	Vehicle        string      `json:"vehicle"`
+	Plate          string      `json:"plate,omitempty"`
 	Etas           []time.Time `json:"etas"`
 }
 
@@ -279,6 +280,7 @@ func (a *API) tripView(t *Trip, viewer string) *TripView {
 	}
 	if role == "" {
 		tv.ShareToken = ""
+		tv.Plate = ""
 	}
 	if viewer != "" {
 		for _, b := range a.store.Bookings {
@@ -331,6 +333,9 @@ func (a *API) bookingView(b *Booking) *BookingView {
 		Driver:    a.store.publicUser(t.DriverID, accepted),
 		Trip:      tripSummary(t),
 	}
+	if !accepted {
+		bv.Trip.Plate = ""
+	}
 	bv.Messages, _ = a.messageStats(b.ID)
 	if b.Status == BookingNegotiating {
 		if lo := b.LastOffer(); lo != nil {
@@ -346,7 +351,7 @@ func (a *API) bookingView(b *Booking) *BookingView {
 
 func tripSummary(t *Trip) *TripSummary {
 	return &TripSummary{ID: t.ID, Origin: t.Origin, Destination: t.Destination, Stops: t.Stops, DepartAt: t.DepartAt,
-		Status: t.Status, Kind: t.Kind, PricePerSeat: t.PricePerSeat, Negotiable: t.Negotiable, Vehicle: t.Vehicle,
+		Status: t.Status, Kind: t.Kind, PricePerSeat: t.PricePerSeat, Negotiable: t.Negotiable, Vehicle: t.Vehicle, Plate: t.Plate,
 		Luggage: t.Luggage, MaxLuggage: t.MaxLuggage, Seats: t.Seats, SegmentPrices: t.SegmentPrices,
 		InstantBooking: t.InstantBooking, Amenities: t.Amenities, Etas: etas(t)}
 }
@@ -572,6 +577,7 @@ type tripInput struct {
 	Amenities      Amenities `json:"amenities"`
 	Kind           string    `json:"kind"`
 	Vehicle        string    `json:"vehicle"`
+	Plate          string    `json:"plate"`
 	Notes          string    `json:"notes"`
 }
 
@@ -632,14 +638,19 @@ func (a *API) createTrip(w http.ResponseWriter, r *http.Request, uid string) err
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	u := s.Users[uid]
+	in.Vehicle = strings.TrimSpace(in.Vehicle)
+	in.Plate = strings.ToUpper(strings.TrimSpace(in.Plate))
 	if in.Vehicle == "" {
-		in.Vehicle = strings.TrimSpace(u.CarModel + " " + u.CarPlate)
+		in.Vehicle = u.CarModel
+	}
+	if in.Plate == "" {
+		in.Plate = u.CarPlate
 	}
 	t := &Trip{ID: newID("trp"), DriverID: uid, Origin: in.Origin, Destination: in.Destination,
 		Stops: in.Stops, Luggage: in.Luggage, MaxLuggage: in.MaxLuggage, SegmentPrices: in.SegmentPrices,
 		DepartAt: in.DepartAt, Seats: in.Seats, PricePerSeat: in.PricePerSeat, Negotiable: in.Negotiable,
 		InstantBooking: in.InstantBooking, Amenities: in.Amenities,
-		Kind: in.Kind, Vehicle: in.Vehicle, Notes: in.Notes, Status: TripScheduled, CreatedAt: time.Now()}
+		Kind: in.Kind, Vehicle: in.Vehicle, Plate: in.Plate, Notes: in.Notes, Status: TripScheduled, CreatedAt: time.Now()}
 	normalizeTrip(t)
 	s.Trips[t.ID] = t
 	s.Changed()

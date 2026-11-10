@@ -34,13 +34,13 @@ Logika inti mengikuti aplikasi bibig (React Native), dibawa ke web.
   Menawarkan tumpangan wajib memilih trip yang sudah dibuat; harga & jam jemput terisi otomatis dari trip.
 
 **Kontak, patokan, dan chat**
-- Nomor telepon driver dan sesama penumpang hanya terlihat setelah pesanan terkonfirmasi di trip yang sama
-  (kartu "Peserta trip" dengan tombol telepon & WhatsApp).
+- Nama lengkap, nomor telepon, dan pelat nomor hanya terlihat setelah pesanan terkonfirmasi di trip yang sama
+  (kartu "Peserta trip" dengan tombol telepon & WhatsApp). Sebelum itu hanya nama depan + inisial dan model mobil.
 - Setiap titik jemput, antar, dan titik stop bisa diberi patokan, misalnya "depan Indomaret, pagar hijau".
 - Chat per pesanan antara driver dan penumpang (selama negosiasi atau terkonfirmasi), real-time lewat
   Server-Sent Events: pesan dan perubahan tawaran langsung muncul di layar lawan bicara.
 
-**Panel admin (CRM)** — `/admin`, login `admin@demo.id` / `demo123`
+**Panel admin (CRM)** — `/admin`, login dengan akun tim (lihat bawah)
 - Ringkasan: pengguna, trip aktif, pesanan, nilai transaksi, permintaan terbuka, jumlah chat.
 - Tarif & waktu tempuh: harga saran per km, harga minimum per ruas, menit per km (dalam kota / antar kota),
   faktor jarak jalan. Langsung dipakai untuk harga saran dan perkiraan jam di seluruh aplikasi.
@@ -62,9 +62,12 @@ Logika inti mengikuti aplikasi bibig (React Native), dibawa ke web.
 |---|---|
 | budi@demo.id, rina@demo.id | driver (sudah punya trip Jakarta–Bandung, Bogor–Jakarta, Sukabumi–Bogor, dll.) |
 | sari@demo.id, andi@demo.id | penumpang (Sari sudah terkonfirmasi di trip Monas–KM 97 + chat, Andi sedang nego trip Semanggi) |
-| admin@demo.id | admin, buka `/admin` |
 
-Password semua akun: `demo123`. Matikan dengan `SEED_DEMO=false`.
+Password semua akun demo: `demo123`. Matikan dengan `SEED_DEMO=false`.
+
+**Akun tim (admin):** `fakhrul@nebeng.id`, `nanda@nebeng.id`, `admin@nebeng.id`. Akun ini dibuat ulang otomatis
+setiap server menyala (`backend/accounts.go`). Repo ini publik, jadi yang disimpan hanya hash PBKDF2;
+password dibagikan terpisah, tidak pernah di-commit.
 
 ## Menjalankan lokal
 

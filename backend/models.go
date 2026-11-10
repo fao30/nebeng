@@ -67,7 +67,8 @@ type Trip struct {
 	InstantBooking bool       `json:"instant_booking"` // book at list price without driver approval
 	Amenities      Amenities  `json:"amenities"`
 	Kind           string     `json:"kind"`
-	Vehicle        string     `json:"vehicle"`
+	Vehicle        string     `json:"vehicle"`         // make & model, shown to everyone
+	Plate          string     `json:"plate,omitempty"` // shown only to confirmed participants
 	Notes          string     `json:"notes"`
 	Status         string     `json:"status"`
 	ShareToken     string     `json:"share_token,omitempty"`

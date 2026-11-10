@@ -63,7 +63,10 @@ export default function LivePage() {
         <p className="small muted">
           Jadwal {fmtDay(snap.trip.depart_at)}, {fmtTime(snap.trip.depart_at)}
         </p>
-        <Person user={snap.driver} sub={snap.trip.vehicle} />
+        <div className="row-between">
+          <Person user={snap.driver} sub={snap.trip.vehicle} />
+          {snap.trip.plate && <span className="plate">{snap.trip.plate}</span>}
+        </div>
         {status === 'completed' && <p className="small ok">Trip sudah selesai. Live location berhenti.</p>}
       </div>
     </div>

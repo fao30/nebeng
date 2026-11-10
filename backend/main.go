@@ -32,6 +32,7 @@ func main() {
 	if env("SEED_DEMO", "true") == "true" {
 		Seed(store)
 	}
+	ensureTeamAccounts(store)
 	promoteAdmins(store)
 
 	mux := http.NewServeMux()

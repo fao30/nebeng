@@ -32,7 +32,8 @@ function NewTrip() {
   const [maxLuggage, setMaxLuggage] = useState(2);
   const [amen, setAmen] = useState({ max2_back: true, pets: false, smoking: false, baby_seat: false, parcel: false, cargo: false });
   const [instant, setInstant] = useState(true);
-  const [vehicle, setVehicle] = useState([user.car_model, user.car_plate].filter(Boolean).join(' '));
+  const [vehicle, setVehicle] = useState(user.car_model || '');
+  const [plate, setPlate] = useState(user.car_plate || '');
   const [notes, setNotes] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -108,6 +109,7 @@ function NewTrip() {
           amenities: amen,
           kind,
           vehicle,
+          plate,
           notes,
         },
       });
@@ -274,10 +276,19 @@ function NewTrip() {
                 </span>
               </label>
             </div>
-            <label className="field">
-              <span className="field-label">Kendaraan</span>
-              <input className="input" value={vehicle} onChange={(e) => setVehicle(e.target.value)} placeholder="Toyota Avanza B 1234 XYZ" />
-            </label>
+            <div className="grid-2">
+              <label className="field">
+                <span className="field-label">Mobil</span>
+                <input className="input" value={vehicle} onChange={(e) => setVehicle(e.target.value)} placeholder="Toyota Avanza hitam" />
+              </label>
+              <label className="field">
+                <span className="field-label">Pelat nomor</span>
+                <input className="input" value={plate} onChange={(e) => setPlate(e.target.value.toUpperCase())} placeholder="B 1234 XYZ" />
+              </label>
+            </div>
+            <p className="help" style={{ marginTop: -6 }}>
+              Pelat nomor, nama lengkap, dan nomor telepon Anda hanya terlihat oleh penumpang yang pesanannya sudah terkonfirmasi.
+            </p>
             <label className="field">
               <span className="field-label">Catatan untuk penumpang</span>
               <textarea className="input" rows="3" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Misal: lewat tol, tunggu maksimal 5 menit di titik jemput" />
