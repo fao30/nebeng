@@ -14,13 +14,14 @@ import (
 // It is intentionally simple so the API runs with zero external services;
 // swap it for Postgres when moving to production.
 type Store struct {
-	mu       sync.RWMutex
-	Users    map[string]*User        `json:"users"`
-	Trips    map[string]*Trip        `json:"trips"`
-	Bookings map[string]*Booking     `json:"bookings"`
-	Requests map[string]*RideRequest `json:"requests"`
-	Messages map[string]*Message     `json:"messages"`
-	Settings *Settings               `json:"settings"`
+	mu            sync.RWMutex
+	Users         map[string]*User         `json:"users"`
+	Trips         map[string]*Trip         `json:"trips"`
+	Bookings      map[string]*Booking      `json:"bookings"`
+	Requests      map[string]*RideRequest  `json:"requests"`
+	Messages      map[string]*Message      `json:"messages"`
+	Notifications map[string]*Notification `json:"notifications"`
+	Settings      *Settings                `json:"settings"`
 
 	path    string
 	dirty   chan struct{}
@@ -30,13 +31,14 @@ type Store struct {
 
 func NewStore(path string) *Store {
 	s := &Store{
-		Users:    map[string]*User{},
-		Trips:    map[string]*Trip{},
-		Bookings: map[string]*Booking{},
-		Requests: map[string]*RideRequest{},
-		Messages: map[string]*Message{},
-		path:     path,
-		dirty:    make(chan struct{}, 1),
+		Users:         map[string]*User{},
+		Trips:         map[string]*Trip{},
+		Bookings:      map[string]*Booking{},
+		Requests:      map[string]*RideRequest{},
+		Messages:      map[string]*Message{},
+		Notifications: map[string]*Notification{},
+		path:          path,
+		dirty:         make(chan struct{}, 1),
 	}
 	if path != "" {
 		if b, err := os.ReadFile(path); err == nil {
@@ -50,6 +52,9 @@ func NewStore(path string) *Store {
 	}
 	if s.Messages == nil {
 		s.Messages = map[string]*Message{}
+	}
+	if s.Notifications == nil {
+		s.Notifications = map[string]*Notification{}
 	}
 	if s.Settings == nil || s.Settings.valid() != nil {
 		s.Settings = defaultSettings()

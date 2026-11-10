@@ -35,6 +35,8 @@ func main() {
 	ensureTeamAccounts(store)
 	promoteAdmins(store)
 
+	go api.reminders(nil)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]any{"ok": true, "time": time.Now(), "version": version()})
@@ -61,6 +63,11 @@ func main() {
 	mux.HandleFunc("GET /api/bookings/{id}/stream", api.auth(api.bookingStream))
 
 	// platform settings (public read) & admin CRM
+	mux.HandleFunc("GET /api/notifications", api.auth(api.listNotifications))
+	mux.HandleFunc("POST /api/notifications/read", api.auth(api.readNotifications))
+	mux.HandleFunc("GET /api/notifications/stream", api.auth(api.notificationStream))
+	mux.HandleFunc("PUT /api/me/routes", api.auth(api.saveRoutes))
+	mux.HandleFunc("GET /api/admin/notifications", api.adminOnly(api.adminNotifications))
 	mux.HandleFunc("GET /api/settings", api.h(api.getSettings))
 	mux.HandleFunc("PUT /api/admin/settings", api.adminOnly(api.putSettings))
 	mux.HandleFunc("GET /api/admin/stats", api.adminOnly(api.adminStats))

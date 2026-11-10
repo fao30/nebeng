@@ -10,16 +10,17 @@ type Point struct {
 }
 
 type User struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Phone     string    `json:"phone"`
-	CarModel  string    `json:"car_model"`
-	CarPlate  string    `json:"car_plate"`
-	IsAdmin   bool      `json:"is_admin"`
-	PassHash  string    `json:"pass_hash,omitempty"`
-	Salt      string    `json:"salt,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
+	ID          string       `json:"id"`
+	Name        string       `json:"name"`
+	Email       string       `json:"email"`
+	Phone       string       `json:"phone"`
+	CarModel    string       `json:"car_model"`
+	CarPlate    string       `json:"car_plate"`
+	IsAdmin     bool         `json:"is_admin"`
+	SavedRoutes []SavedRoute `json:"saved_routes,omitempty"`
+	PassHash    string       `json:"pass_hash,omitempty"`
+	Salt        string       `json:"salt,omitempty"`
+	CreatedAt   time.Time    `json:"created_at"`
 }
 
 // PublicUser is what other users may see.
@@ -72,6 +73,7 @@ type Trip struct {
 	Notes          string     `json:"notes"`
 	Status         string     `json:"status"`
 	ShareToken     string     `json:"share_token,omitempty"`
+	Reminded       bool       `json:"reminded,omitempty"`
 	StartedAt      *time.Time `json:"started_at,omitempty"`
 	CompletedAt    *time.Time `json:"completed_at,omitempty"`
 	CreatedAt      time.Time  `json:"created_at"`

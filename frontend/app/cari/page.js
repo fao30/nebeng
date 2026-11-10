@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { api, qs } from '@/lib/api';
+import { api, getToken, qs } from '@/lib/api';
 import { AMENITIES, fmtDay, routeOf, shortPlace, timeBuckets } from '@/lib/format';
 import SearchBar from '@/components/SearchBar';
 import TripCard from '@/components/TripCard';
@@ -51,6 +51,12 @@ function saveLast(q) {
     localStorage.setItem(LAST_KEY, JSON.stringify(r));
     const recent = [r, ...readRecent().filter((x) => !sameRoute(x, r))].slice(0, 3);
     localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+    // Signed in: keep these routes on the server too, so a new trip on one of
+    // them can send a notification.
+    if (getToken()) {
+      const routes = recent.filter((x) => x.from && x.to).map((x) => ({ from: x.from, to: x.to }));
+      if (routes.length) api('/me/routes', { method: 'PUT', body: { routes } }).catch(() => {});
+    }
   } catch {
     /* storage unavailable */
   }

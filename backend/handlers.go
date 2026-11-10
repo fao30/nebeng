@@ -680,6 +680,7 @@ func (a *API) createTrip(w http.ResponseWriter, r *http.Request, uid string) err
 	normalizeTrip(t)
 	s.Trips[t.ID] = t
 	s.Changed()
+	a.onTripCreated(t)
 	writeJSON(w, 201, a.tripView(t, uid))
 	return nil
 }
@@ -724,6 +725,12 @@ func (a *API) tripStatus(w http.ResponseWriter, r *http.Request, uid string) err
 		return errf(403, "hanya driver yang bisa mengubah status trip")
 	}
 	now := time.Now()
+	var affected []*Booking
+	for _, b := range s.Bookings {
+		if b.TripID == t.ID && (b.Status == BookingAccepted || in.Action == "cancel" && b.Status == BookingNegotiating) {
+			affected = append(affected, b)
+		}
+	}
 	switch in.Action {
 	case "start":
 		if t.Status != TripScheduled {
@@ -751,6 +758,7 @@ func (a *API) tripStatus(w http.ResponseWriter, r *http.Request, uid string) err
 		return errf(400, "action harus start, complete, atau cancel")
 	}
 	s.Changed()
+	a.onTripStatus(t, in.Action, affected)
 	a.hub.Event(t.ID, map[string]any{"type": "status", "status": t.Status})
 	writeJSON(w, 200, a.tripView(t, uid))
 	return nil
@@ -845,6 +853,7 @@ func (a *API) createBooking(w http.ResponseWriter, r *http.Request, uid string) 
 	}
 	s.Bookings[b.ID] = b
 	s.Changed()
+	a.onBookingCreated(b, t)
 	writeJSON(w, 201, a.bookingView(b))
 	return nil
 }
@@ -915,6 +924,10 @@ func (a *API) respondBooking(w http.ResponseWriter, r *http.Request, uid string)
 			for _, other := range s.Bookings {
 				if other.ID != b.ID && other.RequestID == b.RequestID && other.Status == BookingNegotiating {
 					other.Status, other.UpdatedAt = BookingRejected, now
+					if ot := s.Trips[other.TripID]; ot != nil {
+						a.notify(&Notification{UserID: ot.DriverID, Type: NotifBookingRejected, Title: a.firstName(other.PassengerID) + " memilih driver lain",
+							Body: other.leg() + " · tawaran Anda ditutup", Link: "/driver/permintaan", TripID: ot.ID, BookingID: other.ID})
+					}
 				}
 			}
 		}
@@ -940,6 +953,7 @@ func (a *API) respondBooking(w http.ResponseWriter, r *http.Request, uid string)
 	}
 	b.UpdatedAt = now
 	s.Changed()
+	a.onBookingResponse(b, t, uid, in.Action)
 	a.hub.Event("booking:"+b.ID, map[string]any{"type": "booking", "status": b.Status})
 	writeJSON(w, 200, a.bookingView(b))
 	return nil
@@ -987,6 +1001,7 @@ func (a *API) createRequest(w http.ResponseWriter, r *http.Request, uid string) 
 		DepartAt: in.DepartAt, Seats: in.Seats, Luggage: max(0, in.Luggage), Budget: in.Budget, Notes: in.Notes, Status: RequestOpen, CreatedAt: time.Now()}
 	s.Requests[req.ID] = req
 	s.Changed()
+	a.onRequestCreated(req)
 	writeJSON(w, 201, a.requestView(req, uid))
 	return nil
 }
@@ -1127,6 +1142,7 @@ func (a *API) offerOnRequest(w http.ResponseWriter, r *http.Request, uid string)
 		CreatedAt: now, UpdatedAt: now}
 	s.Bookings[b.ID] = b
 	s.Changed()
+	a.onDriverOffer(b, t)
 	writeJSON(w, 201, a.bookingView(b))
 	return nil
 }

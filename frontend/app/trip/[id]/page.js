@@ -41,7 +41,7 @@ export default function TripPage() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     setPlaces({ from: parsePoint(q.get('p')), to: parsePoint(q.get('d')) });
-    setInit({ seats: Number(q.get('s')) || 1, luggage: Number(q.get('k')) || 0 });
+    setInit({ seats: Number(q.get('s')) || 1, luggage: Number(q.get('k')) || 0, chat: q.get('chat') || '' });
   }, []);
 
   const load = useCallback(() => {
@@ -73,7 +73,7 @@ export default function TripPage() {
 
   const isDriver = user && trip.driver_id === user.id;
   return isDriver ? (
-    <DriverView trip={trip} reload={load} />
+    <DriverView trip={trip} reload={load} chatId={init.chat} />
   ) : (
     <PassengerView
       trip={trip}
@@ -232,7 +232,7 @@ function PassengerView({ trip, user, reload, from, to, setSel, init }) {
         <aside className="detail-aside stack" style={{ '--gap': '16px' }} id="pesan">
           {active ? (
             <>
-              <Negotiation booking={active} role="passenger" onChange={reload} />
+              <Negotiation booking={active} role="passenger" onChange={reload} openChat={active.id === init?.chat} />
               <Participants list={trip.participants} meId={user?.id} />
               {accepted && trip.status !== 'completed' && trip.status !== 'cancelled' && (
                 <LivePanel sharing={sharing} onToggle={() => setSharing(!sharing)} broadcast={broadcast} shareToken={shareToken} live={live} passenger />
@@ -261,7 +261,7 @@ function PassengerView({ trip, user, reload, from, to, setSel, init }) {
               {mine
                 .filter((b) => b !== active)
                 .map((b) => (
-                  <Negotiation key={b.id} booking={b} role="passenger" />
+                  <Negotiation key={b.id} booking={b} role="passenger" openChat={b.id === init?.chat} />
                 ))}
             </div>
           )}
@@ -455,7 +455,7 @@ function BookingPanel({ trip, from, to, setSel, init, onDone }) {
 
 /* ---------- driver ---------- */
 
-function DriverView({ trip, reload }) {
+function DriverView({ trip, reload, chatId }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [sharing, setSharing] = useState(false);
@@ -573,7 +573,7 @@ function DriverView({ trip, reload }) {
               </Empty>
             )}
             {[...pending, ...accepted, ...closed].map((b) => (
-              <Negotiation key={b.id} booking={b} role="driver" onChange={reload} />
+              <Negotiation key={b.id} booking={b} role="driver" onChange={reload} openChat={b.id === chatId} />
             ))}
           </section>
         </div>

@@ -1,5 +1,6 @@
 // Small stroke icon set (24×24). Drawn for this app; no icon dependency.
 const P = {
+  bell: ['M6 9a6 6 0 0 1 12 0c0 5 2 6.5 2 6.5H4S6 14 6 9z', 'M10 19a2 2 0 0 0 4 0'],
   search: ['M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z', 'M16.5 16.5 21 21'],
   pin: ['M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z', 'M12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z'],
   flag: ['M5 21V4', 'M5 4h11l-2 4 2 4H5'],

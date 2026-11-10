@@ -95,6 +95,15 @@ func (a *API) postMessage(w http.ResponseWriter, r *http.Request, uid string) er
 	b.UpdatedAt = m.At
 	s.Changed()
 	role := a.bookingRole(b, uid)
+	if t := s.Trips[b.TripID]; t != nil {
+		to := t.DriverID
+		if uid == t.DriverID {
+			to = b.PassengerID
+		}
+		if uid != to {
+			a.notifyChat(to, b, a.firstName(uid), in.Text)
+		}
+	}
 	a.hub.Event("booking:"+b.ID, map[string]any{"type": "message",
 		"message": MessageView{Message: *m, SenderName: s.Users[uid].Name, Role: role}})
 	writeJSON(w, 201, a.messagesFor(b))

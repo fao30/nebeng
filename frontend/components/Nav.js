@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useApp } from '@/app/providers';
 import Icon from './Icon';
 import { Avatar } from './ui';
+import { NotificationBell, NotificationToasts } from './Notifications';
 
 const TABS = {
   passenger: [
@@ -81,6 +82,7 @@ export default function Nav() {
                     Driver
                   </button>
                 </div>
+                <NotificationBell userId={user.id} />
                 <Link href="/profil" className="who row" aria-label="Profil" style={{ '--gap': '8px', color: 'var(--ink)' }}>
                   <Avatar name={user.name} />
                 </Link>
@@ -109,6 +111,7 @@ export default function Nav() {
           </div>
         </div>
       </header>
+      {user && <NotificationToasts />}
       {user && (
         <nav className="tabbar" aria-label="Menu">
           {tabs.map((t) => (

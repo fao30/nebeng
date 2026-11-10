@@ -9,12 +9,12 @@ import { Landmark } from './RouteTimeline';
 import Chat from './Chat';
 
 /** A booking and its price negotiation. `role` is the viewer's side: driver | passenger. */
-export default function Negotiation({ booking: b, role, onChange, showTrip = false }) {
+export default function Negotiation({ booking: b, role, onChange, showTrip = false, openChat = false }) {
   const last = b.offers[b.offers.length - 1];
   const [price, setPrice] = useState(last?.price || 0);
   const [msg, setMsg] = useState('');
   const [countering, setCountering] = useState(false);
-  const [chat, setChat] = useState(false);
+  const [chat, setChat] = useState(openChat);
   // The card stays mounted while the booking updates (so an open chat stays
   // open); follow the latest offer unless the user is typing a counter-offer.
   useEffect(() => {
