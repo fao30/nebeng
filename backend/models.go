@@ -6,6 +6,7 @@ type Point struct {
 	Lat   float64 `json:"lat"`
 	Lng   float64 `json:"lng"`
 	Label string  `json:"label"`
+	Note  string  `json:"note,omitempty"` // landmark / patokan written by the user
 }
 
 type User struct {
@@ -15,6 +16,7 @@ type User struct {
 	Phone     string    `json:"phone"`
 	CarModel  string    `json:"car_model"`
 	CarPlate  string    `json:"car_plate"`
+	IsAdmin   bool      `json:"is_admin"`
 	PassHash  string    `json:"pass_hash,omitempty"`
 	Salt      string    `json:"salt,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
@@ -162,4 +164,13 @@ type Position struct {
 	Heading float64   `json:"heading"`
 	Speed   float64   `json:"speed"`
 	At      time.Time `json:"at"`
+}
+
+// Message is a chat message between the driver and passenger of a booking.
+type Message struct {
+	ID        string    `json:"id"`
+	BookingID string    `json:"booking_id"`
+	SenderID  string    `json:"sender_id"`
+	Text      string    `json:"text"`
+	At        time.Time `json:"at"`
 }

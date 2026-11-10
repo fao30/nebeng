@@ -47,6 +47,15 @@ function ProfileForm() {
           </button>
         </div>
       </div>
+      {user.is_admin && (
+        <a href="/admin" className="card row-between" style={{ marginBottom: 16, color: 'inherit' }}>
+          <span className="row">
+            <Icon name="shield" />
+            <b>Panel admin</b>
+          </span>
+          <Icon name="chevronRight" />
+        </a>
+      )}
       <form className="card stack" style={{ '--gap': '14px' }} onSubmit={submit}>
         <h3>Data diri</h3>
         <label className="field">

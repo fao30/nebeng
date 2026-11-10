@@ -10,12 +10,14 @@ import RouteTimeline from '@/components/RouteTimeline';
 import Icon from '@/components/Icon';
 import { Stepper, Toggle } from '@/components/ui';
 import { useApp } from '../../providers';
+import { useSettings } from '@/lib/settings';
 
 const STEPS = ['Rute', 'Waktu', 'Harga', 'Detail', 'Tinjau'];
 const MAX_STOPS = 10;
 
 function NewTrip() {
   const { user } = useApp();
+  const cfg = useSettings();
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [origin, setOrigin] = useState(null);
@@ -41,10 +43,10 @@ function NewTrip() {
 
   // Keep one price per segment; new segments start at the suggested price.
   useEffect(() => {
-    setPrices((prev) => segKm.map((km, i) => (prev.length === segKm.length && prev[i] ? prev[i] : suggestSegmentPrice(km))));
-  }, [segKm]);
+    setPrices((prev) => segKm.map((km, i) => (prev.length === segKm.length && prev[i] ? prev[i] : suggestSegmentPrice(km, cfg))));
+  }, [segKm, cfg]);
 
-  const etas = route ? estimateEtas(route, new Date(departAt).toISOString(), kind) : [];
+  const etas = route ? estimateEtas(route, new Date(departAt).toISOString(), kind, cfg) : [];
   const preview = route && {
     origin,
     destination: dest,
@@ -132,11 +134,20 @@ function NewTrip() {
           <div className="stack" style={{ '--gap': '14px' }}>
             <h1>Ke mana Anda berangkat?</h1>
             <p className="muted">Tambahkan titik stop tempat penumpang bisa naik atau turun. Urutkan sesuai arah perjalanan.</p>
-            <PointField label="Berangkat dari" kind="origin" value={origin} onChange={setOrigin} active={active === 'origin'} onActivate={() => setActive('origin')} />
+            <PointField label="Berangkat dari" kind="origin" value={origin} onChange={setOrigin} active={active === 'origin'} onActivate={() => setActive('origin')} withNote notePlaceholder="Titik kumpul, misal: lobi utara, dekat pos satpam" />
             {stops.map((s, i) => (
               <div className="stop-item" key={`${s.lat}-${i}`}>
                 <span className="dot dot-stop" />
-                <span>{s.label}</span>
+                <span className="stop-text">
+                  <span>{s.label}</span>
+                  <input
+                    value={s.note || ''}
+                    maxLength={200}
+                    onChange={(e) => setStops((all) => all.map((x, j) => (j === i ? { ...x, note: e.target.value } : x)))}
+                    placeholder="Patokan titik stop (opsional)"
+                    aria-label={`Patokan titik stop ${i + 1}`}
+                  />
+                </span>
                 <button type="button" className="btn btn-ghost icon-btn" onClick={() => moveStop(i, -1)} disabled={i === 0} aria-label="Naikkan">
                   <Icon name="arrowUp" className="icon-sm" />
                 </button>
@@ -149,7 +160,7 @@ function NewTrip() {
               </div>
             ))}
             {stops.length < MAX_STOPS && <StopAdder onAdd={addStop} active={active === 'stop'} onActivate={() => setActive('stop')} />}
-            <PointField label="Tujuan akhir" kind="dest" value={dest} onChange={setDest} active={active === 'dest'} onActivate={() => setActive('dest')} />
+            <PointField label="Tujuan akhir" kind="dest" value={dest} onChange={setDest} active={active === 'dest'} onActivate={() => setActive('dest')} withNote notePlaceholder="Patokan tujuan (opsional)" />
             {route && (
               <p className="small muted">
                 ±{Math.round(segKm.reduce((a, b) => a + b, 0))} km{stops.length ? `, ${stops.length} titik stop` : ''}, {kind === 'antar_kota' ? 'antar kota' : 'dalam kota'}
@@ -187,7 +198,7 @@ function NewTrip() {
                       {shortPlace(route[i])} ke {shortPlace(route[i + 1])}
                     </b>
                     <span className="xs muted">
-                      ±{Math.round(segKm[i])} km, saran {fmtRp(suggestSegmentPrice(segKm[i]))}
+                      ±{Math.round(segKm[i])} km, saran {fmtRp(suggestSegmentPrice(segKm[i], cfg))}
                     </span>
                   </div>
                   <Stepper

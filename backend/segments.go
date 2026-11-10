@@ -49,13 +49,6 @@ func segmentKm(route []Point) []float64 {
 	return out
 }
 
-// SuggestSegmentPrice is the default price per seat for a segment:
-// roughly a fair share of fuel and tolls, rounded to Rp1.000.
-func SuggestSegmentPrice(km float64) int64 {
-	p := km * 1.3 * 650 // road distance ≈ 1.3× straight line, Rp650/km per seat
-	return roundUp1000(math.Max(p, 10000))
-}
-
 func roundUp1000(v float64) int64 { return int64(math.Ceil(v/1000)) * 1000 }
 
 // distributePrice splits a full-route price over segments by distance.
@@ -128,16 +121,11 @@ func (s *Store) available(t *Trip, sp Span) (seats, luggage int) {
 
 // etas estimates the arrival time at each route point.
 func etas(t *Trip) []time.Time {
-	route := t.Route()
-	speed := 60.0 // km/h, intercity
-	if t.Kind == KindIntra {
-		speed = 28
-	}
 	out := []time.Time{t.DepartAt}
 	acc := 0.0
-	for _, k := range segmentKm(route) {
-		acc += k * 1.3
-		out = append(out, t.DepartAt.Add(time.Duration(acc/speed*float64(time.Hour))).Truncate(5*time.Minute))
+	for _, k := range segmentKm(t.Route()) {
+		acc += k
+		out = append(out, t.DepartAt.Add(travelDuration(acc, t.Kind)).Truncate(5*time.Minute))
 	}
 	return out
 }

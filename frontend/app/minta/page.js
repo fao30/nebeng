@@ -8,6 +8,7 @@ import Negotiation from '@/components/Negotiation';
 import RequireAuth from '@/components/RequireAuth';
 import Icon from '@/components/Icon';
 import { Empty, Stepper } from '@/components/ui';
+import { Landmark } from '@/components/RouteTimeline';
 
 const reqStatus = {
   open: ['Menunggu tawaran', 'chip-amber'],
@@ -99,11 +100,17 @@ function Minta() {
               <div className="stack small" style={{ '--gap': '6px' }}>
                 <div className="row" style={{ '--gap': '8px' }}>
                   <span className="dot" />
-                  {r.origin.label}
+                  <span>
+                    {r.origin.label}
+                    <Landmark note={r.origin.note} />
+                  </span>
                 </div>
                 <div className="row" style={{ '--gap': '8px' }}>
                   <span className="dot dot-dest" />
-                  {r.destination.label}
+                  <span>
+                    {r.destination.label}
+                    <Landmark note={r.destination.note} />
+                  </span>
                 </div>
               </div>
               <div className="row wrap">
@@ -136,8 +143,8 @@ function Minta() {
         <aside className="detail-aside">
           <form className="card stack" style={{ '--gap': '14px' }} onSubmit={submit}>
             <h3>Permintaan baru</h3>
-            <PointField label="Jemput di" kind="origin" value={origin} onChange={setOrigin} active={active === 'origin'} onActivate={() => setActive('origin')} />
-            <PointField label="Antar ke" kind="dest" value={dest} onChange={setDest} active={active === 'dest'} onActivate={() => setActive('dest')} />
+            <PointField label="Jemput di" kind="origin" value={origin} onChange={setOrigin} active={active === 'origin'} onActivate={() => setActive('origin')} withNote notePlaceholder="Patokan jemput, misal: lobi kantor, pagar hitam" />
+            <PointField label="Antar ke" kind="dest" value={dest} onChange={setDest} active={active === 'dest'} onActivate={() => setActive('dest')} withNote notePlaceholder="Patokan turun (opsional)" />
             <MapView
               markers={[...(origin ? [{ ...origin, kind: 'pickup', text: 'A' }] : []), ...(dest ? [{ ...dest, kind: 'drop', text: 'B' }] : [])]}
               lines={origin && dest ? [{ from: origin, to: dest, kind: 'walk' }] : []}

@@ -10,6 +10,7 @@ import PointField, { pointFromClick } from '@/components/PointField';
 import RouteTimeline from '@/components/RouteTimeline';
 import Negotiation from '@/components/Negotiation';
 import LivePanel from '@/components/LivePanel';
+import Participants from '@/components/Participants';
 import Icon from '@/components/Icon';
 import { Person, Stepper, Empty } from '@/components/ui';
 import { useBroadcastLocation, useLiveStream } from '@/lib/live';
@@ -39,12 +40,17 @@ export default function TripPage() {
     setInit({ seats: Number(q.get('s')) || 1, luggage: Number(q.get('k')) || 0 });
   }, []);
 
+  // Refetch the quote only when the points move, not while typing a landmark.
+  const pk = pickup === undefined ? undefined : pickup ? `${pickup.lat},${pickup.lng}` : '';
+  const dk = dropoff ? `${dropoff.lat},${dropoff.lng}` : '';
   const load = useCallback(() => {
-    if (pickup === undefined) return;
-    api(`/trips/${id}${qs({ from_lat: pickup?.lat, from_lng: pickup?.lng, to_lat: dropoff?.lat, to_lng: dropoff?.lng })}`)
+    if (pk === undefined) return;
+    const [fl, fg] = pk ? pk.split(',') : [];
+    const [tl, tg] = dk ? dk.split(',') : [];
+    api(`/trips/${id}${qs({ from_lat: fl, from_lng: fg, to_lat: tl, to_lng: tg })}`)
       .then(setTrip)
       .catch((e) => setErr(e.message));
-  }, [id, pickup, dropoff]);
+  }, [id, pk, dk]);
 
   useEffect(() => {
     if (!ready) return;
@@ -210,6 +216,7 @@ function PassengerView({ trip, user, reload, pickup, dropoff, setPickup, setDrop
           {active ? (
             <>
               <Negotiation booking={active} role="passenger" onChange={reload} />
+              <Participants list={trip.participants} meId={user?.id} />
               {accepted && trip.status !== 'completed' && trip.status !== 'cancelled' && (
                 <LivePanel sharing={sharing} onToggle={() => setSharing(!sharing)} broadcast={broadcast} shareToken={shareToken} live={live} passenger />
               )}
@@ -317,8 +324,8 @@ function BookingPanel({ trip, pickup, dropoff, setPickup, setDropoff, activeFiel
       </div>
 
       <div className="stack" style={{ '--gap': '8px' }}>
-        <PointField label="Titik jemput" kind="origin" value={pickup} onChange={(p) => setPickup(p || trip.origin)} active={activeField === 'pickup'} onActivate={() => setActiveField('pickup')} />
-        <PointField label="Titik antar" kind="dest" value={dropoff} onChange={(p) => setDropoff(p || trip.destination)} active={activeField === 'drop'} onActivate={() => setActiveField('drop')} />
+        <PointField label="Titik jemput" kind="origin" value={pickup} onChange={(p) => setPickup(p || trip.origin)} active={activeField === 'pickup'} onActivate={() => setActiveField('pickup')} withNote notePlaceholder="Patokan jemput, misal: depan Indomaret, baju biru" />
+        <PointField label="Titik antar" kind="dest" value={dropoff} onChange={(p) => setDropoff(p || trip.destination)} active={activeField === 'drop'} onActivate={() => setActiveField('drop')} withNote notePlaceholder="Patokan turun (opsional)" />
         <p className="help">Pilih titik di sepanjang rute. Bisa juga klik di peta setelah memilih kolom.</p>
       </div>
 
@@ -526,6 +533,7 @@ function DriverView({ trip, reload }) {
         </div>
 
         <aside className="detail-aside stack" style={{ '--gap': '16px' }}>
+          {accepted.length > 0 && <Participants list={trip.participants} meId={trip.driver_id} />}
           <div className="card stack">
             <div className="row-between">
               <h3>Kursi per ruas</h3>

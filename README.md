@@ -33,6 +33,21 @@ Logika inti mengikuti aplikasi bibig (React Native), dibawa ke web.
 - Permintaan penumpang: searah trip tertentu (jarak dari rute & titik stop) atau per area, dengan radius jemput/antar.
   Menawarkan tumpangan wajib memilih trip yang sudah dibuat; harga & jam jemput terisi otomatis dari trip.
 
+**Kontak, patokan, dan chat**
+- Nomor telepon driver dan sesama penumpang hanya terlihat setelah pesanan terkonfirmasi di trip yang sama
+  (kartu "Peserta trip" dengan tombol telepon & WhatsApp).
+- Setiap titik jemput, antar, dan titik stop bisa diberi patokan, misalnya "depan Indomaret, pagar hijau".
+- Chat per pesanan antara driver dan penumpang (selama negosiasi atau terkonfirmasi).
+
+**Panel admin (CRM)** — `/admin`, login `admin@demo.id` / `demo123`
+- Ringkasan: pengguna, trip aktif, pesanan, nilai transaksi, permintaan terbuka, jumlah chat.
+- Tarif & waktu tempuh: harga saran per km, harga minimum per ruas, menit per km (dalam kota / antar kota),
+  faktor jarak jalan. Langsung dipakai untuk harga saran dan perkiraan jam di seluruh aplikasi.
+- Trip: filter tanggal, harga per kursi, nama/email/telepon driver atau penumpang, status; detail pesanan & chat.
+- Percakapan: semua chat dan tawar-menawar, bisa dicari per nama dan tanggal.
+- Pengguna: daftar akun dengan jumlah trip, pesanan, permintaan.
+- Tambah admin lain lewat env backend `ADMIN_EMAILS=email1@x.com,email2@y.com` (akun harus sudah daftar).
+
 **Live location**
 - Driver dan penumpang yang terkonfirmasi berbagi GPS (tiap ±3 detik), tampil real-time (Server-Sent Events).
 - Link pantau publik `/live/<token>` untuk keluarga, tanpa login.
@@ -45,7 +60,8 @@ Logika inti mengikuti aplikasi bibig (React Native), dibawa ke web.
 | Email | Peran contoh |
 |---|---|
 | budi@demo.id, rina@demo.id | driver (sudah punya trip Jakarta–Bandung, Bogor–Jakarta, Sukabumi–Bogor, dll.) |
-| sari@demo.id, andi@demo.id | penumpang (Sari punya 2 permintaan tumpangan) |
+| sari@demo.id, andi@demo.id | penumpang (Sari sudah terkonfirmasi di trip Monas–KM 97 + chat, Andi sedang nego trip Semanggi) |
+| admin@demo.id | admin, buka `/admin` |
 
 Password semua akun: `demo123`. Matikan dengan `SEED_DEMO=false`.
 
@@ -130,9 +146,13 @@ Alternatif: Railway / Fly.io / VPS dengan Dockerfile yang sama. Variabel env:
 | GET | /api/trips/{id}/share | token link pantau |
 | POST | /api/trips/{id}/location | kirim GPS `{lat,lng,heading,speed}` |
 | GET | /api/live/{token}, /api/live/{token}/stream | snapshot & SSE publik |
+| GET/POST | /api/bookings/{id}/messages | chat pesanan (driver/penumpang; admin baca) |
+| GET | /api/settings | tarif & waktu tempuh (publik) |
+| PUT | /api/admin/settings | ubah tarif & waktu tempuh (admin) |
+| GET | /api/admin/stats, /api/admin/trips, /api/admin/users, /api/admin/conversations | CRM admin |
 
 ## Batasan versi ini
 - Rute digambar sebagai garis lurus antar titik (asal → stop → tujuan); pencocokan juga memakai garis ini,
   jadi makin banyak titik stop, makin akurat. Untuk rute jalan sebenarnya, tambahkan OSRM/Google Directions.
-- Belum ada pembayaran, rating, chat bebas, dan notifikasi push (halaman memperbarui data tiap 10 detik).
+- Belum ada pembayaran, rating, dan notifikasi push (halaman dan chat memperbarui data berkala).
 - Nominatim & tile OSM gratis punya batas pemakaian; pakai penyedia berbayar untuk produksi.

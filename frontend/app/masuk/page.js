@@ -82,7 +82,7 @@ export default function Masuk() {
         </button>
       </form>
       <p className="small muted" style={{ textAlign: 'center', marginTop: 14 }}>
-        Akun demo: <b>budi@demo.id</b> (driver) atau <b>andi@demo.id</b> (penumpang), password <b>demo123</b>
+        Akun demo: <b>budi@demo.id</b> (driver), <b>andi@demo.id</b> (penumpang), <b>admin@demo.id</b> (admin). Password <b>demo123</b>
       </p>
     </div>
   );

@@ -7,7 +7,7 @@ import { geocode, reverseGeocode } from '@/lib/api';
  * Place picker: type to get suggestions, use current location, or (when the
  * parent passes `active`/`onActivate`) click the map to fill it.
  */
-export default function PointField({ label, value, onChange, active, onActivate, kind = 'origin', placeholder, compact }) {
+export default function PointField({ label, value, onChange, active, onActivate, kind = 'origin', placeholder, compact, withNote, notePlaceholder }) {
   const [editing, setEditing] = useState(!value);
   const [q, setQ] = useState('');
   const [results, setResults] = useState([]);
@@ -134,6 +134,18 @@ export default function PointField({ label, value, onChange, active, onActivate,
         <p className="error" style={{ marginTop: 6 }}>
           {err}
         </p>
+      )}
+      {withNote && value && !editing && (
+        <div className="note-field">
+          <Icon name="flag" className="icon-sm" />
+          <input
+            value={value.note || ''}
+            maxLength={200}
+            onChange={(e) => onChange({ ...value, note: e.target.value })}
+            placeholder={notePlaceholder || 'Patokan, misal: depan Indomaret, pagar hijau'}
+            aria-label={`Patokan ${label}`}
+          />
+        </div>
       )}
     </div>
   );

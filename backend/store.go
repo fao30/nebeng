@@ -18,6 +18,8 @@ type Store struct {
 	Trips    map[string]*Trip        `json:"trips"`
 	Bookings map[string]*Booking     `json:"bookings"`
 	Requests map[string]*RideRequest `json:"requests"`
+	Messages map[string]*Message     `json:"messages"`
+	Settings *Settings               `json:"settings"`
 
 	path    string
 	dirty   chan struct{}
@@ -31,6 +33,7 @@ func NewStore(path string) *Store {
 		Trips:    map[string]*Trip{},
 		Bookings: map[string]*Booking{},
 		Requests: map[string]*RideRequest{},
+		Messages: map[string]*Message{},
 		path:     path,
 		dirty:    make(chan struct{}, 1),
 	}
@@ -44,6 +47,13 @@ func NewStore(path string) *Store {
 		}
 		go s.saver()
 	}
+	if s.Messages == nil {
+		s.Messages = map[string]*Message{}
+	}
+	if s.Settings == nil || s.Settings.valid() != nil {
+		s.Settings = defaultSettings()
+	}
+	cfg.Store(s.Settings)
 	for _, t := range s.Trips {
 		normalizeTrip(t)
 	}
@@ -68,6 +78,16 @@ func (s *Store) reindex() {
 			s.byShare[t.ShareToken] = id
 		}
 	}
+}
+
+// byEmailLocked looks up a user id by email without the index (used during seeding).
+func (s *Store) byEmailLocked(email string) string {
+	for id, u := range s.Users {
+		if u.Email == email {
+			return id
+		}
+	}
+	return ""
 }
 
 // Changed marks the store dirty; must be called with mu held (write).

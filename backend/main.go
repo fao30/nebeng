@@ -32,6 +32,7 @@ func main() {
 	if env("SEED_DEMO", "true") == "true" {
 		Seed(store)
 	}
+	promoteAdmins(store)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
@@ -52,8 +53,18 @@ func main() {
 	mux.HandleFunc("GET /api/trips/{id}/share", api.auth(api.shareLink))
 	mux.HandleFunc("POST /api/trips/{id}/location", api.auth(api.postLocation))
 
-	// negotiation
+	// negotiation & chat
 	mux.HandleFunc("POST /api/bookings/{id}/respond", api.auth(api.respondBooking))
+	mux.HandleFunc("GET /api/bookings/{id}/messages", api.auth(api.listMessages))
+	mux.HandleFunc("POST /api/bookings/{id}/messages", api.auth(api.postMessage))
+
+	// platform settings (public read) & admin CRM
+	mux.HandleFunc("GET /api/settings", api.h(api.getSettings))
+	mux.HandleFunc("PUT /api/admin/settings", api.adminOnly(api.putSettings))
+	mux.HandleFunc("GET /api/admin/stats", api.adminOnly(api.adminStats))
+	mux.HandleFunc("GET /api/admin/trips", api.adminOnly(api.adminTrips))
+	mux.HandleFunc("GET /api/admin/users", api.adminOnly(api.adminUsers))
+	mux.HandleFunc("GET /api/admin/conversations", api.adminOnly(api.adminConversations))
 
 	// ride requests (passenger posts, driver browses & offers)
 	mux.HandleFunc("GET /api/requests", api.auth(api.listRequests))

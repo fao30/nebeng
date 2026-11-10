@@ -5,6 +5,8 @@ import { api } from '@/lib/api';
 import { bookingStatusChip, bookingStatusLabel, fmtDay, fmtRp, fmtTime, shortPlace } from '@/lib/format';
 import Icon from './Icon';
 import { Person } from './ui';
+import { Landmark } from './RouteTimeline';
+import Chat from './Chat';
 
 /** A booking and its price negotiation. `role` is the viewer's side: driver | passenger. */
 export default function Negotiation({ booking: b, role, onChange, showTrip = false }) {
@@ -12,6 +14,7 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
   const [price, setPrice] = useState(last?.price || 0);
   const [msg, setMsg] = useState('');
   const [countering, setCountering] = useState(false);
+  const [chat, setChat] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const myTurn = b.status === 'negotiating' && b.awaiting === role;
@@ -52,6 +55,7 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
         <Person user={other} sub={sub} />
         <span className={`chip ${bookingStatusChip[b.status]}`}>{bookingStatusLabel[b.status]}</span>
       </div>
+      <Chat bookingId={b.id} role={role} open={chat} onClose={() => setChat(false)} title={`Chat dengan ${other?.name || ''}`} />
 
       <div className="stack small" style={{ '--gap': '4px', marginTop: 12 }}>
         {showTrip && (
@@ -62,14 +66,20 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
             , {fmtDay(b.trip.depart_at)}
           </div>
         )}
-        <div className="row" style={{ '--gap': '8px' }}>
+        <div className="row" style={{ '--gap': '8px', alignItems: 'flex-start' }}>
           <span className="dot" />
-          <span className="grow ink2">{b.pickup.label}</span>
+          <span className="grow ink2">
+            {b.pickup.label}
+            <Landmark note={b.pickup.note} />
+          </span>
           {b.pickup_at && <span className="tnum strong">{fmtTime(b.pickup_at)}</span>}
         </div>
-        <div className="row" style={{ '--gap': '8px' }}>
+        <div className="row" style={{ '--gap': '8px', alignItems: 'flex-start' }}>
           <span className="dot dot-dest" />
-          <span className="grow ink2">{b.dropoff.label}</span>
+          <span className="grow ink2">
+            {b.dropoff.label}
+            <Landmark note={b.dropoff.note} />
+          </span>
         </div>
         {b.offered_time && (
           <div className="chip chip-primary" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
@@ -139,11 +149,21 @@ export default function Negotiation({ booking: b, role, onChange, showTrip = fal
           )}
         </>
       )}
-      {(b.status === 'accepted' || (b.status === 'negotiating' && !myTurn)) && b.trip.status !== 'completed' && (
-        <button className="link link-danger small" style={{ marginTop: 10 }} disabled={busy} onClick={() => act('cancel')}>
-          Batalkan pesanan
-        </button>
-      )}
+      <div className="row-between wrap" style={{ marginTop: 12 }}>
+        {(!closed || b.message_count > 0) ? (
+          <button className="btn btn-soft btn-sm" onClick={() => setChat(true)} aria-label="Buka chat">
+            <Icon name="message" className="icon-sm" />
+            Chat{b.message_count > 0 ? ` (${b.message_count})` : ''}
+          </button>
+        ) : (
+          <span />
+        )}
+        {(b.status === 'accepted' || (b.status === 'negotiating' && !myTurn)) && b.trip.status !== 'completed' && (
+          <button className="link link-danger small" disabled={busy} onClick={() => act('cancel')}>
+            Batalkan pesanan
+          </button>
+        )}
+      </div>
       {err && (
         <p className="error" style={{ marginTop: 8 }}>
           {err}

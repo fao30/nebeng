@@ -148,6 +148,7 @@ type TripView struct {
 	Quote            *Quote         `json:"quote,omitempty"`
 	Bookings         []*BookingView `json:"bookings,omitempty"`
 	MyBookings       []*BookingView `json:"my_bookings,omitempty"`
+	Participants     []Participant  `json:"participants,omitempty"`
 }
 
 type BookingView struct {
@@ -156,6 +157,35 @@ type BookingView struct {
 	Passenger *PublicUser  `json:"passenger"`
 	Driver    *PublicUser  `json:"driver"`
 	Awaiting  string       `json:"awaiting,omitempty"` // whose turn: driver|passenger
+	Messages  int          `json:"message_count"`
+}
+
+// Participant is someone confirmed on a trip. Only other confirmed
+// participants (and the driver) receive this list, phone numbers included.
+type Participant struct {
+	User     *PublicUser `json:"user"`
+	Role     string      `json:"role"`
+	Seats    int         `json:"seats,omitempty"`
+	Luggage  int         `json:"luggage,omitempty"`
+	Pickup   *Point      `json:"pickup,omitempty"`
+	Dropoff  *Point      `json:"dropoff,omitempty"`
+	PickupAt *time.Time  `json:"pickup_at,omitempty"`
+}
+
+// cleanPoint trims user-written text on a point.
+func cleanPoint(p *Point) {
+	if p == nil {
+		return
+	}
+	trim := func(s string, n int) string {
+		s = strings.TrimSpace(s)
+		if r := []rune(s); len(r) > n {
+			return string(r[:n])
+		}
+		return s
+	}
+	p.Label = trim(p.Label, 200)
+	p.Note = trim(p.Note, 200)
 }
 
 // Quote is the price and availability for one passenger's part of a route.
@@ -264,7 +294,28 @@ func (a *API) tripView(t *Trip, viewer string) *TripView {
 		sortBookings(tv.Bookings)
 		sortBookings(tv.MyBookings)
 	}
+	if role != "" {
+		tv.Participants = a.participants(t)
+	}
 	return tv
+}
+
+// participants: the driver and every passenger with a confirmed booking. Caller holds a lock.
+func (a *API) participants(t *Trip) []Participant {
+	out := []Participant{{User: a.store.publicUser(t.DriverID, true), Role: ByDriver}}
+	var bs []*Booking
+	for _, b := range a.store.Bookings {
+		if b.TripID == t.ID && b.Status == BookingAccepted {
+			bs = append(bs, b)
+		}
+	}
+	sort.Slice(bs, func(i, j int) bool { return bs[i].FromPos < bs[j].FromPos })
+	for _, b := range bs {
+		p, d, at := b.Pickup, b.Dropoff, b.PickupAt
+		out = append(out, Participant{User: a.store.publicUser(b.PassengerID, true), Role: ByPassenger,
+			Seats: b.Seats, Luggage: b.Luggage, Pickup: &p, Dropoff: &d, PickupAt: &at})
+	}
+	return out
 }
 
 func sortBookings(bs []*BookingView) {
@@ -280,6 +331,7 @@ func (a *API) bookingView(b *Booking) *BookingView {
 		Driver:    a.store.publicUser(t.DriverID, accepted),
 		Trip:      tripSummary(t),
 	}
+	bv.Messages, _ = a.messageStats(b.ID)
 	if b.Status == BookingNegotiating {
 		if lo := b.LastOffer(); lo != nil {
 			if lo.By == ByDriver {
@@ -528,6 +580,11 @@ func (a *API) createTrip(w http.ResponseWriter, r *http.Request, uid string) err
 	if err := readJSON(r, &in); err != nil {
 		return err
 	}
+	cleanPoint(&in.Origin)
+	cleanPoint(&in.Destination)
+	for i := range in.Stops {
+		cleanPoint(&in.Stops[i])
+	}
 	if !validPoint(in.Origin) || !validPoint(in.Destination) {
 		return errf(400, "titik asal dan tujuan wajib dipilih")
 	}
@@ -697,6 +754,8 @@ func (a *API) createBooking(w http.ResponseWriter, r *http.Request, uid string) 
 			return errf(409, "Anda sudah punya pesanan aktif di trip ini")
 		}
 	}
+	cleanPoint(in.Pickup)
+	cleanPoint(in.Dropoff)
 	pickup, dropoff := t.Origin, t.Destination
 	if in.Pickup != nil && validPoint(*in.Pickup) {
 		pickup = *in.Pickup
@@ -848,6 +907,8 @@ func (a *API) createRequest(w http.ResponseWriter, r *http.Request, uid string) 
 	if err := readJSON(r, &in); err != nil {
 		return err
 	}
+	cleanPoint(&in.Origin)
+	cleanPoint(&in.Destination)
 	if !validPoint(in.Origin) || !validPoint(in.Destination) {
 		return errf(400, "titik jemput dan antar wajib dipilih")
 	}

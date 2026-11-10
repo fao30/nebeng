@@ -63,6 +63,11 @@ export default function Nav() {
                     {t.label}
                   </Link>
                 ))}
+              {user.is_admin && (
+                <Link href="/admin" aria-current={path.startsWith('/admin') ? 'page' : undefined}>
+                  Admin
+                </Link>
+              )}
             </nav>
           )}
           <div className="header-end">

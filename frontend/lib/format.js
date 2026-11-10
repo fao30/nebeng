@@ -86,18 +86,21 @@ export function haversine(a, b) {
   return 2 * 6371 * Math.asin(Math.sqrt(h));
 }
 
+// Platform settings (admin-editable). Defaults match the backend's.
+export const DEFAULT_SETTINGS = { price_per_km: 650, min_segment_price: 10000, road_factor: 1.3, min_per_km_intra: 2.1, min_per_km_inter: 1.0 };
+
 // Same formula as the backend's SuggestSegmentPrice.
-export function suggestSegmentPrice(km) {
-  return Math.ceil(Math.max(km * 1.3 * 650, 10000) / 1000) * 1000;
+export function suggestSegmentPrice(km, cfg = DEFAULT_SETTINGS) {
+  return Math.ceil(Math.max(km * cfg.road_factor * cfg.price_per_km, cfg.min_segment_price) / 1000) * 1000;
 }
 
-export function estimateEtas(points, departISO, kind) {
-  const speed = kind === 'dalam_kota' ? 28 : 60;
+export function estimateEtas(points, departISO, kind, cfg = DEFAULT_SETTINGS) {
+  const mpk = kind === 'dalam_kota' ? cfg.min_per_km_intra : cfg.min_per_km_inter;
   const out = [new Date(departISO)];
   let acc = 0;
   for (let i = 1; i < points.length; i++) {
-    acc += haversine(points[i - 1], points[i]) * 1.3;
-    const t = new Date(departISO).getTime() + (acc / speed) * 3600e3;
+    acc += haversine(points[i - 1], points[i]) * cfg.road_factor;
+    const t = new Date(departISO).getTime() + acc * mpk * 60e3;
     out.push(new Date(Math.floor(t / 300e3) * 300e3));
   }
   return out;

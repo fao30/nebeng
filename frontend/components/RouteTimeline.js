@@ -1,4 +1,15 @@
 import { fmtTime, routeOf, shortPlace } from '@/lib/format';
+import Icon from './Icon';
+
+export function Landmark({ note }) {
+  if (!note) return null;
+  return (
+    <span className="landmark">
+      <Icon name="flag" />
+      {note}
+    </span>
+  );
+}
 
 /**
  * Vertical route with times. With a `quote` (the passenger's part of the
@@ -14,6 +25,7 @@ export default function RouteTimeline({ trip, quote, pickup, dropoff, compact = 
   let rows = pts.map((p, i) => ({
     pos: i,
     label: p.label,
+    note: p.note,
     time: etas[i] || (i === 0 ? trip.depart_at : null),
     kind: i === 0 ? 'origin' : i === pts.length - 1 ? 'dest' : 'stop',
     sub: i === 0 ? 'Berangkat' : i === pts.length - 1 ? 'Tujuan akhir' : 'Titik stop',
@@ -26,6 +38,7 @@ export default function RouteTimeline({ trip, quote, pickup, dropoff, compact = 
     const pickRow = {
       pos: from,
       label: pickup?.label || rows.find((r) => near(r.pos, from))?.label || 'Titik jemput Anda',
+      note: pickup?.note || rows.find((r) => near(r.pos, from))?.note,
       time: quote.pickup_at,
       kind: 'pickup',
       sub: 'Naik di sini',
@@ -33,6 +46,7 @@ export default function RouteTimeline({ trip, quote, pickup, dropoff, compact = 
     const dropRow = {
       pos: to,
       label: dropoff?.label || rows.find((r) => near(r.pos, to))?.label || 'Titik antar Anda',
+      note: dropoff?.note || rows.find((r) => near(r.pos, to))?.note,
       time: quote.dropoff_at,
       kind: 'drop',
       sub: 'Turun di sini',
@@ -72,6 +86,7 @@ export default function RouteTimeline({ trip, quote, pickup, dropoff, compact = 
                   {r.kind === 'pickup' || r.kind === 'drop' ? r.sub : rest.join(',').trim() || r.sub}
                 </span>
               )}
+              {!compact && r.on && <Landmark note={r.note} />}
             </div>
           </div>
         );

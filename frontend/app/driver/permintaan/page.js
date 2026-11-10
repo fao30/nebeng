@@ -9,6 +9,7 @@ import Negotiation from '@/components/Negotiation';
 import RequireAuth from '@/components/RequireAuth';
 import Icon from '@/components/Icon';
 import { Empty, Person, Segmented, Sheet, Stepper } from '@/components/ui';
+import { Landmark } from '@/components/RouteTimeline';
 
 function Permintaan() {
   const [trips, setTrips] = useState(null);
@@ -171,12 +172,18 @@ function RequestCard({ n, req, canOffer, onOffer, onChange }) {
       <div className="stack" style={{ '--gap': '6px' }}>
         <div className="row small" style={{ '--gap': '8px' }}>
           <span className="dot" />
-          <span className="grow">{req.origin.label}</span>
+          <span className="grow">
+            {req.origin.label}
+            <Landmark note={req.origin.note} />
+          </span>
           <b className="tnum">{fmtTime(req.depart_at)}</b>
         </div>
         <div className="row small" style={{ '--gap': '8px' }}>
           <span className="dot dot-dest" />
-          <span className="grow">{req.destination.label}</span>
+          <span className="grow">
+            {req.destination.label}
+            <Landmark note={req.destination.note} />
+          </span>
         </div>
       </div>
       <div className="row wrap">
