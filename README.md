@@ -37,7 +37,8 @@ Logika inti mengikuti aplikasi bibig (React Native), dibawa ke web.
 - Nomor telepon driver dan sesama penumpang hanya terlihat setelah pesanan terkonfirmasi di trip yang sama
   (kartu "Peserta trip" dengan tombol telepon & WhatsApp).
 - Setiap titik jemput, antar, dan titik stop bisa diberi patokan, misalnya "depan Indomaret, pagar hijau".
-- Chat per pesanan antara driver dan penumpang (selama negosiasi atau terkonfirmasi).
+- Chat per pesanan antara driver dan penumpang (selama negosiasi atau terkonfirmasi), real-time lewat
+  Server-Sent Events: pesan dan perubahan tawaran langsung muncul di layar lawan bicara.
 
 **Panel admin (CRM)** — `/admin`, login `admin@demo.id` / `demo123`
 - Ringkasan: pengguna, trip aktif, pesanan, nilai transaksi, permintaan terbuka, jumlah chat.
@@ -147,6 +148,7 @@ Alternatif: Railway / Fly.io / VPS dengan Dockerfile yang sama. Variabel env:
 | POST | /api/trips/{id}/location | kirim GPS `{lat,lng,heading,speed}` |
 | GET | /api/live/{token}, /api/live/{token}/stream | snapshot & SSE publik |
 | GET/POST | /api/bookings/{id}/messages | chat pesanan (driver/penumpang; admin baca) |
+| GET | /api/bookings/{id}/stream?token= | SSE real-time: pesan baru & perubahan pesanan |
 | GET | /api/settings | tarif & waktu tempuh (publik) |
 | PUT | /api/admin/settings | ubah tarif & waktu tempuh (admin) |
 | GET | /api/admin/stats, /api/admin/trips, /api/admin/users, /api/admin/conversations | CRM admin |

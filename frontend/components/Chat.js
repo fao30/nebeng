@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { api } from '@/lib/api';
+import { API_URL, api, getToken } from '@/lib/api';
 import { fmtDay, fmtRp, fmtTime } from '@/lib/format';
 import Icon from './Icon';
 import { Sheet } from './ui';
@@ -14,6 +14,7 @@ export default function Chat({ bookingId, role, title, open, onClose, readOnly }
   const [text, setText] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [live, setLive] = useState(false);
   const end = useRef(null);
 
   const load = useCallback(() => {
@@ -22,12 +23,29 @@ export default function Chat({ bookingId, role, title, open, onClose, readOnly }
       .catch((e) => setErr(e.message));
   }, [bookingId]);
 
+  // Real time: new messages and offer changes arrive over Server-Sent Events.
+  // A slow poll stays on as a safety net if the stream drops.
   useEffect(() => {
     if (!open) return;
     load();
-    const t = setInterval(load, 4000);
-    return () => clearInterval(t);
-  }, [open, load]);
+    const es = new EventSource(`${API_URL}/api/bookings/${bookingId}/stream?token=${encodeURIComponent(getToken() || '')}`);
+    es.onopen = () => setLive(true);
+    es.onerror = () => setLive(false);
+    es.onmessage = (ev) => {
+      const msg = JSON.parse(ev.data);
+      if (msg.type === 'message') {
+        setData((d) => (!d || d.messages.some((m) => m.id === msg.message.id) ? d : { ...d, messages: [...d.messages, msg.message] }));
+      } else if (msg.type === 'booking') {
+        load();
+      }
+    };
+    const t = setInterval(load, 20000);
+    return () => {
+      es.close();
+      clearInterval(t);
+      setLive(false);
+    };
+  }, [open, load, bookingId]);
 
   useEffect(() => {
     end.current?.scrollIntoView({ block: 'end' });
@@ -80,6 +98,10 @@ export default function Chat({ bookingId, role, title, open, onClose, readOnly }
         ) : null
       }
     >
+      <div className="chat-status xs">
+        <span className={`live-dot ${live ? 'on' : ''}`} aria-hidden />
+        {live ? 'Tersambung langsung' : 'Menyambungkan…'}
+      </div>
       {role === 'admin' && b && (
         <p className="xs muted" style={{ marginBottom: 12 }}>
           Kiri: driver ({b.driver?.name}). Kanan: penumpang ({b.passenger?.name}). Admin hanya bisa membaca.

@@ -879,6 +879,7 @@ func (a *API) respondBooking(w http.ResponseWriter, r *http.Request, uid string)
 	}
 	b.UpdatedAt = now
 	s.Changed()
+	a.hub.Event("booking:"+b.ID, map[string]any{"type": "booking", "status": b.Status})
 	writeJSON(w, 200, a.bookingView(b))
 	return nil
 }
@@ -1247,6 +1248,12 @@ func (a *API) liveStream(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
+	return a.streamSSE(w, r, t.ID, map[string]any{"type": "snapshot", "positions": a.hub.Snapshot(t.ID)})
+}
+
+// streamSSE subscribes to a hub channel and streams its events as
+// Server-Sent Events until the client disconnects.
+func (a *API) streamSSE(w http.ResponseWriter, r *http.Request, key string, first map[string]any) error {
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		return errf(500, "streaming tidak didukung")
@@ -1257,10 +1264,10 @@ func (a *API) liveStream(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("X-Accel-Buffering", "no")
 	w.WriteHeader(200)
 
-	ch := a.hub.Subscribe(t.ID)
-	defer a.hub.Unsubscribe(t.ID, ch)
+	ch := a.hub.Subscribe(key)
+	defer a.hub.Unsubscribe(key, ch)
 
-	init, _ := json.Marshal(map[string]any{"type": "snapshot", "positions": a.hub.Snapshot(t.ID)})
+	init, _ := json.Marshal(first)
 	fmt.Fprintf(w, "retry: 3000\ndata: %s\n\n", init)
 	flusher.Flush()
 

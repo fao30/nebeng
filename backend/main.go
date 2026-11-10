@@ -36,7 +36,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, 200, map[string]any{"ok": true, "time": time.Now()})
+		writeJSON(w, 200, map[string]any{"ok": true, "time": time.Now(), "version": version()})
 	})
 
 	mux.HandleFunc("POST /api/auth/register", api.h(api.register))
@@ -57,6 +57,7 @@ func main() {
 	mux.HandleFunc("POST /api/bookings/{id}/respond", api.auth(api.respondBooking))
 	mux.HandleFunc("GET /api/bookings/{id}/messages", api.auth(api.listMessages))
 	mux.HandleFunc("POST /api/bookings/{id}/messages", api.auth(api.postMessage))
+	mux.HandleFunc("GET /api/bookings/{id}/stream", api.auth(api.bookingStream))
 
 	// platform settings (public read) & admin CRM
 	mux.HandleFunc("GET /api/settings", api.h(api.getSettings))
@@ -85,6 +86,18 @@ func main() {
 	log.Printf("nebeng API listening on %s", addr)
 	srv := &http.Server{Addr: addr, Handler: logging(cors(mux)), ReadHeaderTimeout: 10 * time.Second}
 	log.Fatal(srv.ListenAndServe())
+}
+
+// version reports the deployed commit (Render sets RENDER_GIT_COMMIT).
+func version() string {
+	v := os.Getenv("RENDER_GIT_COMMIT")
+	if len(v) > 7 {
+		v = v[:7]
+	}
+	if v == "" {
+		v = "dev"
+	}
+	return v
 }
 
 func cors(next http.Handler) http.Handler {

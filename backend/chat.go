@@ -94,8 +94,29 @@ func (a *API) postMessage(w http.ResponseWriter, r *http.Request, uid string) er
 	s.Messages[m.ID] = m
 	b.UpdatedAt = m.At
 	s.Changed()
+	role := a.bookingRole(b, uid)
+	a.hub.Event("booking:"+b.ID, map[string]any{"type": "message",
+		"message": MessageView{Message: *m, SenderName: s.Users[uid].Name, Role: role}})
 	writeJSON(w, 201, a.messagesFor(b))
 	return nil
+}
+
+// bookingStream pushes new chat messages and booking changes in real time
+// (Server-Sent Events). EventSource can't send headers, so the token comes
+// as ?token=, which the auth middleware accepts.
+func (a *API) bookingStream(w http.ResponseWriter, r *http.Request, uid string) error {
+	s := a.store
+	s.mu.RLock()
+	b := s.Bookings[r.PathValue("id")]
+	allowed := b != nil && (a.bookingRole(b, uid) != "" || s.Users[uid].IsAdmin)
+	s.mu.RUnlock()
+	if b == nil {
+		return errf(404, "pesanan tidak ditemukan")
+	}
+	if !allowed {
+		return errf(403, "bukan percakapan Anda")
+	}
+	return a.streamSSE(w, r, "booking:"+b.ID, map[string]any{"type": "ready"})
 }
 
 // messageStats: count and last time, for list views. Caller holds a lock.
