@@ -6,8 +6,8 @@ import { fmtTime, shortPlace } from '@/lib/format';
 const wa = (phone) => `https://wa.me/${phone.replace(/^0/, '62').replace(/\D/g, '')}`;
 
 /**
- * Everyone confirmed on a trip, with phone numbers. The API only sends this
- * list to the driver and to passengers whose booking is confirmed.
+ * Everyone confirmed on a trip. Phone numbers only go between driver and
+ * passenger: the API never sends one passenger another passenger's number.
  */
 export default function Participants({ list, meId }) {
   if (!list?.length) return null;
@@ -15,7 +15,7 @@ export default function Participants({ list, meId }) {
     <div className="card stack" style={{ '--gap': '14px' }}>
       <div>
         <h3>Peserta trip</h3>
-        <p className="xs muted">Nomor hanya terlihat oleh driver dan penumpang yang sudah terkonfirmasi di trip ini.</p>
+        <p className="xs muted">Nomor telepon hanya bisa dilihat antara driver dan penumpang. Sesama penumpang tidak bisa melihat nomor satu sama lain.</p>
       </div>
       {list.map((p) => {
         const me = p.user.id === meId;
@@ -35,7 +35,11 @@ export default function Participants({ list, meId }) {
                 </div>
               )}
             </div>
-            {p.user.phone && <div className="small tnum ink2" style={{ marginLeft: 46 }}>{p.user.phone}</div>}
+            {p.user.phone ? (
+              <div className="small tnum ink2" style={{ marginLeft: 46 }}>{p.user.phone}</div>
+            ) : (
+              !me && <div className="xs muted" style={{ marginLeft: 46 }}>Nomor disembunyikan</div>
+            )}
             {p.role === 'passenger' && p.pickup && (
               <div className="small ink2" style={{ marginLeft: 46, marginTop: 4 }}>
                 <div>

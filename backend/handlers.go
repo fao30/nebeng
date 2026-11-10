@@ -320,13 +320,16 @@ func (a *API) tripView(t *Trip, viewer string) *TripView {
 		sortBookings(tv.MyBookings)
 	}
 	if role != "" {
-		tv.Participants = a.participants(t)
+		tv.Participants = a.participants(t, viewer)
 	}
 	return tv
 }
 
-// participants: the driver and every passenger with a confirmed booking. Caller holds a lock.
-func (a *API) participants(t *Trip) []Participant {
+// participants: the driver and every passenger with a confirmed booking.
+// Phone numbers only flow between the driver and a passenger: the driver sees
+// every passenger's, a passenger sees the driver's and their own, never
+// another passenger's. Caller holds a lock.
+func (a *API) participants(t *Trip, viewer string) []Participant {
 	out := []Participant{{User: a.store.publicUser(t.DriverID, true), Role: ByDriver}}
 	var bs []*Booking
 	for _, b := range a.store.Bookings {
@@ -337,7 +340,7 @@ func (a *API) participants(t *Trip) []Participant {
 	sort.Slice(bs, func(i, j int) bool { return bs[i].FromPos < bs[j].FromPos })
 	for _, b := range bs {
 		p, d, at := b.Pickup, b.Dropoff, b.PickupAt
-		out = append(out, Participant{User: a.store.publicUser(b.PassengerID, true), Role: ByPassenger,
+		out = append(out, Participant{User: a.store.publicUser(b.PassengerID, viewer == t.DriverID || viewer == b.PassengerID), Role: ByPassenger,
 			Seats: b.Seats, Luggage: b.Luggage, Pickup: &p, Dropoff: &d, PickupAt: &at})
 	}
 	return out
