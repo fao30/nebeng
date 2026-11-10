@@ -7,7 +7,7 @@ import { currentPosition, reverseGeocode, searchPlaces } from '../geo';
 import { ErrorText, s } from '../ui';
 
 /** A place picker: tap to open a search screen (debounced), or use current location. */
-export default function PlaceField({ label, value, onChange, kind = 'origin', placeholder, withNote, near }) {
+export default function PlaceField({ label, value, onChange, kind = 'origin', placeholder, withNote, near, hideDot }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
   const [debounced, setDebounced] = useState('');
@@ -57,11 +57,11 @@ export default function PlaceField({ label, value, onChange, kind = 'origin', pl
     }
   }
 
-  const dot = kind === 'dest' ? { backgroundColor: colors.primary } : kind === 'stop' ? { backgroundColor: colors.amber } : { borderWidth: 3, borderColor: colors.primary };
+  const dot = kind === 'dest' ? { backgroundColor: colors.teal } : kind === 'stop' ? { backgroundColor: colors.surface, borderWidth: 2.5, borderColor: colors.indigo } : { backgroundColor: colors.primary };
   return (
     <View style={{ gap: 6 }}>
       <Pressable onPress={() => setOpen(true)} style={[s.input, { flexDirection: 'row', alignItems: 'center', gap: 10, height: 54 }]} accessibilityLabel={label}>
-        <View style={[{ width: 12, height: 12, borderRadius: 6 }, dot]} />
+        {!hideDot && <View style={[{ width: 12, height: 12, borderRadius: 6 }, dot]} />}
         <View style={{ flex: 1 }}>
           <Text style={t.xs}>{label}</Text>
           <Text style={[t.body, !value && { color: colors.muted }]} numberOfLines={1}>

@@ -4,6 +4,7 @@ import Icon from '../Icon';
 import { colors, t } from '../theme';
 import { fmtDuration, fmtRp, fmtTime, km, routeOf, shortPlace, tripStatusLabel } from '../format';
 import { Card, Chip, Person, Row } from '../ui';
+import MiniRoute from './MiniRoute';
 
 /** Vertical route with times; `from`/`to` mark where this passenger boards and leaves. */
 export function RouteTimeline({ trip, from, to, compact }) {
@@ -27,9 +28,9 @@ export function RouteTimeline({ trip, from, to, compact }) {
                   height: 12,
                   borderRadius: 6,
                   marginTop: 4,
-                  backgroundColor: i === pts.length - 1 || i === to ? colors.primary : colors.surface,
+                  backgroundColor: i === pts.length - 1 || i === to ? colors.teal : i === 0 || i === from ? colors.primary : colors.surface,
                   borderWidth: 3,
-                  borderColor: active ? colors.primary : colors.line,
+                  borderColor: !active ? colors.line : i === pts.length - 1 || i === to ? colors.teal : colors.primary,
                 }}
               />
               {!last && <View style={{ width: 2, flex: 1, minHeight: compact ? 18 : 24, backgroundColor: active && i < (to ?? pts.length) ? colors.primary : colors.line }} />}
@@ -64,8 +65,9 @@ export function TripCard({ trip, onPress, radius, showStatus }) {
           <RouteTimeline trip={trip} from={q?.pickup_index} to={q?.dropoff_index} compact />
           {dur != null && <Text style={[t.xs, { marginLeft: 72, marginTop: 4 }]}>{fmtDuration(dur)} perjalanan</Text>}
         </View>
-        <View style={{ alignItems: 'flex-end' }}>
-          <Text style={[t.h3, t.tnum, { fontSize: 18 }]}>{fmtRp(price)}</Text>
+        <View style={{ alignItems: 'flex-end', gap: 2 }}>
+          <MiniRoute points={routeOf(trip)} from={q?.pickup_index} to={q?.dropoff_index} size={72} />
+          <Text style={[t.h3, t.tnum, { fontSize: 18, marginTop: 6 }]}>{fmtRp(price)}</Text>
           <Text style={t.xs}>per kursi</Text>
           {showStatus && trip.status !== 'scheduled' && <Chip label={tripStatusLabel[trip.status]} />}
         </View>

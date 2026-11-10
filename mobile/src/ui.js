@@ -84,6 +84,7 @@ const btn = {
   danger: { bg: colors.red, fg: '#fff' },
   dangerGhost: { bg: 'transparent', fg: colors.red },
   mint: { bg: colors.mint, fg: '#fff' },
+  teal: { bg: colors.teal, fg: '#0B2A30' },
 };
 
 export function LinkText({ children, onPress, danger, style }) {
@@ -250,10 +251,10 @@ export const Loading = () => (
 
 export const s = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  card: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.line, gap: 12 },
-  btn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 50, paddingHorizontal: 18, borderRadius: 14, borderWidth: 1 },
+  card: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.line, gap: 12, ...shadow, shadowOpacity: 0.06, elevation: 2 },
+  btn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 52, paddingHorizontal: 18, borderRadius: 14, borderWidth: 1 },
   btnSmall: { height: 38, paddingHorizontal: 14, borderRadius: 11 },
-  btnText: { fontSize: 16, fontWeight: '700' },
+  btnText: { fontSize: 16, fontWeight: '800' },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', paddingHorizontal: 9, paddingVertical: 3, borderRadius: 999 },
   chipText: { fontSize: 12, fontWeight: '700' },
   label: { fontSize: 13.5, fontWeight: '700', color: colors.ink },

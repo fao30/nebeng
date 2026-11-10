@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 import { api } from '../api';
 import { colors, t } from '../theme';
-import { fmtDay } from '../format';
+import { fmtDay, initials } from '../format';
 import { Button, Card, Chip, ErrorText, Field, Person, Row, Screen, Segmented, Stars } from '../ui';
 import { ListItem } from '../components/TripBits';
 import { useApp } from '../state';
@@ -36,18 +36,29 @@ export default function Profile({ navigation }) {
   return (
     <Screen>
       <View style={{ gap: 14 }}>
-        <Card>
-          <Person user={user} sub={user.email} size={52} />
-          <Text style={t.small}>Mode aplikasi</Text>
-          <Segmented
-            value={mode}
-            onChange={setMode}
-            options={[
-              { value: 'passenger', label: 'Penumpang' },
-              { value: 'driver', label: 'Pemilik mobil' },
-            ]}
-          />
-        </Card>
+        <View style={{ backgroundColor: colors.indigo, borderRadius: 26, padding: 20, gap: 16 }}>
+          <Row gap={14}>
+            <View style={{ width: 58, height: 58, borderRadius: 29, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: colors.indigo, fontWeight: '900', fontSize: 20 }}>{initials(user.name)}</Text>
+            </View>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={{ color: '#FFFFFF', fontWeight: '900', fontSize: 20 }} numberOfLines={1}>
+                {user.name}
+              </Text>
+              <Text style={{ color: '#E1E3FF', fontWeight: '700', fontSize: 13 }}>{user.identity_status === 'approved' ? '✓ Terverifikasi' : user.email}</Text>
+            </View>
+          </Row>
+          <View style={{ flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.16)', borderRadius: 14, padding: 4 }}>
+            {[
+              ['passenger', 'Penumpang'],
+              ['driver', 'Pemilik mobil'],
+            ].map(([v, label]) => (
+              <Pressable key={v} onPress={() => setMode(v)} accessibilityRole="tab" accessibilityState={{ selected: mode === v }} style={{ flex: 1, paddingVertical: 10, borderRadius: 11, backgroundColor: mode === v ? '#FFFFFF' : 'transparent', alignItems: 'center' }}>
+                <Text style={{ fontWeight: '800', color: mode === v ? colors.primary : '#FFFFFF' }}>{label}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
 
         <Card>
           <ListItem icon="shield" title="Verifikasi akun" onPress={() => navigation.navigate('Verifikasi')} right={<Chip tone={idTone} label={idLabel} />} />

@@ -6,14 +6,14 @@ export default function Logo({ size = 40 }) {
     <Svg width={size} height={size} viewBox="0 0 64 64">
       <Defs>
         <LinearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor="#5B39C9" />
-          <Stop offset="1" stopColor="#3B2093" />
+          <Stop offset="0" stopColor="#6066E6" />
+          <Stop offset="1" stopColor="#4349C9" />
         </LinearGradient>
       </Defs>
       <Rect width="64" height="64" rx="16" fill="url(#g)" />
       <Path d="M20 44c0-12 24-12 24-24" fill="none" stroke="#fff" strokeWidth="5.5" strokeLinecap="round" />
       <Circle cx="20" cy="44" r="6" fill="#fff" />
-      <Circle cx="44" cy="20" r="6" fill="#fff" />
+      <Circle cx="44" cy="20" r="6" fill="#7FE0EE" />
     </Svg>
   );
 }

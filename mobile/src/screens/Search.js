@@ -121,9 +121,19 @@ export default function Search({ navigation }) {
         setRefreshing(false);
       }}
     >
-      <Card style={{ gap: 10 }}>
-        <PlaceField label="Dari" value={from} onChange={setFrom} placeholder="Titik jemput Anda" />
-        <PlaceField label="Ke" value={to} onChange={setTo} kind="dest" placeholder="Tujuan Anda" near={from} />
+      <Card style={{ gap: 12, borderRadius: 26 }}>
+        <Text style={t.h1}>Mau ke mana?</Text>
+        <Row gap={12} style={{ alignItems: 'stretch' }}>
+          <View style={{ alignItems: 'center', paddingVertical: 22 }}>
+            <View style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: colors.primary }} />
+            <View style={{ width: 2, flex: 1, backgroundColor: '#CDD2E8', marginVertical: 2 }} />
+            <View style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: colors.teal }} />
+          </View>
+          <View style={{ flex: 1, gap: 8 }}>
+            <PlaceField label="Dari" value={from} onChange={setFrom} placeholder="Titik jemput kamu" hideDot />
+            <PlaceField label="Ke" value={to} onChange={setTo} kind="dest" placeholder="Tujuan kamu" near={from} hideDot />
+          </View>
+        </Row>
         <Row gap={8}>
           <View style={{ flex: 1 }}>
             <DateTimeField value={date} onChange={setDate} clearable />
@@ -142,7 +152,7 @@ export default function Search({ navigation }) {
           <Text style={t.small}>Radius jemput & antar</Text>
           <Segmented value={radius} onChange={setRadius} options={RADII} />
         </Row>
-        <Button icon="search" title="Cari" onPress={() => search()} />
+        <Button icon="search" title="Cari tumpangan" onPress={() => search()} />
       </Card>
 
       {recent.length > 0 && (
