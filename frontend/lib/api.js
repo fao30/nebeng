@@ -1,5 +1,6 @@
 import { amapEnabled, amapReverse, amapSearch } from './amap';
 import { maptilerEnabled, maptilerReverse, maptilerSearch } from './maptiler';
+import { googleEnabled, googleReverse, googleSearch } from './gmaps';
 
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080').replace(/\/$/, '');
 
@@ -51,15 +52,24 @@ export function qs(params) {
 const geoCache = new Map();
 
 /**
- * Address search. Provider order: MapTiler (if key set) → AMap (if key set)
- * → OpenStreetMap Nominatim. Results are cached per query; pass an
+ * Address search. Provider order: Google Places (if key set) → MapTiler →
+ * AMap → OpenStreetMap Nominatim. Google results carry a `resolve()` that
+ * fetches coordinates when picked. Results are cached per query; pass an
  * AbortSignal so a newer keystroke cancels the older request.
  */
 export async function geocode(query, { signal, near } = {}) {
   const key = query.trim().toLowerCase();
   if (geoCache.has(key)) return geoCache.get(key);
   let rows = null;
-  if (maptilerEnabled()) {
+  if (googleEnabled()) {
+    try {
+      rows = await googleSearch(query, { near });
+      if (signal?.aborted) throw new DOMException('aborted', 'AbortError');
+    } catch (e) {
+      if (e.name === 'AbortError') throw e;
+    }
+  }
+  if (!rows?.length && maptilerEnabled()) {
     try {
       rows = await maptilerSearch(query, { signal, near });
     } catch (e) {
@@ -74,7 +84,7 @@ export async function geocode(query, { signal, near } = {}) {
     }
   }
   if (!rows?.length) rows = await nominatimSearch(query, signal);
-  geoCache.set(key, rows);
+  if (!rows.some((r) => r.resolve)) geoCache.set(key, rows);
   return rows;
 }
 
@@ -87,6 +97,13 @@ async function nominatimSearch(query, signal) {
 }
 
 export async function reverseGeocode(lat, lng) {
+  if (googleEnabled()) {
+    try {
+      return await googleReverse(lat, lng);
+    } catch {
+      /* next provider */
+    }
+  }
   if (maptilerEnabled()) {
     try {
       return await maptilerReverse(lat, lng);

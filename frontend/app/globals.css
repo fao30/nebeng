@@ -1945,3 +1945,9 @@ input[type='range'] {
   padding: 2px 4px;
   max-width: 240px;
 }
+.powered {
+  text-align: right;
+  font-size: 0.7rem;
+  color: var(--muted);
+  padding: 4px 10px 2px;
+}

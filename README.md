@@ -89,6 +89,11 @@ Catatan: GPS browser hanya jalan di `https://` atau `localhost`. Untuk tes live 
 
 Urutan penyedia (otomatis, dengan cadangan bila gagal):
 
+0. **Google Maps Platform** — `NEXT_PUBLIC_GOOGLE_MAPS_KEY` (+ opsional `NEXT_PUBLIC_GOOGLE_MAP_ID`).
+   Peta Google Maps + pencarian **Places API (New) Autocomplete** dengan session token (koordinat diambil
+   hanya saat alamat dipilih) + Geocoding API untuk klik di peta. Aktifkan ketiga API itu dan billing di
+   Google Cloud, batasi key ke domain Anda (HTTP referrers) dan ke tiga API tersebut. Sesuai ketentuan Google,
+   hasil Places hanya ditampilkan di peta Google, jadi bila key diisi, peta juga memakai Google.
 1. **MapTiler** — `NEXT_PUBLIC_MAPTILER_KEY`. Tile peta di Leaflet + Geocoding API untuk kolom titik jemput/antar
    (dibatasi ke Indonesia, diurutkan dekat lokasi). Jika tile gagal dimuat, peta beralih ke OpenStreetMap.
 2. **AMap** ([mapsplatform.opnavi.com](https://mapsplatform.opnavi.com)) — `NEXT_PUBLIC_AMAP_KEY`,

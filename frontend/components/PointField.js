@@ -57,7 +57,18 @@ export default function PointField({ label, value, onChange, active, onActivate,
     if (v.trim().length < 3) setResults([]);
   }
 
-  function pick(p) {
+  async function pick(p) {
+    if (p.resolve) {
+      // Google suggestions get their coordinates only when picked.
+      setBusy(true);
+      try {
+        p = await p.resolve();
+      } catch {
+        setBusy(false);
+        return setErr('Lokasi ini tidak bisa dipakai. Pilih saran lain atau klik di peta.');
+      }
+      setBusy(false);
+    }
     onChange(p);
     setResults([]);
     setQ('');
@@ -143,6 +154,7 @@ export default function PointField({ label, value, onChange, active, onActivate,
               {r.label}
             </button>
           ))}
+          {results.some((r) => r.source === 'google') && <div className="powered">Powered by Google</div>}
         </div>
       )}
       {active && editing && !results.length && !err && onActivate && (
