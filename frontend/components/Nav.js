@@ -29,10 +29,11 @@ const TABS = {
 export function BrandGlyph() {
   return (
     <span className="brand-glyph" aria-hidden>
-      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round">
-        <circle cx="6" cy="18" r="2.2" fill="#fff" stroke="none" />
-        <circle cx="18" cy="6" r="2.2" fill="#7fe0ee" stroke="none" />
-        <path d="M6 18c0-6 12-6 12-12" />
+      {/* Logo "N Rute": the letter N drawn as a route, ending at a teal destination. */}
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M6.8 17.4V6.8l10.4 10.4V6.6" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="6.8" cy="17.4" r="1.9" fill="#fff" />
+        <circle cx="17.2" cy="6.4" r="2.2" fill="#33b5c9" />
       </svg>
     </span>
   );
@@ -64,7 +65,7 @@ export default function Nav() {
         <div className="header-inner">
           <Link href="/" className="brand" aria-label="Numpang, beranda">
             <BrandGlyph />
-            <span className={user ? 'brand-word' : ''}>numpang</span>
+            <span className={user ? 'brand-word' : ''}>Numpang</span>
           </Link>
           {user && (
             <nav className="nav" aria-label="Menu utama">

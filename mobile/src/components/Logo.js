@@ -1,19 +1,14 @@
 import React from 'react';
-import Svg, { Circle, Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
+import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
+/** Logo "N Rute": the letter N drawn as a route, ending at a teal destination. */
 export default function Logo({ size = 40 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 64 64">
-      <Defs>
-        <LinearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor="#6066E6" />
-          <Stop offset="1" stopColor="#4349C9" />
-        </LinearGradient>
-      </Defs>
-      <Rect width="64" height="64" rx="16" fill="url(#g)" />
-      <Path d="M20 44c0-12 24-12 24-24" fill="none" stroke="#fff" strokeWidth="5.5" strokeLinecap="round" />
-      <Circle cx="20" cy="44" r="6" fill="#fff" />
-      <Circle cx="44" cy="20" r="6" fill="#7FE0EE" />
+      <Rect width="64" height="64" rx="16" fill="#26337A" />
+      <Path d="M19 45V19l26 26V18" fill="none" stroke="#FFFFFF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+      <Circle cx="19" cy="45" r="4.6" fill="#FFFFFF" />
+      <Circle cx="45" cy="17.5" r="5.4" fill="#33B5C9" />
     </Svg>
   );
 }

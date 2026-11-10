@@ -170,21 +170,22 @@ button {
   align-items: center;
   gap: 10px;
   color: var(--primary);
-  font-weight: 900;
-  font-size: 1.3rem;
-  letter-spacing: -0.02em;
+  font-family: 'Outfit', var(--font);
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
 }
 .brand-glyph {
   width: 34px;
   height: 34px;
   border-radius: 11px;
-  background: var(--indigo);
+  background: var(--primary);
   display: grid;
   place-items: center;
 }
 .brand-glyph svg {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
 }
 .nav {
   display: flex;
