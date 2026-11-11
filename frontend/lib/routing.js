@@ -12,6 +12,7 @@
 import { useEffect, useState } from 'react';
 import { googleEnabled, loadGoogle } from './gmaps';
 import { DEFAULT_SETTINGS, haversine } from './format';
+import { api } from './api';
 
 const cache = new Map();
 const OSRM_TRAFFIC = { dalam_kota: 1.45, antar_kota: 1.15 };
@@ -224,10 +225,40 @@ export function thinPath(path, max = 600) {
  * Road path and legs for a published trip: uses what was saved with the trip,
  * otherwise asks the router (older trips).
  */
-export function useTripRoad(trip) {
+const savedTrips = new Set();
+
+export function useTripRoad(trip, { onSaved } = {}) {
   const pts = trip ? [trip.origin, ...(trip.stops || []), trip.destination] : [];
   const saved = trip && trip.leg_minutes?.length === pts.length - 1;
   const { route } = useRoute(saved ? [] : pts, { kind: trip?.kind, departAt: trip?.depart_at });
+
+  // Trips made before road routing: store the measured legs on the server once,
+  // so jam tiba, search results and quotes use them for everyone.
+  useEffect(() => {
+    if (!trip || saved || !route || route.source === 'estimate' || savedTrips.has(trip.id)) return;
+    if (route.legs.length !== pts.length - 1) return;
+    let token = '';
+    try {
+      token = localStorage.getItem('nebeng_token') || '';
+    } catch {
+      /* ignore */
+    }
+    if (!token) return;
+    savedTrips.add(trip.id);
+    api(`/trips/${trip.id}/route`, {
+      method: 'POST',
+      body: {
+        leg_km: route.legs.map((l) => Math.round(l.km * 10) / 10),
+        leg_minutes: route.legs.map((l) => Math.round(l.min * 10) / 10),
+        route_source: route.source,
+        path: encodePath(thinPath(route.path)),
+      },
+    })
+      .then((r) => r?.saved && onSaved?.())
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trip?.id, saved, route]);
+
   if (!trip) return null;
   if (saved) {
     return {
@@ -245,3 +276,11 @@ export const ROUTE_SOURCE_LABEL = {
   osm: 'OpenStreetMap, ditambah perkiraan macet',
   estimate: 'perkiraan jarak lurus',
 };
+
+/** Trip with jam tiba taken from road legs when the server still has the straight-line estimate. */
+export function withRoadEtas(trip, road) {
+  if (!trip || !road || road.saved || road.source === 'estimate') return trip;
+  const n = (trip.stops || []).length + 1;
+  if (road.legs.length !== n) return trip;
+  return { ...trip, etas: etasFromLegs(trip.depart_at, road.legs).map((d) => d.toISOString()) };
+}

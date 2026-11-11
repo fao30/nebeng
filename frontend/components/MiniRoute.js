@@ -22,20 +22,20 @@ export default function MiniRoute({ points = [], size = 88, from, to }) {
   const hi = from != null ? c.slice(from, (to ?? c.length - 1) + 1) : null;
   return (
     <svg className="mini-route" width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
-      <rect width={size} height={size} rx="14" fill="#ebf1ff" />
+      <rect width={size} height={size} rx="14" fill="#eef0fd" />
       <g stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.9">
         <path d={`M0 ${size * 0.35} L${size} ${size * 0.3}`} />
         <path d={`M${size * 0.62} 0 L${size * 0.58} ${size}`} />
       </g>
-      <path d={d} fill="none" stroke={hi ? '#b8ccfb' : '#155dfc'} strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" />
+      <path d={d} fill="none" stroke={hi ? '#b9bfe6' : '#5157d9'} strokeWidth="2.6" strokeLinejoin="round" strokeLinecap="round" />
       {hi && hi.length > 1 && (
-        <path d={hi.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ')} fill="none" stroke="#155dfc" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
+        <path d={hi.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ')} fill="none" stroke="#5157d9" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
       )}
       {c.slice(1, -1).map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r="2.6" fill="#fff" stroke="#155dfc" strokeWidth="1.6" />
+        <circle key={i} cx={x} cy={y} r="2.6" fill="#fff" stroke="#5157d9" strokeWidth="1.6" />
       ))}
-      <circle cx={c[0][0]} cy={c[0][1]} r="4.5" fill="#155dfc" />
-      <circle cx={c[c.length - 1][0]} cy={c[c.length - 1][1]} r="4.5" fill="#f9ff52" stroke="#0b1736" strokeWidth="2" />
+      <circle cx={c[0][0]} cy={c[0][1]} r="4.5" fill="#26337a" />
+      <circle cx={c[c.length - 1][0]} cy={c[c.length - 1][1]} r="4.5" fill="#33b5c9" />
     </svg>
   );
 }

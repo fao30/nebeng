@@ -54,6 +54,7 @@ func main() {
 	mux.HandleFunc("POST /api/trips", api.auth(api.createTrip))
 	mux.HandleFunc("GET /api/trips/{id}", api.h(api.getTrip))
 	mux.HandleFunc("POST /api/trips/{id}/status", api.auth(api.tripStatus))
+	mux.HandleFunc("POST /api/trips/{id}/route", api.auth(api.saveTripRoute))
 	mux.HandleFunc("POST /api/trips/{id}/bookings", api.auth(api.createBooking))
 	mux.HandleFunc("GET /api/trips/{id}/share", api.auth(api.shareLink))
 	mux.HandleFunc("POST /api/trips/{id}/location", api.auth(api.postLocation))

@@ -2,6 +2,7 @@ package main
 
 import (
 	"math"
+	"net/http"
 	"time"
 )
 
@@ -211,4 +212,42 @@ func normalizeTrip(t *Trip) {
 		sum += p
 	}
 	t.PricePerSeat = sum
+}
+
+// saveTripRoute lets the app attach measured road legs to a trip that has none
+// yet (trips created before road routing). The first viewer who can route the
+// trip fills it in for everyone. Values must be plausible for the trip's points.
+func (a *API) saveTripRoute(w http.ResponseWriter, r *http.Request, uid string) error {
+	var in tripInput
+	if err := readJSON(r, &in); err != nil {
+		return err
+	}
+	s := a.store
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	t := s.Trips[r.PathValue("id")]
+	if t == nil {
+		return errf(404, "trip tidak ditemukan")
+	}
+	route := t.Route()
+	nseg := len(route) - 1
+	if len(t.LegMinutes) == nseg && t.DriverID != uid {
+		writeJSON(w, 200, map[string]any{"saved": false})
+		return nil
+	}
+	cleanRouting(&in, nseg)
+	if in.LegKm == nil {
+		return errf(400, "data rute tidak lengkap")
+	}
+	for i := 0; i < nseg; i++ {
+		straight := HaversineKm(route[i], route[i+1])
+		minPerKm := in.LegMinutes[i] / in.LegKm[i]
+		if in.LegKm[i] < straight*0.9 || in.LegKm[i] > straight*4+3 || minPerKm < 0.35 || minPerKm > 8 {
+			return errf(400, "data rute tidak masuk akal")
+		}
+	}
+	t.LegKm, t.LegMinutes, t.RouteSrc, t.Path = in.LegKm, in.LegMinutes, in.RouteSrc, in.Path
+	s.Changed()
+	writeJSON(w, 200, map[string]any{"saved": true, "etas": etas(t)})
+	return nil
 }

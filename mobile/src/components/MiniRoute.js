@@ -21,16 +21,16 @@ export default function MiniRoute({ points = [], size = 80, from, to }) {
   const hi = from != null ? c.slice(from, (to ?? c.length - 1) + 1) : null;
   return (
     <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <Rect width={size} height={size} rx={13} fill="#EBF1FF" />
+      <Rect width={size} height={size} rx={13} fill="#EEF0FD" />
       <Path d={`M0 ${size * 0.35} L${size} ${size * 0.3}`} stroke="#FFFFFF" strokeWidth={5} strokeLinecap="round" />
       <Path d={`M${size * 0.62} 0 L${size * 0.58} ${size}`} stroke="#FFFFFF" strokeWidth={5} strokeLinecap="round" />
-      <Path d={line(c)} fill="none" stroke={hi ? '#B8CCFB' : '#155DFC'} strokeWidth={2.6} strokeLinejoin="round" strokeLinecap="round" />
-      {hi && hi.length > 1 && <Path d={line(hi)} fill="none" stroke="#155DFC" strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" />}
+      <Path d={line(c)} fill="none" stroke={hi ? '#B9BFE6' : '#5157D9'} strokeWidth={2.6} strokeLinejoin="round" strokeLinecap="round" />
+      {hi && hi.length > 1 && <Path d={line(hi)} fill="none" stroke="#5157D9" strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" />}
       {c.slice(1, -1).map(([x, y], i) => (
-        <Circle key={i} cx={x} cy={y} r={2.6} fill="#FFFFFF" stroke="#155DFC" strokeWidth={1.6} />
+        <Circle key={i} cx={x} cy={y} r={2.6} fill="#FFFFFF" stroke="#5157D9" strokeWidth={1.6} />
       ))}
-      <Circle cx={c[0][0]} cy={c[0][1]} r={4.5} fill="#155DFC" />
-      <Circle cx={c[c.length - 1][0]} cy={c[c.length - 1][1]} r={4.5} fill="#F9FF52" stroke="#0B1736" strokeWidth={2} />
+      <Circle cx={c[0][0]} cy={c[0][1]} r={4.5} fill="#26337A" />
+      <Circle cx={c[c.length - 1][0]} cy={c[c.length - 1][1]} r={4.5} fill="#33B5C9" />
     </Svg>
   );
 }

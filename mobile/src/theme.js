@@ -1,24 +1,23 @@
 import { StyleSheet } from 'react-native';
 
-// Numpang palette "Electric Blue + Neon Yellow". `teal*` names are kept and now mean the yellow accent;
-// yellow never carries white text and gets an ink outline on light surfaces.
+// Design E "Biru Peta": navy primary, indigo brand, teal for destinations and live.
 export const colors = {
-  ink: '#0B1736',
-  ink2: '#3A4566',
-  muted: '#646E8F',
-  line: '#E2E7F5',
-  line2: '#EFF3FD',
-  canvas: '#F5F7FF',
+  ink: '#1C2452',
+  ink2: '#4A5280',
+  muted: '#6A7299',
+  line: '#E6E9F4',
+  line2: '#F3F4FA',
+  canvas: '#F5F6FB',
   surface: '#FFFFFF',
-  primary: '#155DFC',
-  primary600: '#0F47CF',
-  primary50: '#EBF1FF',
-  primary100: '#D5E2FF',
-  indigo: '#0B1736',
-  teal: '#F9FF52',
-  tealInk: '#155DFC',
-  teal50: '#FBFFC2',
-  map: '#E8EEFC',
+  primary: '#26337A',
+  primary600: '#1A2459',
+  primary50: '#EEF0FD',
+  primary100: '#DDE1F7',
+  indigo: '#5157D9',
+  teal: '#33B5C9',
+  tealInk: '#0E6A78',
+  teal50: '#E9F8FA',
+  map: '#ECEEF7',
   mint: '#0B7A55',
   mint50: '#E6F7F2',
   amber: '#8A5300',
@@ -31,7 +30,7 @@ export const colors = {
 export const radius = { sm: 12, md: 16, lg: 22 };
 
 export const shadow = {
-  shadowColor: '#155DFC',
+  shadowColor: '#26337A',
   shadowOpacity: 0.08,
   shadowRadius: 16,
   shadowOffset: { width: 0, height: 6 },

@@ -74,7 +74,7 @@ export default function BookingCard({ booking: b, role, onChange, navigation, sh
           {b.pickup_at && <Text style={[t.body, t.strong, t.tnum]}>{fmtTime(b.pickup_at)}</Text>}
         </Row>
         <Row gap={8}>
-          <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.teal, borderWidth: 2, borderColor: colors.ink }} />
+          <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.teal }} />
           <Text style={[t.small, { flex: 1 }]} numberOfLines={2}>
             {b.dropoff.label}
           </Text>

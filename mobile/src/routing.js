@@ -2,6 +2,7 @@
 // so a trip made on either shows the same route and leg times.
 import { useEffect, useState } from 'react';
 import { haversine } from './format';
+import { api } from './api';
 
 const TRAFFIC = { dalam_kota: 1.45, antar_kota: 1.15 };
 const cache = new Map();
@@ -54,19 +55,38 @@ export function useRoute(points, kind) {
 }
 
 /** Saved road data of a trip, or a fresh route for older trips. */
-export function useTripRoad(trip) {
+const savedTrips = new Set();
+
+export function useTripRoad(trip, { onSaved, loggedIn } = {}) {
   const pts = trip ? [trip.origin, ...(trip.stops || []), trip.destination] : [];
   const saved = trip && trip.leg_minutes?.length === pts.length - 1;
   const fresh = useRoute(saved ? [] : pts, trip?.kind);
+  useEffect(() => {
+    if (!trip || saved || !fresh || !loggedIn || savedTrips.has(trip.id) || fresh.legs.length !== pts.length - 1) return;
+    savedTrips.add(trip.id);
+    api(`/trips/${trip.id}/route`, {
+      method: 'POST',
+      body: {
+        leg_km: fresh.legs.map((l) => Math.round(l.km * 10) / 10),
+        leg_minutes: fresh.legs.map((l) => Math.round(l.min * 10) / 10),
+        route_source: fresh.source,
+        path: encodePath(thinPath(fresh.path)),
+      },
+    })
+      .then((r) => r?.saved && onSaved?.())
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trip?.id, saved, fresh, loggedIn]);
   if (!trip) return null;
   if (saved) {
     return {
       source: trip.route_source || 'google',
       path: trip.path ? decodePath(trip.path) : pts,
       legs: trip.leg_minutes.map((min, i) => ({ min, km: trip.leg_km?.[i] || 0 })),
+      saved: true,
     };
   }
-  return fresh;
+  return fresh ? { ...fresh, saved: false } : null;
 }
 
 export function fmtMin(min) {
@@ -130,4 +150,18 @@ export function thinPath(path, max = 600) {
   if (path.length <= max) return path;
   const step = (path.length - 1) / (max - 1);
   return Array.from({ length: max }, (_, i) => path[Math.round(i * step)]);
+}
+
+/** Trip with jam tiba from road legs while the server still has the straight-line estimate. */
+export function withRoadEtas(trip, road) {
+  if (!trip || !road || road.saved) return trip;
+  if (road.legs.length !== (trip.stops || []).length + 1) return trip;
+  const t0 = new Date(trip.depart_at).getTime();
+  let acc = 0;
+  const etas = [new Date(t0).toISOString()];
+  for (const l of road.legs) {
+    acc += l.min;
+    etas.push(new Date(Math.floor((t0 + acc * 60e3) / 300e3) * 300e3).toISOString());
+  }
+  return { ...trip, etas };
 }

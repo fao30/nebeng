@@ -10,7 +10,7 @@ import { useApp } from '../../providers';
 import MapView from '@/components/MapView';
 import RouteTimeline from '@/components/RouteTimeline';
 import RouteSummary from '@/components/RouteSummary';
-import { useTripRoad } from '@/lib/routing';
+import { useTripRoad, withRoadEtas } from '@/lib/routing';
 import Negotiation from '@/components/Negotiation';
 import LivePanel from '@/components/LivePanel';
 import Participants from '@/components/Participants';
@@ -72,15 +72,19 @@ export default function TripPage() {
     return () => clearInterval(t);
   }, [ready, load, user]);
 
+  const road = useTripRoad(trip, { onSaved: load });
+
   if (err) return <Empty icon="info" title="Trip tidak bisa dibuka">{err}</Empty>;
   if (!trip) return <p className="muted">Memuat trip…</p>;
 
+  const shown = withRoadEtas(trip, road);
   const isDriver = user && trip.driver_id === user.id;
   return isDriver ? (
-    <DriverView trip={trip} reload={load} chatId={init.chat} rateId={init.rate} />
+    <DriverView trip={shown} road={road} reload={load} chatId={init.chat} rateId={init.rate} />
   ) : (
     <PassengerView
-      trip={trip}
+      trip={shown}
+      road={road}
       user={user}
       reload={load}
       from={places?.from}
@@ -158,7 +162,7 @@ function DriverCard({ trip }) {
 
 /* ---------- passenger ---------- */
 
-function PassengerView({ trip, user, reload, from, to, setSel, init }) {
+function PassengerView({ trip, road, user, reload, from, to, setSel, init }) {
   const mine = trip.my_bookings || [];
   const active = mine.find((b) => b.status === 'negotiating' || b.status === 'accepted');
   const accepted = active?.status === 'accepted';
@@ -167,7 +171,6 @@ function PassengerView({ trip, user, reload, from, to, setSel, init }) {
   const live = useLiveStream(accepted ? shareToken : '');
   const broadcast = useBroadcastLocation(trip.id, sharing && accepted && trip.status !== 'completed');
   const q = trip.quote;
-  const road = useTripRoad(trip);
 
   useEffect(() => {
     if (accepted && trip.status !== 'completed' && trip.status !== 'cancelled') {
@@ -463,7 +466,7 @@ function BookingPanel({ trip, from, to, setSel, init, onDone }) {
 
 /* ---------- driver ---------- */
 
-function DriverView({ trip, reload, chatId, rateId }) {
+function DriverView({ trip, road, reload, chatId, rateId }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [sharing, setSharing] = useState(false);
@@ -506,7 +509,6 @@ function DriverView({ trip, reload, chatId, rateId }) {
   }
 
   const route = routeOf(trip);
-  const road = useTripRoad(trip);
   const bookings = trip.bookings || [];
   const accepted = bookings.filter((b) => b.status === 'accepted');
   const pending = bookings.filter((b) => b.status === 'negotiating');

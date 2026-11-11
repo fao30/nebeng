@@ -41,7 +41,7 @@ export default function TripMap({ trip, live = [], highlight, height = 220, path
             coordinate={coords[i]}
             title={p.label}
             description={p.note || undefined}
-            pinColor={highlight && (i === highlight[0] || i === highlight[1]) ? colors.primary : i === 0 || i === pts.length - 1 ? colors.ink : colors.amber}
+            pinColor={highlight && (i === highlight[0] || i === highlight[1]) ? colors.primary : i === 0 || i === pts.length - 1 ? '#7a5bd9' : colors.amber}
           />
         ))}
         {live.map((p) => (

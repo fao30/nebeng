@@ -11,7 +11,7 @@ import { RouteTimeline, SectionTitle } from '../components/TripBits';
 import BookingCard from '../components/BookingCard';
 import TripMap from '../components/TripMap';
 import RouteLegs from '../components/RouteLegs';
-import { useTripRoad } from '../routing';
+import { useTripRoad, withRoadEtas } from '../routing';
 import KycNotice from '../components/KycNotice';
 import { watchPosition } from '../geo';
 import { identityOK, useApp, useLiveRefresh } from '../state';
@@ -265,7 +265,7 @@ export default function Trip({ route, navigation }) {
   }, [load]);
   useLiveRefresh(load, { tripId: id });
   const live = useLive(trip?.share_token);
-  const road = useTripRoad(trip);
+  const road = useTripRoad(trip, { onSaved: load, loggedIn: !!user });
 
   useEffect(() => {
     if (trip) navigation.setOptions({ title: `${shortPlace(trip.origin)} → ${shortPlace(trip.destination)}` });
@@ -321,7 +321,7 @@ export default function Trip({ route, navigation }) {
         <Card>
           <Person user={trip.driver} rating="driver" sub={`${trip.vehicle || 'Kendaraan'}${trip.plate ? ` · ${trip.plate}` : ''}`} size={46} />
           {!trip.plate && !isDriver && <Text style={t.xs}>Pelat nomor dan nama lengkap pemilik mobil terlihat setelah pesanan Anda terkonfirmasi.</Text>}
-          <RouteTimeline trip={trip} from={isDriver ? null : q?.pickup_index} to={isDriver ? null : q?.dropoff_index} />
+          <RouteTimeline trip={withRoadEtas(trip, road)} from={isDriver ? null : q?.pickup_index} to={isDriver ? null : q?.dropoff_index} />
           {trip.notes ? <Text style={t.small}>Catatan: {trip.notes}</Text> : null}
         </Card>
 
