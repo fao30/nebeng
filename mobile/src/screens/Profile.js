@@ -31,7 +31,7 @@ export default function Profile({ navigation }) {
   }
   const [idLabel, idTone] = KYC[user.identity_status || ''];
   const [carLabel, carTone] = KYC[user.vehicle_status || ''];
-  const avg = (sum, n) => (n ? (sum / n).toFixed(1) : '–');
+  const avg = (sum, n) => (n ? (sum / n).toFixed(1) : '-');
 
   return (
     <Screen>

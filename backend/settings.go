@@ -28,11 +28,11 @@ func defaultSettings() *Settings {
 func (c *Settings) valid() error {
 	switch {
 	case c.PricePerKm < 0 || c.PricePerKm > 100000:
-		return errf(400, "harga per km harus 0–100.000")
+		return errf(400, "harga per km harus 0-100.000")
 	case c.MinSegmentPrice < 0 || c.MinSegmentPrice > 10_000_000:
 		return errf(400, "harga minimum per ruas tidak valid")
 	case c.RoadFactor < 1 || c.RoadFactor > 3:
-		return errf(400, "faktor jalan harus 1–3")
+		return errf(400, "faktor jalan harus 1-3")
 	case c.MinPerKmIntra <= 0 || c.MinPerKmIntra > 30 || c.MinPerKmInter <= 0 || c.MinPerKmInter > 30:
 		return errf(400, "menit per km harus lebih dari 0 dan maksimal 30")
 	}

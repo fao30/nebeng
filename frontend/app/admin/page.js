@@ -114,7 +114,7 @@ function Settings() {
             </div>
           </div>
           <p className="xs muted">
-            Contoh: {km} km ≈ Jakarta–Bandung lewat tol. Pemilik mobil tetap bisa mengubah harga tiap ruas; angka ini hanya saran awal.
+            Contoh: {km} km ≈ Jakarta-Bandung lewat tol. Pemilik mobil tetap bisa mengubah harga tiap ruas; angka ini hanya saran awal.
           </p>
         </div>
       </aside>

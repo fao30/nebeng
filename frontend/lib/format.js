@@ -108,8 +108,8 @@ export function estimateEtas(points, departISO, kind, cfg = DEFAULT_SETTINGS) {
 
 export const timeBuckets = [
   { id: 'subuh', label: 'Sebelum 06.00', icon: 'moon', test: (h) => h < 6 },
-  { id: 'pagi', label: '06.00 – 12.00', icon: 'sunrise', test: (h) => h >= 6 && h < 12 },
-  { id: 'siang', label: '12.00 – 18.00', icon: 'sun', test: (h) => h >= 12 && h < 18 },
+  { id: 'pagi', label: '06.00 - 12.00', icon: 'sunrise', test: (h) => h >= 6 && h < 12 },
+  { id: 'siang', label: '12.00 - 18.00', icon: 'sun', test: (h) => h >= 12 && h < 18 },
   { id: 'malam', label: 'Setelah 18.00', icon: 'sunset', test: (h) => h >= 18 },
 ];
 

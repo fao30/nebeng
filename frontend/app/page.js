@@ -35,7 +35,7 @@ function HeroMap() {
           <text x="20" y="152">Jl. Ahmad Yani</text>
           <text x="420" y="314">Jl. Raya Bekasi</text>
           <text x="250" y="420" transform="rotate(-45 250 420)">
-            Tol Jakarta–Cikampek
+            Tol Jakarta-Cikampek
           </text>
         </g>
         <path d="M80 500 L200 470 L205 300 L330 305 L405 300 L410 145 L500 120" stroke="#26337a" strokeWidth="7" fill="none" strokeLinejoin="round" strokeLinecap="round" />

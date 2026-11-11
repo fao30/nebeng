@@ -679,7 +679,7 @@ func (a *API) createTrip(w http.ResponseWriter, r *http.Request, uid string) err
 		return errf(400, "waktu berangkat harus di masa depan")
 	}
 	if in.Seats < 1 || in.Seats > 8 {
-		return errf(400, "maksimal penumpang 1–8 orang")
+		return errf(400, "maksimal penumpang 1-8 orang")
 	}
 	if len(in.Stops) > 10 {
 		return errf(400, "maksimal 10 titik stop")
@@ -695,7 +695,7 @@ func (a *API) createTrip(w http.ResponseWriter, r *http.Request, uid string) err
 	if !in.Luggage {
 		in.MaxLuggage = 0
 	} else if in.MaxLuggage < 1 || in.MaxLuggage > 20 {
-		return errf(400, "jumlah koper 1–20")
+		return errf(400, "jumlah koper 1-20")
 	}
 	if in.PricePerSeat < 0 {
 		return errf(400, "harga tidak valid")

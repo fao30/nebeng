@@ -60,8 +60,8 @@ Logika inti mengikuti aplikasi bibig (React Native), dibawa ke web.
 
 | Email | Peran contoh |
 |---|---|
-| budi@demo.id, rina@demo.id | driver (sudah punya trip Jakarta–Bandung, Bogor–Jakarta, Sukabumi–Bogor, dll.) |
-| sari@demo.id, andi@demo.id | penumpang (Sari sudah terkonfirmasi di trip Monas–KM 97 + chat, Andi sedang nego trip Semanggi) |
+| budi@demo.id, rina@demo.id | driver (sudah punya trip Jakarta-Bandung, Bogor-Jakarta, Sukabumi-Bogor, dll.) |
+| sari@demo.id, andi@demo.id | penumpang (Sari sudah terkonfirmasi di trip Monas-KM 97 + chat, Andi sedang nego trip Semanggi) |
 
 Password semua akun demo: `demo123`. Matikan dengan `SEED_DEMO=false`.
 

@@ -14,7 +14,7 @@ export const vehicleOK = (u) => identityOK(u) && u?.vehicle_status === 'approved
 
 /**
  * Shrink a photo before upload: max 1600 px on the long side, JPEG 85 %.
- * Keeps ID text readable while sending ~200–400 KB instead of 5 MB.
+ * Keeps ID text readable while sending ~200-400 KB instead of 5 MB.
  */
 export async function compressImage(file, max = 1600) {
   const url = URL.createObjectURL(file);
