@@ -282,5 +282,17 @@ export function withRoadEtas(trip, road) {
   if (!trip || !road || road.saved || road.source === 'estimate') return trip;
   const n = (trip.stops || []).length + 1;
   if (road.legs.length !== n) return trip;
-  return { ...trip, etas: etasFromLegs(trip.depart_at, road.legs).map((d) => d.toISOString()) };
+  const etas = etasFromLegs(trip.depart_at, road.legs).map((d) => d.toISOString());
+  // Time at a fractional route position (e.g. 1.4 = 40% of the way from point 1 to 2).
+  const at = (pos) => {
+    if (pos == null || Number.isNaN(pos)) return null;
+    const i = Math.max(0, Math.min(etas.length - 1, Math.floor(pos)));
+    const j = Math.min(etas.length - 1, i + 1);
+    const a = new Date(etas[i]).getTime();
+    const b = new Date(etas[j]).getTime();
+    return new Date(a + (b - a) * Math.min(1, Math.max(0, pos - i))).toISOString();
+  };
+  const q = trip.quote;
+  const quote = q ? { ...q, pickup_at: at(q.from_pos) || q.pickup_at, dropoff_at: at(q.to_pos) || q.dropoff_at } : q;
+  return { ...trip, etas, quote };
 }
