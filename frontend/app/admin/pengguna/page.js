@@ -12,7 +12,7 @@ const stars = (avg, n) =>
       ★ {avg.toFixed(1)} <span className="muted">({n})</span>
     </span>
   ) : (
-    <span className="muted">—</span>
+    <span className="muted">-</span>
   );
 
 export default function AdminUsers() {
@@ -94,10 +94,10 @@ export default function AdminUsers() {
                   </div>
                 </td>
                 <td>
-                  <span className="tnum">{u.phone || '—'}</span>
+                  <span className="tnum">{u.phone || '-'}</span>
                   <span className="sub">{u.email}</span>
                 </td>
-                <td>{u.car_model ? `${u.car_model} ${u.car_plate}` : <span className="muted">—</span>}</td>
+                <td>{u.car_model ? `${u.car_model} ${u.car_plate}` : <span className="muted">-</span>}</td>
                 <td>{stars(u.driver_rating, u.driver_ratings)}</td>
                 <td>{stars(u.passenger_rating, u.passenger_ratings)}</td>
                 <td className="num">{u.trips_as_driver}</td>

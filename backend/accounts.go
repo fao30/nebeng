@@ -6,7 +6,7 @@ import (
 )
 
 // Team accounts that must exist on every start (the free hosting disk is
-// wiped on each restart). Only PBKDF2 hashes are stored here — the repo is
+// wiped on each restart). Only PBKDF2 hashes are stored here - the repo is
 // public, so passwords are never committed. They are all admins and can
 // still use the app as passenger or driver.
 var teamAccounts = []struct{ Name, Email, Salt, Hash string }{

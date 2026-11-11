@@ -1,4 +1,4 @@
-// MapTiler Cloud — map tiles and geocoding (search). https://docs.maptiler.com
+// MapTiler Cloud - map tiles and geocoding (search). https://docs.maptiler.com
 // Set NEXT_PUBLIC_MAPTILER_KEY (and restrict it to your domain in the
 // MapTiler dashboard). Optional NEXT_PUBLIC_MAPTILER_STYLE (default streets-v4).
 

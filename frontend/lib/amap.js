@@ -1,5 +1,5 @@
 'use client';
-// AMap (Gaode) international Maps Platform — https://mapsplatform.opnavi.com
+// AMap (Gaode) international Maps Platform - https://mapsplatform.opnavi.com
 // Configure with NEXT_PUBLIC_AMAP_KEY, NEXT_PUBLIC_AMAP_SECURITY_CODE and
 // optionally NEXT_PUBLIC_AMAP_REGION ("sg" default, or "de").
 // Without a key the app falls back to OpenStreetMap (Leaflet).

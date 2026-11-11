@@ -43,7 +43,7 @@ function readRecent() {
 }
 
 // Remember the last route (searched first next time) and the 3 most recent
-// distinct routes (shown as shortcuts) — e.g. a daily Tambun → MT Haryono commute.
+// distinct routes (shown as shortcuts) - e.g. a daily Tambun → MT Haryono commute.
 function saveLast(q) {
   if (!q.from && !q.to) return;
   const r = { from: q.from || null, to: q.to || null, seats: q.seats || 1 };

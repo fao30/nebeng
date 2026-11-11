@@ -1,10 +1,10 @@
-# Nebeng — aplikasi berbagi tumpangan
+# Nebeng - aplikasi berbagi tumpangan
 
 Web app car sharing ala BlaBlaCar: satu akun bisa menjadi **penumpang** dan **driver** (ganti mode di bar atas),
 trip dalam kota maupun antar kota berbasis titik jemput/antar di peta, negosiasi harga, dan live location sharing.
 
-- `backend/` — API Go (hanya standard library, Go 1.24+). Penyimpanan in-memory + snapshot file JSON.
-- `frontend/` — Next.js 15 (App Router, JavaScript). Peta Leaflet + OpenStreetMap, pencarian alamat via Nominatim.
+- `backend/` - API Go (hanya standard library, Go 1.24+). Penyimpanan in-memory + snapshot file JSON.
+- `frontend/` - Next.js 15 (App Router, JavaScript). Peta Leaflet + OpenStreetMap, pencarian alamat via Nominatim.
 
 ## Fitur
 
@@ -40,7 +40,7 @@ Logika inti mengikuti aplikasi bibig (React Native), dibawa ke web.
 - Chat per pesanan antara driver dan penumpang (selama negosiasi atau terkonfirmasi), real-time lewat
   Server-Sent Events: pesan dan perubahan tawaran langsung muncul di layar lawan bicara.
 
-**Panel admin (CRM)** — `/admin`, login dengan akun tim (lihat bawah)
+**Panel admin (CRM)** - `/admin`, login dengan akun tim (lihat bawah)
 - Ringkasan: pengguna, trip aktif, pesanan, nilai transaksi, permintaan terbuka, jumlah chat.
 - Tarif & waktu tempuh: harga saran per km, harga minimum per ruas, menit per km (dalam kota / antar kota),
   faktor jarak jalan. Langsung dipakai untuk harga saran dan perkiraan jam di seluruh aplikasi.
@@ -89,16 +89,16 @@ Catatan: GPS browser hanya jalan di `https://` atau `localhost`. Untuk tes live 
 
 Urutan penyedia (otomatis, dengan cadangan bila gagal):
 
-0. **Google Maps Platform** — `NEXT_PUBLIC_GOOGLE_MAPS_KEY` (+ opsional `NEXT_PUBLIC_GOOGLE_MAP_ID`).
+0. **Google Maps Platform** - `NEXT_PUBLIC_GOOGLE_MAPS_KEY` (+ opsional `NEXT_PUBLIC_GOOGLE_MAP_ID`).
    Peta Google Maps + pencarian **Places API (New) Autocomplete** dengan session token (koordinat diambil
    hanya saat alamat dipilih) + Geocoding API untuk klik di peta. Aktifkan ketiga API itu dan billing di
    Google Cloud, batasi key ke domain Anda (HTTP referrers) dan ke tiga API tersebut. Sesuai ketentuan Google,
    hasil Places hanya ditampilkan di peta Google, jadi bila key diisi, peta juga memakai Google.
-1. **MapTiler** — `NEXT_PUBLIC_MAPTILER_KEY`. Tile peta di Leaflet + Geocoding API untuk kolom titik jemput/antar
+1. **MapTiler** - `NEXT_PUBLIC_MAPTILER_KEY`. Tile peta di Leaflet + Geocoding API untuk kolom titik jemput/antar
    (dibatasi ke Indonesia, diurutkan dekat lokasi). Jika tile gagal dimuat, peta beralih ke OpenStreetMap.
-2. **AMap** ([mapsplatform.opnavi.com](https://mapsplatform.opnavi.com)) — `NEXT_PUBLIC_AMAP_KEY`,
+2. **AMap** ([mapsplatform.opnavi.com](https://mapsplatform.opnavi.com)) - `NEXT_PUBLIC_AMAP_KEY`,
    `NEXT_PUBLIC_AMAP_SECURITY_CODE`, `NEXT_PUBLIC_AMAP_REGION` (`sg`/`de`). Dipakai hanya bila MapTiler tidak diisi.
-3. **OpenStreetMap + Nominatim** — tanpa key.
+3. **OpenStreetMap + Nominatim** - tanpa key.
 
 Pencarian memakai `useDebounce` (350 ms): request baru dikirim setelah berhenti mengetik, request lama
 dibatalkan (AbortController), dan hasil disimpan di cache.
