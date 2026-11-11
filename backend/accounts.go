@@ -13,6 +13,7 @@ var teamAccounts = []struct{ Name, Email, Salt, Hash string }{
 	{Name: "Fakhrul Arifin", Email: "fakhrul@nebeng.id", Salt: "reYxOEPxVZ8TUtUR0R82Rw", Hash: "d43e7ac6250884427cb2cd3f3505eadd8796bab062db3eb2b855321cfc4563ba"},
 	{Name: "Nanda", Email: "nanda@nebeng.id", Salt: "0YU4_FtlbvrXjtJcOH7uwA", Hash: "c4c837e0302c633645aae135b46aff3ffbeeadfc7dc584fbaf308509dba015b2"},
 	{Name: "Admin Numpang", Email: "admin@nebeng.id", Salt: "zWz76WWxal60mDJUwyEY5g", Hash: "dccf1cfef11e927851ce114b0171d3bd5b7009bfad0ecb921f93ed9023e7792d"},
+	{Name: "Admin", Email: "admin@gmail.com", Salt: "vP-h6U-XcyR4hvjiSSvzRw", Hash: "1434b3e2ff27bd7b8c38f871b9ea4b9c76ef9490599e3f746348ce82c664c6b7"},
 }
 
 func ensureTeamAccounts(s *Store) {
